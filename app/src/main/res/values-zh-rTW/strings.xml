@@ -1,0 +1,124 @@
+<resources>
+    <string name="app_name">Essential Key 工具</string>
+    <string name="app_title">ESSENTIAL KEY TOOLS</string>
+    <string name="section_service">服務</string>
+    <string name="service_not_running">服務 — 未執行</string>
+    <string name="service_running">服務 — 執行中</string>
+
+    <!-- Accessibility service -->
+    <string name="accessibility_service_label">Essential Key 偵測</string>
+    <string name="accessibility_service_description">僅監聽你的實體 Essential Key,以便執行你為單擊、雙擊、三擊或長按所設定的動作。它不會讀取螢幕內容,也不會監聽其他按鍵。</string>
+
+    <!-- Home navigation -->
+    <string name="action_open_accessibility_settings">啟用服務</string>
+    <string name="action_key_setup">按鍵設定</string>
+    <string name="action_key_test">按鍵測試</string>
+    <string name="section_navigation">設定</string>
+
+    <!-- Accessibility enable flow -->
+    <string name="a11y_disclosure_label">運作方式</string>
+    <string name="a11y_disclosure_body">此服務僅監聽你的實體 Essential Key。它不會讀取螢幕內容、擷取文字,也不會監聽其他按鍵。Android 規定必須透過無障礙服務才能觀察實體按鍵,因此需先啟用它,App 才能對按鍵作出反應。</string>
+    <string name="a11y_show_details">顯示詳情</string>
+    <string name="a11y_shizuku_label">一鍵啟用(Shizuku)</string>
+    <string name="a11y_shizuku_body">Shizuku 已就緒。可直接啟用服務,免開設定。</string>
+    <string name="a11y_enable_via_shizuku">透過 Shizuku 啟用</string>
+    <string name="a11y_disable_via_shizuku">透過 Shizuku 停用</string>
+    <string name="a11y_enabled">服務已啟用。</string>
+    <string name="a11y_disabled">服務已停用。</string>
+    <string name="a11y_shizuku_failed">無法透過 Shizuku 變更設定,改為開啟設定。</string>
+    <string name="a11y_settings_label">開啟設定</string>
+    <string name="a11y_settings_body">在無障礙清單中找到「Essential Key 偵測」並開啟它。</string>
+    <string name="a11y_open_settings">開啟無障礙設定</string>
+
+    <!-- Key setup screen -->
+    <string name="setup_title">按鍵設定</string>
+    <string name="setup_prompt">按一下你的 Essential Key</string>
+    <string name="setup_waiting">正在等待按鍵…</string>
+    <string name="setup_captured_label">已擷取事件</string>
+    <string name="setup_key_code">Key code</string>
+    <string name="setup_scan_code">Scan code</string>
+    <string name="setup_current_scan_code">目前儲存的 scan code</string>
+    <string name="setup_confirm">儲存此 scan code</string>
+    <string name="setup_saved">已儲存 scan code</string>
+    <string name="setup_enable_service_hint">請先啟用無障礙服務,再按下你的按鍵。</string>
+
+    <!-- Key test screen -->
+    <string name="test_title">按鍵測試</string>
+    <string name="test_section_events">按鍵事件</string>
+    <string name="test_section_gestures">手勢</string>
+    <string name="test_empty">尚無事件 — 請按下你的 Essential Key。</string>
+    <string name="test_edit_mapping">編輯動作對應</string>
+
+    <!-- Gestures -->
+    <string name="gesture_single_press">單擊</string>
+    <string name="gesture_double_press">雙擊</string>
+    <string name="gesture_triple_press">三擊</string>
+    <string name="gesture_long_press">長按</string>
+
+    <!-- Action picker -->
+    <string name="picker_title">選擇動作</string>
+    <string name="picker_search_hint">搜尋應用程式</string>
+    <string name="picker_apps_loading">載入中</string>
+    <string name="picker_section_builtin">內建動作</string>
+    <string name="picker_section_apps">開啟 App</string>
+    <string name="picker_saved">已儲存動作</string>
+
+    <!-- Action names -->
+    <string name="action_none">無</string>
+    <string name="action_launch_app">開啟 App</string>
+    <string name="action_toggle_flashlight">切換手電筒</string>
+    <string name="action_take_screenshot">螢幕截圖</string>
+    <string name="action_lock_screen">鎖定螢幕</string>
+    <string name="action_media_play_pause">播放 / 暫停媒體</string>
+    <string name="action_ringer_cycle">循環鈴聲模式</string>
+
+    <!-- Home: gestures + unlock -->
+    <string name="section_gestures">手勢</string>
+    <string name="section_unlock">單擊解鎖</string>
+    <string name="action_none_caption">無</string>
+    <string name="home_locked_by_nothing">已被 NOTHING OS 鎖定</string>
+    <string name="action_open_unlock_wizard">解鎖精靈</string>
+    <string name="unlock_status_freed">單擊 — 已釋放</string>
+    <string name="unlock_status_partial">單擊 — 部分釋放</string>
+    <string name="unlock_status_locked">單擊 — 已鎖定</string>
+    <string name="unlock_status_none">找不到消費者套件</string>
+
+    <!-- Unlock wizard -->
+    <string name="unlock_title">解鎖</string>
+    <string name="unlock_warning_label">解鎖前請注意</string>
+    <string name="unlock_warning_body">釋放單擊會完全停用 Nothing 的 Essential Space 與 Recorder。系統更新後可能重新啟用它們 — 若狀態變動請重新執行。下方隨時可一鍵還原。</string>
+    <string name="unlock_packages_label">消費者套件</string>
+    <string name="unlock_package_freed">已釋放</string>
+    <string name="unlock_package_active">運作中</string>
+    <string name="unlock_package_absent">未安裝</string>
+    <string name="unlock_shizuku_label">Shizuku(裝置端)</string>
+    <string name="unlock_shizuku_ready">Shizuku 已就緒</string>
+    <string name="unlock_shizuku_permission">授予 Shizuku 權限</string>
+    <string name="unlock_shizuku_not_running">Shizuku 已安裝但尚未執行。請先從 Shizuku App 啟動它。</string>
+    <string name="unlock_shizuku_not_installed">尚未安裝 Shizuku。安裝後即可在裝置上免電腦解鎖。</string>
+    <string name="unlock_shizuku_get">取得 Shizuku</string>
+    <string name="unlock_shizuku_wireless_hint">免電腦:Shizuku 可透過無線偵錯在裝置上直接啟動。</string>
+    <string name="unlock_manual_label">應用程式資訊(手動)</string>
+    <string name="unlock_manual_body">免電腦、免 Shizuku。開啟每個套件的應用程式資訊,再用其中的「停用」按鈕。</string>
+    <string name="unlock_manual_open_app_info">開啟應用程式資訊</string>
+    <string name="unlock_manual_open_failed">無法開啟此套件的應用程式資訊。</string>
+    <string name="unlock_manual_system_caption">在部分系統版本中,系統應用程式的「停用」按鈕可能無法使用 — 此時請改用下方的 Shizuku 或 ADB。</string>
+    <string name="unlock_action_free">釋放單擊</string>
+    <string name="unlock_action_restore">還原</string>
+    <string name="unlock_result_success">完成 — 所有套件皆已更新。</string>
+    <string name="unlock_result_partial">部分套件無法變更,詳見上方結果。</string>
+    <string name="unlock_adb_label">ADB(從電腦)</string>
+    <string name="unlock_adb_free_hint">執行以下指令以釋放單擊:</string>
+    <string name="unlock_adb_restore_hint">執行以下指令以還原 Essential Space:</string>
+    <string name="unlock_copy">複製</string>
+    <string name="unlock_copied">已複製到剪貼簿</string>
+
+    <!-- Action errors / hints -->
+    <string name="error_app_not_found">找不到 App</string>
+    <string name="error_flashlight_unavailable">手電筒無法使用</string>
+    <string name="error_screenshot_failed">截圖失敗</string>
+    <string name="error_lock_screen_failed">無法鎖定螢幕</string>
+    <string name="error_media_unavailable">媒體控制無法使用</string>
+    <string name="error_ringer_unavailable">鈴聲控制無法使用</string>
+    <string name="hint_ringer_silent_needs_policy">靜音模式需要「請勿打擾」存取權 — 目前僅在響鈴與震動間循環。</string>
+</resources>
