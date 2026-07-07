@@ -73,5 +73,7 @@ JVM unit tests and has no Android dependency, so it is verified without a device
 
 ## Background
 
-The interception mechanism, package-disable approach, and design tokens are documented in
-[`docs/RESEARCH.md`](docs/RESEARCH.md).
+The interception mechanism builds on community findings: the Essential Key is unmapped in the
+public keylayout files (hence `KEYCODE_UNKNOWN`), Nothing OS launches Essential Space from system
+policy, and disabling the consumer packages frees the single press for accessibility-based
+remapping.
