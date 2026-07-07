@@ -25,6 +25,8 @@
     <string name="a11y_disable_via_shizuku">透過 Shizuku 停用</string>
     <string name="a11y_enabled">服務已啟用。</string>
     <string name="a11y_disabled">服務已停用。</string>
+    <string name="a11y_enabling">正在啟用…</string>
+    <string name="a11y_disabling">正在停用…</string>
     <string name="a11y_shizuku_failed">無法透過 Shizuku 變更設定,改為開啟設定。</string>
     <string name="a11y_settings_label">開啟設定</string>
     <string name="a11y_settings_body">在無障礙清單中找到「Essential Key 偵測」並開啟它。</string>

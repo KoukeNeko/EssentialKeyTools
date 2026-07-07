@@ -20,6 +20,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -56,6 +57,7 @@ import dev.koukeneko.essentialkeytools.unlock.ShizukuGate
 import dev.koukeneko.essentialkeytools.unlock.UnlockStatus
 import dev.koukeneko.essentialkeytools.unlock.UnlockerFactory
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -70,6 +72,12 @@ private val NAV_BUTTON_GAP = 12.dp
 private val STATUS_TO_ACTION_GAP = 16.dp
 private val DISCLOSURE_GAP = 12.dp
 private val ENABLE_PATH_GAP = 16.dp
+private val PROGRESS_HINT_GAP = 12.dp
+
+// The OS starts/stops the AccessibilityService asynchronously after the secure-settings write, so a
+// single immediate re-read of isRunning can race the transition. Poll until it settles or we give up.
+private const val SERVICE_STATE_POLL_INTERVAL_MS = 100L
+private const val SERVICE_STATE_POLL_TIMEOUT_MS = 3000L
 
 /**
  * The main control panel. Surfaces live service and single-press-unlock status, one card per
@@ -89,7 +97,7 @@ fun HomeScreen(
     val context = LocalContext.current
     val repository = remember { SettingsRepository.getInstance(context) }
     val actionMap by repository.gestureActionMap.collectAsState(initial = GestureActionMap.EMPTY)
-    val serviceRunning = rememberServiceRunningState()
+    val serviceRunningState = rememberServiceRunningState()
     val unlockStatus = rememberUnlockStatus()
 
     // Padding sits inside the scroll so the black canvas extends under the bars and the last card
@@ -107,7 +115,7 @@ fun HomeScreen(
         )
         Spacer(modifier = Modifier.height(TITLE_TO_CONTENT_GAP))
 
-        ServiceStatusCard(serviceRunning = serviceRunning)
+        ServiceStatusCard(serviceRunningState = serviceRunningState)
         Spacer(modifier = Modifier.height(CARD_GAP))
         UnlockStatusCard(status = unlockStatus, onUnlockWizard = onUnlockWizard)
         Spacer(modifier = Modifier.height(CARD_GAP))
@@ -122,13 +130,14 @@ fun HomeScreen(
 }
 
 /**
- * Reflects [EssentialKeyDetectionService.isRunning], refreshed each time the screen resumes so the
- * status is current after the user returns from the system accessibility settings.
+ * Holds [EssentialKeyDetectionService.isRunning] as a hoisted state so the in-app Shizuku toggle can
+ * push the new value the moment its command lands, and refreshes it each time the screen resumes so
+ * the status is current after the user returns from the system accessibility settings.
  */
 @Composable
-private fun rememberServiceRunningState(): Boolean {
-    var running by remember { mutableStateOf(EssentialKeyDetectionService.isRunning) }
-    OnResume { running = EssentialKeyDetectionService.isRunning }
+private fun rememberServiceRunningState(): MutableState<Boolean> {
+    val running = remember { mutableStateOf(EssentialKeyDetectionService.isRunning) }
+    OnResume { running.value = EssentialKeyDetectionService.isRunning }
     return running
 }
 
@@ -157,11 +166,14 @@ private fun OnResume(onResume: () -> Unit) {
 }
 
 @Composable
-private fun ServiceStatusCard(serviceRunning: Boolean) {
+private fun ServiceStatusCard(serviceRunningState: MutableState<Boolean>) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     val controller = remember { UnlockerFactory.createServiceController() }
-    // Read once per composition; the whole home screen recomposes on resume, so this stays current.
+    val serviceRunning = serviceRunningState.value
+    // A toggle is mid-flight: buttons are disabled so a double-tap can't fire the command twice.
+    var toggleInFlight by remember { mutableStateOf(false) }
+    // Re-key on the running flag so the Shizuku-readiness check re-evaluates after the state flips.
     val shizukuReady = remember(serviceRunning) {
         ShizukuGate.availability() == ShizukuAvailability.READY
     }
@@ -183,13 +195,27 @@ private fun ServiceStatusCard(serviceRunning: Boolean) {
         if (serviceRunning) {
             EnabledServiceControls(
                 shizukuReady = shizukuReady,
-                onDisable = { toggleServiceViaShizuku(context, coroutineScope, controller, enable = false) }
+                toggleInFlight = toggleInFlight,
+                onDisable = {
+                    toggleServiceViaShizuku(
+                        context, coroutineScope, controller,
+                        enable = false,
+                        runningState = serviceRunningState,
+                        onInFlightChange = { toggleInFlight = it }
+                    )
+                }
             )
         } else {
             DisabledServiceControls(
                 shizukuReady = shizukuReady,
+                toggleInFlight = toggleInFlight,
                 onEnableViaShizuku = {
-                    toggleServiceViaShizuku(context, coroutineScope, controller, enable = true)
+                    toggleServiceViaShizuku(
+                        context, coroutineScope, controller,
+                        enable = true,
+                        runningState = serviceRunningState,
+                        onInFlightChange = { toggleInFlight = it }
+                    )
                 },
                 onOpenSettings = { openAccessibilitySettings(context) }
             )
@@ -205,6 +231,7 @@ private fun ServiceStatusCard(serviceRunning: Boolean) {
 @Composable
 private fun DisabledServiceControls(
     shizukuReady: Boolean,
+    toggleInFlight: Boolean,
     onEnableViaShizuku: () -> Unit,
     onOpenSettings: () -> Unit
 ) {
@@ -221,8 +248,12 @@ private fun DisabledServiceControls(
         NothingButton(
             text = stringResource(R.string.a11y_enable_via_shizuku),
             onClick = onEnableViaShizuku,
+            enabled = !toggleInFlight,
             modifier = Modifier.fillMaxWidth()
         )
+        if (toggleInFlight) {
+            ToggleProgressHint(text = stringResource(R.string.a11y_enabling))
+        }
         Spacer(modifier = Modifier.height(DISCLOSURE_GAP))
         NothingButton(
             text = stringResource(R.string.a11y_open_settings),
@@ -248,7 +279,11 @@ private fun DisabledServiceControls(
 
 /** The service is on: offer a symmetric one-tap disable via Shizuku only when Shizuku is ready. */
 @Composable
-private fun EnabledServiceControls(shizukuReady: Boolean, onDisable: () -> Unit) {
+private fun EnabledServiceControls(
+    shizukuReady: Boolean,
+    toggleInFlight: Boolean,
+    onDisable: () -> Unit
+) {
     if (!shizukuReady) {
         return
     }
@@ -257,7 +292,22 @@ private fun EnabledServiceControls(shizukuReady: Boolean, onDisable: () -> Unit)
         text = stringResource(R.string.a11y_disable_via_shizuku),
         onClick = onDisable,
         outlined = true,
+        enabled = !toggleInFlight,
         modifier = Modifier.fillMaxWidth()
+    )
+    if (toggleInFlight) {
+        ToggleProgressHint(text = stringResource(R.string.a11y_disabling))
+    }
+}
+
+/** A subtle inline hint shown while a Shizuku toggle command is running. */
+@Composable
+private fun ToggleProgressHint(text: String) {
+    Spacer(modifier = Modifier.height(PROGRESS_HINT_GAP))
+    Text(
+        text = text,
+        style = MaterialTheme.typography.labelSmall,
+        color = MaterialTheme.colorScheme.onSurfaceVariant
     )
 }
 
@@ -424,32 +474,58 @@ private const val HIGHLIGHT_FRAGMENT_ARG_KEY = ":settings:fragment_args_key"
 private const val HIGHLIGHT_SHOW_FRAGMENT_ARGS = ":settings:show_fragment_args"
 
 /**
- * Runs the enable/disable through Shizuku off the main thread. On any non-success outcome (shell
- * unavailable or a command failure) it falls back to the settings path with a toast, so the user is
- * never left without a way forward. The card refreshes on resume, reflecting the new state.
+ * Runs the enable/disable through Shizuku off the main thread, then flips the hoisted running state
+ * so the card re-renders into the opposite set of controls without waiting for a resume. On any
+ * non-success outcome (shell unavailable or a command failure) it falls back to the settings path
+ * with a toast, so the user is never left without a way forward.
  */
 private fun toggleServiceViaShizuku(
     context: Context,
     coroutineScope: kotlinx.coroutines.CoroutineScope,
     controller: dev.koukeneko.essentialkeytools.unlock.AccessibilityServiceController,
-    enable: Boolean
+    enable: Boolean,
+    runningState: MutableState<Boolean>,
+    onInFlightChange: (Boolean) -> Unit
 ) {
+    onInFlightChange(true)
     coroutineScope.launch {
-        val result = withContext(Dispatchers.IO) {
-            if (enable) controller.enable() else controller.disable()
-        }
-        when (result) {
-            ServiceToggleResult.SUCCEEDED -> {
-                val message = if (enable) R.string.a11y_enabled else R.string.a11y_disabled
-                Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+        try {
+            val result = withContext(Dispatchers.IO) {
+                if (enable) controller.enable() else controller.disable()
             }
-            ServiceToggleResult.SHELL_UNAVAILABLE,
-            ServiceToggleResult.COMMAND_FAILED -> {
-                Toast.makeText(context, R.string.a11y_shizuku_failed, Toast.LENGTH_LONG).show()
-                openAccessibilitySettings(context)
+            when (result) {
+                ServiceToggleResult.SUCCEEDED -> {
+                    val message = if (enable) R.string.a11y_enabled else R.string.a11y_disabled
+                    Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+                    // The OS toggles the service asynchronously; poll until isRunning catches up.
+                    runningState.value = awaitServiceState(expectedRunning = enable)
+                }
+                ServiceToggleResult.SHELL_UNAVAILABLE,
+                ServiceToggleResult.COMMAND_FAILED -> {
+                    Toast.makeText(context, R.string.a11y_shizuku_failed, Toast.LENGTH_LONG).show()
+                    openAccessibilitySettings(context)
+                }
             }
+        } finally {
+            onInFlightChange(false)
         }
     }
+}
+
+/**
+ * Polls [EssentialKeyDetectionService.isRunning] until it matches [expectedRunning] or the timeout
+ * elapses, returning whatever the flag reads at that point so the card shows the true current state
+ * even if the transition never lands.
+ */
+private suspend fun awaitServiceState(expectedRunning: Boolean): Boolean {
+    var elapsedMs = 0L
+    while (EssentialKeyDetectionService.isRunning != expectedRunning &&
+        elapsedMs < SERVICE_STATE_POLL_TIMEOUT_MS
+    ) {
+        delay(SERVICE_STATE_POLL_INTERVAL_MS)
+        elapsedMs += SERVICE_STATE_POLL_INTERVAL_MS
+    }
+    return EssentialKeyDetectionService.isRunning
 }
 
 /**

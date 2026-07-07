@@ -25,6 +25,8 @@
     <string name="a11y_disable_via_shizuku">Disable via Shizuku</string>
     <string name="a11y_enabled">Service enabled.</string>
     <string name="a11y_disabled">Service disabled.</string>
+    <string name="a11y_enabling">Enabling…</string>
+    <string name="a11y_disabling">Disabling…</string>
     <string name="a11y_shizuku_failed">Could not change the setting via Shizuku. Opening Settings instead.</string>
     <string name="a11y_settings_label">Open Settings</string>
     <string name="a11y_settings_body">Find "Essential Key detection" in the accessibility list and turn it on.</string>
