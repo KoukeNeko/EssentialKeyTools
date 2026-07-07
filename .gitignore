@@ -16,3 +16,6 @@ local.properties
 
 # Release bundles built locally
 app/release/
+
+# Local research notes, not published
+docs/RESEARCH*.md
