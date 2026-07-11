@@ -47,6 +47,8 @@ import dev.koukeneko.essentialkeytools.service.EssentialKeyDetectionService
 import dev.koukeneko.essentialkeytools.settings.GestureActionMap
 import dev.koukeneko.essentialkeytools.settings.SettingsRepository
 import dev.koukeneko.essentialkeytools.ui.AppLabelResolver
+import dev.koukeneko.essentialkeytools.ui.AppLanguage
+import dev.koukeneko.essentialkeytools.ui.AppLocale
 import dev.koukeneko.essentialkeytools.ui.UiLabels
 import dev.koukeneko.essentialkeytools.ui.screenContentPadding
 import dev.koukeneko.essentialkeytools.ui.components.NothingButton
@@ -137,6 +139,8 @@ fun HomeScreen(
         )
         Spacer(modifier = Modifier.height(CARD_GAP))
         NavigationCard(onKeySetup = onKeySetup, onKeyTest = onKeyTest)
+        Spacer(modifier = Modifier.height(CARD_GAP))
+        LanguageCard()
         Spacer(modifier = Modifier.height(CARD_GAP))
         ContributionCard()
     }
@@ -481,6 +485,40 @@ private fun NavigationCard(onKeySetup: () -> Unit, onKeyTest: () -> Unit) {
             )
         }
     }
+}
+
+/**
+ * In-app language switcher. The active language is the filled option; picking another applies it
+ * through [AppLocale], which triggers a system-driven activity recreation so the whole UI re-renders
+ * in the chosen locale. Reading [AppLocale.current] in a plain remember is enough because that
+ * recreation rebuilds this composition from scratch.
+ */
+@Composable
+private fun LanguageCard() {
+    val context = LocalContext.current
+    val currentLanguage = remember { AppLocale.current(context) }
+    NothingCard(modifier = Modifier.fillMaxWidth()) {
+        NothingSectionLabel(text = stringResource(R.string.section_language))
+        Spacer(modifier = Modifier.height(LABEL_GAP))
+        Column(verticalArrangement = Arrangement.spacedBy(NAV_BUTTON_GAP)) {
+            for (language in AppLanguage.entries) {
+                val selected = language == currentLanguage
+                NothingButton(
+                    text = languageLabel(language),
+                    onClick = { if (!selected) AppLocale.apply(context, language) },
+                    outlined = !selected,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun languageLabel(language: AppLanguage): String = when (language) {
+    AppLanguage.SYSTEM -> stringResource(R.string.language_system)
+    AppLanguage.ENGLISH -> stringResource(R.string.language_english)
+    AppLanguage.TRADITIONAL_CHINESE -> stringResource(R.string.language_traditional_chinese)
 }
 
 /**

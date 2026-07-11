@@ -124,6 +124,10 @@
     <string name="error_ringer_unavailable">鈴聲控制無法使用</string>
     <string name="hint_ringer_silent_needs_policy">靜音模式需要「請勿打擾」存取權 — 目前僅在響鈴與震動間循環。</string>
 
+    <!-- Language -->
+    <string name="section_language">語言</string>
+    <string name="language_system">跟隨系統</string>
+
     <!-- Contribution -->
     <string name="section_contribute">貢獻</string>
     <string name="contribute_repository_caption">在 GitHub 檢視原始碼</string>

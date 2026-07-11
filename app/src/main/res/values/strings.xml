@@ -124,6 +124,12 @@
     <string name="error_ringer_unavailable">Ringer control unavailable</string>
     <string name="hint_ringer_silent_needs_policy">Silent mode needs Do Not Disturb access — cycling ring and vibrate only.</string>
 
+    <!-- Language -->
+    <string name="section_language">Language</string>
+    <string name="language_system">Follow system</string>
+    <string name="language_english" translatable="false">English</string>
+    <string name="language_traditional_chinese" translatable="false">繁體中文</string>
+
     <!-- Contribution -->
     <string name="section_contribute">Contribute</string>
     <string name="contribute_repository_caption">View source on GitHub</string>

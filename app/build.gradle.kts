@@ -35,6 +35,11 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+    androidResources {
+        // Generate the per-app locale config from the values-* folders so the app appears in the
+        // system per-app language settings; the default locale is declared in resources.properties.
+        generateLocaleConfig = true
+    }
     buildFeatures {
         compose = true
     }
