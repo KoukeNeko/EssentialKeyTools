@@ -7,6 +7,16 @@ can observe. Single / double / triple press and long press each get their own ac
 The UI follows the Nothing OS design language: pure-black canvas, flat rounded cards with hairline
 outlines, uppercase monospace section labels, and red used at most once per screen.
 
+## Screenshots
+
+<p align="center">
+  <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/1.png" width="19%" alt="Home" />
+  <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/2.png" width="19%" alt="Action picker" />
+  <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/3.png" width="19%" alt="Unlock wizard" />
+  <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/4.png" width="19%" alt="Key setup" />
+  <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/5.png" width="19%" alt="Key test" />
+</p>
+
 ## Features
 
 - **Four gestures, four actions** — single, double, triple, long press, each mapped independently.
@@ -90,3 +100,7 @@ policy, and disabling the consumer packages frees the single press for accessibi
 remapping.
 
 <img width="1260" height="2800" alt="image" src="https://github.com/user-attachments/assets/5788f456-bb02-4587-9728-f95b157fb832" />
+
+## License
+
+[MIT](LICENSE) © KoukeNeko

@@ -17,6 +17,9 @@ local.properties
 # Release bundles built locally
 app/release/
 
+# Local screenshot/recording sources — the published copies live under fastlane/
+/screenshots/
+
 # Release signing — the keystore and its passwords must never be committed
 /app/keystore/
 /app/keystore.properties

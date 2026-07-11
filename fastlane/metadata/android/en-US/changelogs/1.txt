@@ -1,0 +1,6 @@
+First release.
+
+* Map single / double / triple / long press to independent actions.
+* On-device accessibility-service enable and single-press unlock via Shizuku (no PC).
+* Runtime "learn your key" scan-code capture, key test, and one-tap restore.
+* English and Traditional Chinese, with a shortcut to system per-app language settings.

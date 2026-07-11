@@ -1,0 +1,22 @@
+Remap the Nothing Phone Essential Key to your own actions — no root required.
+
+Single, double, triple, and long press each get their own action: launch an app,
+toggle the flashlight, take a screenshot, lock the screen, play/pause media, or cycle
+the ringer mode.
+
+Features:
+
+* Four gestures, four independent actions.
+* "Learn your key" setup captures the key's scan code at runtime, so it adapts to any
+  model or firmware.
+* One-tap accessibility-service enable via Shizuku, or a guided jump into Settings.
+* Single-press unlock wizard: freeing the single press requires Nothing's Essential
+  Space packages to be disabled — the app does it on-device in one tap via Shizuku
+  (no PC needed), with manual and ADB paths, live per-package status, and one-tap
+  restore. Double, triple, and long press work without this step.
+* Nothing OS design language: pure-black canvas, hairline cards, monospaced labels.
+
+Requires a Nothing phone with the Essential Key, running Android 15 or newer.
+
+The accessibility service listens only for your hardware Essential Key so it can run
+the action you assigned; it does not read screen content or monitor any other key.
