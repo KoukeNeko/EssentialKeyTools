@@ -1,0 +1,43 @@
+name: Build APK
+
+# Mirrors scripts/verify.sh (lint + unit tests + debug assembly) on every push and pull request,
+# then publishes the installable debug APK as a downloadable artifact.
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: build-apk-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      # Match the JBR the project builds with locally (Android Studio ships JDK 21).
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Run quality gate and assemble the debug APK
+        run: ./gradlew lint test assembleDebug --stacktrace
+
+      - name: Upload the debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: essential-key-tools-debug
+          path: app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
