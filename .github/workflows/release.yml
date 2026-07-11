@@ -1,13 +1,18 @@
 name: Release
 
 # On a version tag (e.g. v1.1) build a signed release APK and publish it to a GitHub release.
-# The signing keystore and passwords are injected from repository secrets, so the private key never
-# lives in the repository. See RELEASE_KEYSTORE_BASE64 / RELEASE_STORE_PASSWORD / RELEASE_KEY_PASSWORD
-# / RELEASE_KEY_ALIAS in the repo's Actions secrets.
+# Can also be run manually (workflow_dispatch) against an existing tag to rebuild/replace its APK.
+# The signing keystore and passwords come from repository secrets, so the private key never lives in
+# the repository: RELEASE_KEYSTORE_BASE64 / RELEASE_STORE_PASSWORD / RELEASE_KEY_PASSWORD / RELEASE_KEY_ALIAS.
 on:
   push:
     tags:
       - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Existing tag to build and publish (e.g. v1.0)'
+        required: true
 
 permissions:
   contents: write
@@ -16,8 +21,25 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
-      - name: Check out the repository
+      # Resolve the tag from either the push ref or the manual input, and validate it before it is
+      # used as a git ref or in the shell so a crafted value cannot be interpreted as a command.
+      - name: Resolve the target tag
+        id: resolve
+        env:
+          INPUT_TAG: ${{ github.event.inputs.tag }}
+          REF_NAME: ${{ github.ref_name }}
+        run: |
+          TAG="${INPUT_TAG:-$REF_NAME}"
+          if ! printf '%s' "$TAG" | grep -Eq '^v[0-9A-Za-z._-]+$'; then
+            echo "Refusing to build unexpected tag: $TAG" >&2
+            exit 1
+          fi
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+
+      - name: Check out the tag
         uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.resolve.outputs.tag }}
 
       # Match the JBR the project builds with locally (Android Studio ships JDK 21).
       - name: Set up JDK 21
@@ -54,12 +76,12 @@ jobs:
         if: always()
         run: rm -f app/keystore/release.jks app/keystore.properties
 
-      # Create the release for this tag (or attach to it if it already exists), naming the asset by
-      # tag. TAG comes through env so a crafted tag name cannot be interpreted as a shell command.
+      # Create the release for this tag, or attach to it if it already exists (clobbering the asset).
+      # TAG comes through env so a crafted tag name cannot be interpreted as a shell command.
       - name: Publish the release
         env:
           GH_TOKEN: ${{ github.token }}
-          TAG: ${{ github.ref_name }}
+          TAG: ${{ steps.resolve.outputs.tag }}
         run: |
           ASSET="EssentialKeyTools-${TAG}.apk"
           cp app/build/outputs/apk/release/app-release.apk "$ASSET"
