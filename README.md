@@ -99,8 +99,6 @@ public keylayout files (hence `KEYCODE_UNKNOWN`), Nothing OS launches Essential 
 policy, and disabling the consumer packages frees the single press for accessibility-based
 remapping.
 
-<img width="1260" height="2800" alt="image" src="https://github.com/user-attachments/assets/5788f456-bb02-4587-9728-f95b157fb832" />
-
 ## License
 
 [MIT](LICENSE) © KoukeNeko
