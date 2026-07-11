@@ -126,7 +126,8 @@
 
     <!-- Language -->
     <string name="section_language">語言</string>
-    <string name="language_system">跟隨系統</string>
+    <string name="action_open_language_settings">開啟語言設定</string>
+    <string name="language_settings_unavailable">無法開啟語言設定。</string>
 
     <!-- Contribution -->
     <string name="section_contribute">貢獻</string>

@@ -126,9 +126,8 @@
 
     <!-- Language -->
     <string name="section_language">Language</string>
-    <string name="language_system">Follow system</string>
-    <string name="language_english" translatable="false">English</string>
-    <string name="language_traditional_chinese" translatable="false">繁體中文</string>
+    <string name="action_open_language_settings">Open language settings</string>
+    <string name="language_settings_unavailable">Could not open language settings.</string>
 
     <!-- Contribution -->
     <string name="section_contribute">Contribute</string>

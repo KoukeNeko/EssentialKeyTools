@@ -47,8 +47,6 @@ import dev.koukeneko.essentialkeytools.service.EssentialKeyDetectionService
 import dev.koukeneko.essentialkeytools.settings.GestureActionMap
 import dev.koukeneko.essentialkeytools.settings.SettingsRepository
 import dev.koukeneko.essentialkeytools.ui.AppLabelResolver
-import dev.koukeneko.essentialkeytools.ui.AppLanguage
-import dev.koukeneko.essentialkeytools.ui.AppLocale
 import dev.koukeneko.essentialkeytools.ui.UiLabels
 import dev.koukeneko.essentialkeytools.ui.screenContentPadding
 import dev.koukeneko.essentialkeytools.ui.components.NothingButton
@@ -488,37 +486,48 @@ private fun NavigationCard(onKeySetup: () -> Unit, onKeyTest: () -> Unit) {
 }
 
 /**
- * In-app language switcher. The active language is the filled option; picking another applies it
- * through [AppLocale], which triggers a system-driven activity recreation so the whole UI re-renders
- * in the chosen locale. Reading [AppLocale.current] in a plain remember is enough because that
- * recreation rebuilds this composition from scratch.
+ * Opens this app's per-app language screen in system settings when tapped. The languages offered
+ * there come from the locale config AGP generates from the values-* folders (generateLocaleConfig),
+ * so the list stays in sync with the translations the app actually ships.
  */
 @Composable
 private fun LanguageCard() {
     val context = LocalContext.current
-    val currentLanguage = remember { AppLocale.current(context) }
     NothingCard(modifier = Modifier.fillMaxWidth()) {
         NothingSectionLabel(text = stringResource(R.string.section_language))
         Spacer(modifier = Modifier.height(LABEL_GAP))
-        Column(verticalArrangement = Arrangement.spacedBy(NAV_BUTTON_GAP)) {
-            for (language in AppLanguage.entries) {
-                val selected = language == currentLanguage
-                NothingButton(
-                    text = languageLabel(language),
-                    onClick = { if (!selected) AppLocale.apply(context, language) },
-                    outlined = !selected,
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
-        }
+        NothingButton(
+            text = stringResource(R.string.action_open_language_settings),
+            onClick = { openAppLanguageSettings(context) },
+            outlined = true,
+            modifier = Modifier.fillMaxWidth()
+        )
     }
 }
 
-@Composable
-private fun languageLabel(language: AppLanguage): String = when (language) {
-    AppLanguage.SYSTEM -> stringResource(R.string.language_system)
-    AppLanguage.ENGLISH -> stringResource(R.string.language_english)
-    AppLanguage.TRADITIONAL_CHINESE -> stringResource(R.string.language_traditional_chinese)
+/**
+ * Opens the per-app language screen in system settings (Android 13+). Falls back to the app details
+ * page, then a toast, on OEM builds that do not surface the locale screen directly.
+ */
+private fun openAppLanguageSettings(context: Context) {
+    val packageUri = android.net.Uri.fromParts("package", context.packageName, null)
+    val localeSettings = Intent(Settings.ACTION_APP_LOCALE_SETTINGS, packageUri)
+        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    try {
+        context.startActivity(localeSettings)
+    } catch (error: android.content.ActivityNotFoundException) {
+        openAppDetailsSettings(context, packageUri)
+    }
+}
+
+private fun openAppDetailsSettings(context: Context, packageUri: android.net.Uri) {
+    val details = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, packageUri)
+        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    try {
+        context.startActivity(details)
+    } catch (error: android.content.ActivityNotFoundException) {
+        Toast.makeText(context, R.string.language_settings_unavailable, Toast.LENGTH_LONG).show()
+    }
 }
 
 /**
