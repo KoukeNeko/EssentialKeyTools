@@ -26,6 +26,17 @@ outlines, uppercase monospace section labels, and red used at most once per scre
 - **Live status** — home screen shows whether the accessibility service is running and whether the
   single press is freed, re-checked on resume to catch drift from an OS update.
 
+## Permissions
+
+- **`INTERNET`** — used for one thing only: the home screen's contribution card fetches the
+  repository's contributor list from the public GitHub API
+  (`api.github.com/repos/KoukeNeko/EssentialKeyTools/contributors`). No account, analytics, or
+  tracking is involved. Every other feature works fully offline — if the request fails the card just
+  falls back to the repository link.
+- **Accessibility service** — observes only your hardware Essential Key to run the mapped action; it
+  does not read screen content or monitor any other key (see the in-app disclosure and *Background*
+  below).
+
 ## Setup
 
 1. **Enable the accessibility service** — the home card walks you through it: read the disclosure,

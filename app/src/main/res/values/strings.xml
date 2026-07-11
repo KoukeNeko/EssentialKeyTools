@@ -123,4 +123,12 @@
     <string name="error_media_unavailable">Media control unavailable</string>
     <string name="error_ringer_unavailable">Ringer control unavailable</string>
     <string name="hint_ringer_silent_needs_policy">Silent mode needs Do Not Disturb access — cycling ring and vibrate only.</string>
+
+    <!-- Contribution -->
+    <string name="section_contribute">Contribute</string>
+    <string name="contribute_repository_caption">View source on GitHub</string>
+    <string name="contribute_contributors">Contributors</string>
+    <string name="contribute_contributors_loading">Loading contributors…</string>
+    <string name="contribute_contributors_error">Couldn\'t load contributors</string>
+    <string name="contribute_open_failed">Could not open the link.</string>
 </resources>

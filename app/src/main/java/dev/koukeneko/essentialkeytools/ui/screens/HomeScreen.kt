@@ -23,6 +23,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
@@ -39,6 +40,8 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import dev.koukeneko.essentialkeytools.R
 import dev.koukeneko.essentialkeytools.actions.KeyAction
+import dev.koukeneko.essentialkeytools.contributors.Contributor
+import dev.koukeneko.essentialkeytools.contributors.GitHubContributorsService
 import dev.koukeneko.essentialkeytools.core.KeyGesture
 import dev.koukeneko.essentialkeytools.service.EssentialKeyDetectionService
 import dev.koukeneko.essentialkeytools.settings.GestureActionMap
@@ -73,11 +76,19 @@ private val STATUS_TO_ACTION_GAP = 16.dp
 private val DISCLOSURE_GAP = 12.dp
 private val ENABLE_PATH_GAP = 16.dp
 private val PROGRESS_HINT_GAP = 12.dp
+private val CONTRIBUTOR_SECTION_GAP = 20.dp
 
 // The OS starts/stops the AccessibilityService asynchronously after the secure-settings write, so a
 // single immediate re-read of isRunning can race the transition. Poll until it settles or we give up.
 private const val SERVICE_STATE_POLL_INTERVAL_MS = 100L
 private const val SERVICE_STATE_POLL_TIMEOUT_MS = 3000L
+
+// The repository is a proper noun, not translatable copy, so it lives in code; only the captions
+// rendered around it come from string resources. The contributor list itself is fetched from the
+// GitHub API at runtime by GitHubContributorsService.
+private const val URL_SCHEME_PREFIX = "https://"
+private const val REPOSITORY_DISPLAY_NAME = "KoukeNeko/EssentialKeyTools"
+private const val REPOSITORY_URL = "https://github.com/KoukeNeko/EssentialKeyTools"
 
 /**
  * The main control panel. Surfaces live service and single-press-unlock status, one card per
@@ -126,6 +137,8 @@ fun HomeScreen(
         )
         Spacer(modifier = Modifier.height(CARD_GAP))
         NavigationCard(onKeySetup = onKeySetup, onKeyTest = onKeyTest)
+        Spacer(modifier = Modifier.height(CARD_GAP))
+        ContributionCard()
     }
 }
 
@@ -467,6 +480,126 @@ private fun NavigationCard(onKeySetup: () -> Unit, onKeyTest: () -> Unit) {
                 modifier = Modifier.fillMaxWidth()
             )
         }
+    }
+}
+
+/**
+ * Footer credit: a tappable link to the open-source repository, followed by the contributor list
+ * fetched live from the GitHub API. Each row opens the relevant GitHub page in the browser.
+ */
+@Composable
+private fun ContributionCard() {
+    val context = LocalContext.current
+    val contributorsState = rememberContributorsState()
+    NothingCard(modifier = Modifier.fillMaxWidth()) {
+        NothingSectionLabel(text = stringResource(R.string.section_contribute))
+        Spacer(modifier = Modifier.height(LABEL_GAP))
+        ContributionLinkRow(
+            title = REPOSITORY_DISPLAY_NAME,
+            caption = stringResource(R.string.contribute_repository_caption),
+            onClick = { openUrl(context, REPOSITORY_URL) }
+        )
+        Spacer(modifier = Modifier.height(CONTRIBUTOR_SECTION_GAP))
+        NothingSectionLabel(text = stringResource(R.string.contribute_contributors))
+        Spacer(modifier = Modifier.height(LABEL_GAP))
+        ContributorsSection(
+            state = contributorsState,
+            onOpenProfile = { profileUrl -> openUrl(context, profileUrl) }
+        )
+    }
+}
+
+/** Snapshot of the asynchronous contributor fetch, driving what the contributors section renders. */
+private sealed interface ContributorsUiState {
+    data object Loading : ContributorsUiState
+    data class Loaded(val contributors: List<Contributor>) : ContributorsUiState
+    data object Error : ContributorsUiState
+}
+
+/** Fetches the contributor list once when the card enters composition, off the main thread. */
+@Composable
+private fun rememberContributorsState(): ContributorsUiState {
+    val service = remember { GitHubContributorsService() }
+    return produceState<ContributorsUiState>(ContributorsUiState.Loading, service) {
+        value = service.fetchContributors().fold(
+            onSuccess = { contributors -> ContributorsUiState.Loaded(contributors) },
+            onFailure = { ContributorsUiState.Error }
+        )
+    }.value
+}
+
+/**
+ * Renders the contributor rows once loaded, a muted caption while loading, and the same caption on
+ * failure so an offline device still shows a coherent card with the repository link intact.
+ */
+@Composable
+private fun ContributorsSection(state: ContributorsUiState, onOpenProfile: (String) -> Unit) {
+    when (state) {
+        ContributorsUiState.Loading ->
+            ContributionCaption(text = stringResource(R.string.contribute_contributors_loading))
+        ContributorsUiState.Error ->
+            ContributionCaption(text = stringResource(R.string.contribute_contributors_error))
+        is ContributorsUiState.Loaded ->
+            if (state.contributors.isEmpty()) {
+                ContributionCaption(text = stringResource(R.string.contribute_contributors_error))
+            } else {
+                Column(verticalArrangement = Arrangement.spacedBy(GESTURE_ROW_GAP)) {
+                    for (contributor in state.contributors) {
+                        ContributionLinkRow(
+                            title = contributor.handle,
+                            caption = contributor.profileUrl.removePrefix(URL_SCHEME_PREFIX),
+                            onClick = { onOpenProfile(contributor.profileUrl) }
+                        )
+                    }
+                }
+            }
+    }
+}
+
+/** A single muted caption line used for the loading and error states of the contributor list. */
+@Composable
+private fun ContributionCaption(text: String) {
+    Text(
+        text = text,
+        style = MaterialTheme.typography.labelSmall,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        modifier = Modifier.padding(vertical = GESTURE_ROW_GAP)
+    )
+}
+
+/** A single tappable credit row: a primary name over a muted caption, mirroring the gesture rows. */
+@Composable
+private fun ContributionLinkRow(title: String, caption: String, onClick: () -> Unit) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
+            .padding(vertical = GESTURE_ROW_VERTICAL_PADDING)
+    ) {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.titleLarge,
+            color = MaterialTheme.colorScheme.onBackground
+        )
+        Text(
+            text = caption,
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
+}
+
+/**
+ * Opens an external URL in the user's browser. A device with no browser is the only expected
+ * failure, so it surfaces a toast instead of crashing.
+ */
+private fun openUrl(context: Context, url: String) {
+    val intent = Intent(Intent.ACTION_VIEW, android.net.Uri.parse(url))
+        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    try {
+        context.startActivity(intent)
+    } catch (error: android.content.ActivityNotFoundException) {
+        Toast.makeText(context, R.string.contribute_open_failed, Toast.LENGTH_LONG).show()
     }
 }
 

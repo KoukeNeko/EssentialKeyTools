@@ -2,6 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- The home-screen contribution card fetches the contributor list from the GitHub API. -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <!-- The action picker lists launchable apps, so package visibility must be declared. -->
     <queries>
         <intent>

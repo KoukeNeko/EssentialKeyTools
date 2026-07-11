@@ -123,4 +123,12 @@
     <string name="error_media_unavailable">媒體控制無法使用</string>
     <string name="error_ringer_unavailable">鈴聲控制無法使用</string>
     <string name="hint_ringer_silent_needs_policy">靜音模式需要「請勿打擾」存取權 — 目前僅在響鈴與震動間循環。</string>
+
+    <!-- Contribution -->
+    <string name="section_contribute">貢獻</string>
+    <string name="contribute_repository_caption">在 GitHub 檢視原始碼</string>
+    <string name="contribute_contributors">貢獻者</string>
+    <string name="contribute_contributors_loading">正在載入貢獻者…</string>
+    <string name="contribute_contributors_error">無法載入貢獻者</string>
+    <string name="contribute_open_failed">無法開啟連結。</string>
 </resources>
