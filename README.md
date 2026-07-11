@@ -1,5 +1,16 @@
 # Essential Key Tools
 
+<p align="center">
+  <a href="https://github.com/KoukeNeko/EssentialKeyTools/releases/latest"><img alt="Release" src="https://img.shields.io/github/v/release/KoukeNeko/EssentialKeyTools?style=for-the-badge&logo=github&label=RELEASE&color=2196F3"></a>
+  <a href="https://github.com/KoukeNeko/EssentialKeyTools/releases"><img alt="Downloads" src="https://img.shields.io/github/downloads/KoukeNeko/EssentialKeyTools/total?style=for-the-badge&logo=github&label=DOWNLOADS&color=4CAF50"></a>
+  <a href="https://github.com/KoukeNeko/EssentialKeyTools/actions/workflows/build-apk.yml"><img alt="Build" src="https://img.shields.io/github/actions/workflow/status/KoukeNeko/EssentialKeyTools/build-apk.yml?branch=main&style=for-the-badge&logo=githubactions&logoColor=white&label=BUILD"></a>
+  <img alt="Android 15+" src="https://img.shields.io/badge/ANDROID-15%2B-3DDC84?style=for-the-badge&logo=android&logoColor=white">
+  <img alt="Kotlin" src="https://img.shields.io/badge/KOTLIN-2.2.10-7F52FF?style=for-the-badge&logo=kotlin&logoColor=white">
+  <img alt="Jetpack Compose" src="https://img.shields.io/badge/COMPOSE-4285F4?style=for-the-badge&logo=jetpackcompose&logoColor=white">
+  <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/LICENSE-MIT-4CAF50?style=for-the-badge&logo=github"></a>
+  <a href="https://github.com/KoukeNeko/EssentialKeyTools/stargazers"><img alt="Stars" src="https://img.shields.io/github/stars/KoukeNeko/EssentialKeyTools?style=for-the-badge&logo=github&label=STARS&color=2196F3"></a>
+</p>
+
 Remap the Nothing Phone **Essential Key** to your own actions — no root required. The hardware key
 enters the input pipeline as `keyCode=0` with Linux `scanCode=250`, which an `AccessibilityService`
 can observe. Single / double / triple press and long press each get their own action.
