@@ -115,6 +115,12 @@ public keylayout files (hence `KEYCODE_UNKNOWN`), Nothing OS launches Essential 
 policy, and disabling the consumer packages frees the single press for accessibility-based
 remapping.
 
+## Support
+
+If Essential Key Tools is useful to you, you can support development:
+
+<a href="https://buymeacoffee.com/doershing"><img alt="Buy Me a Coffee" src="https://img.shields.io/badge/Buy%20Me%20a%20Coffee-doershing-FFDD00?style=for-the-badge&logo=buymeacoffee&logoColor=black"></a>
+
 ## License
 
 [MIT](LICENSE) © KoukeNeko
