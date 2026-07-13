@@ -58,6 +58,9 @@ outlines, uppercase monospace section labels, and red used at most once per scre
   does not read screen content or monitor any other key (see the in-app disclosure and *Background*
   below).
 
+The app collects no personal data and has no analytics, ads, or tracking. See the full
+[Privacy Policy](PRIVACY.md).
+
 ## Setup
 
 1. **Enable the accessibility service** — the home card walks you through it: read the disclosure,
