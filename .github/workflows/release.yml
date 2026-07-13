@@ -115,8 +115,10 @@ jobs:
           fi
 
       # Continuous deployment to Google Play. Runs only when the Play service-account secret is set,
-      # so tagging still works before CD is configured. Uploads to the PRODUCTION track (full
-      # rollout) — the Play "what's new" text comes from distribution/whatsnew/whatsnew-<lang>.
+      # so tagging still works before CD is configured. Uploads to the PRODUCTION track as a DRAFT:
+      # the app has not had its first production release yet, so Google only allows draft — publish
+      # that first release once in the Play Console, then switch status to "completed" for hands-off
+      # full rollouts. The Play "what's new" text comes from distribution/whatsnew/whatsnew-<lang>.
       - name: Check for Play credentials
         id: play
         env:
@@ -137,5 +139,5 @@ jobs:
           packageName: dev.koukeneko.essentialkeytools
           releaseFiles: app/build/outputs/bundle/release/app-release.aab
           track: production
-          status: completed
+          status: draft
           whatsNewDirectory: distribution/whatsnew
