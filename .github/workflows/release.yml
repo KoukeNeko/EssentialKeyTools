@@ -24,18 +24,29 @@ jobs:
     steps:
       # Resolve the tag from either the push ref or the manual input, and validate it before it is
       # used as a git ref or in the shell so a crafted value cannot be interpreted as a command.
-      - name: Resolve the target tag
+      - name: Resolve the tag and derive the version
         id: resolve
         env:
           INPUT_TAG: ${{ github.event.inputs.tag }}
           REF_NAME: ${{ github.ref_name }}
         run: |
           TAG="${INPUT_TAG:-$REF_NAME}"
-          if ! printf '%s' "$TAG" | grep -Eq '^v[0-9A-Za-z._-]+$'; then
-            echo "Refusing to build unexpected tag: $TAG" >&2
+          # Require v<major>.<minor>[.<patch>] (optionally a -prerelease suffix) so the version code
+          # can be derived, and to reject anything unexpected before using it as a ref / in the shell.
+          if ! printf '%s' "$TAG" | grep -Eq '^v[0-9]+\.[0-9]+(\.[0-9]+)?(-[0-9A-Za-z.-]+)?$'; then
+            echo "Tag must look like v1.2 or v1.2.3: $TAG" >&2
             exit 1
           fi
-          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          VERSION_NAME="${TAG#v}"
+          CORE="${VERSION_NAME%%-*}"
+          IFS='.' read -r MAJ MIN PAT <<< "$CORE"
+          VERSION_CODE=$(( 10#$MAJ * 10000 + 10#${MIN:-0} * 100 + 10#${PAT:-0} ))
+          {
+            echo "tag=$TAG"
+            echo "version_name=$VERSION_NAME"
+            echo "version_code=$VERSION_CODE"
+          } >> "$GITHUB_OUTPUT"
+          echo "Resolved $TAG -> versionName=$VERSION_NAME versionCode=$VERSION_CODE"
 
       - name: Check out the tag
         uses: actions/checkout@v4
@@ -71,7 +82,10 @@ jobs:
           } > app/keystore.properties
 
       - name: Build the signed release APK and AAB
-        run: ./gradlew assembleRelease bundleRelease --stacktrace
+        env:
+          VERSION_NAME: ${{ steps.resolve.outputs.version_name }}
+          VERSION_CODE: ${{ steps.resolve.outputs.version_code }}
+        run: ./gradlew assembleRelease bundleRelease -PversionName="$VERSION_NAME" -PversionCode="$VERSION_CODE" --stacktrace
 
       - name: Remove signing material from the workspace
         if: always()

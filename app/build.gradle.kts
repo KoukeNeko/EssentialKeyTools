@@ -28,8 +28,10 @@ android {
         applicationId = "dev.koukeneko.essentialkeytools"
         minSdk = 35
         targetSdk = 36
-        versionCode = 2
-        versionName = "1.0.1"
+        // CI derives these from the release tag and passes them as -PversionCode / -PversionName
+        // (see release.yml); the literals below are only the fallback for local builds.
+        versionCode = (project.findProperty("versionCode") as String?)?.toInt() ?: 2
+        versionName = (project.findProperty("versionName") as String?) ?: "1.0.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
