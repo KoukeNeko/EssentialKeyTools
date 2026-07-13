@@ -102,11 +102,16 @@ jobs:
           AAB="EssentialKeyTools-${TAG}.aab"
           cp app/build/outputs/apk/release/app-release.apk "$APK"
           cp app/build/outputs/bundle/release/app-release.aab "$AAB"
+          # Release body = the human "what's new" (same text as the Play listing) + a changelog link.
+          # --generate-notes is not used: with direct-to-main commits and no PRs it produces nothing.
+          NOTES="$(mktemp)"
+          cat distribution/whatsnew/whatsnew-en-US > "$NOTES"
+          printf '\n\n**Full changelog:** %s/%s/commits/%s\n' "$GITHUB_SERVER_URL" "$GITHUB_REPOSITORY" "$TAG" >> "$NOTES"
           if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             gh release upload "$TAG" "$APK" "$AAB" --repo "$GITHUB_REPOSITORY" --clobber
           else
             gh release create "$TAG" "$APK" "$AAB" --repo "$GITHUB_REPOSITORY" \
-              --title "Essential Key Tools ${TAG}" --generate-notes
+              --title "Essential Key Tools ${TAG}" --notes-file "$NOTES"
           fi
 
       # Continuous deployment to Google Play. Runs only when the Play service-account secret is set,
