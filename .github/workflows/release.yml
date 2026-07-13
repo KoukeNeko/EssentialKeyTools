@@ -115,9 +115,8 @@ jobs:
           fi
 
       # Continuous deployment to Google Play. Runs only when the Play service-account secret is set,
-      # so tagging still works before CD is configured. Uploads to the internal testing track — the
-      # Play "what's new" text comes from distribution/whatsnew/whatsnew-<lang>; promote to
-      # production manually in the Play Console.
+      # so tagging still works before CD is configured. Uploads to the PRODUCTION track (full
+      # rollout) — the Play "what's new" text comes from distribution/whatsnew/whatsnew-<lang>.
       - name: Check for Play credentials
         id: play
         env:
@@ -130,13 +129,13 @@ jobs:
             echo "PLAY_SERVICE_ACCOUNT_JSON not set — skipping Play upload."
           fi
 
-      - name: Upload the AAB to Google Play (internal track)
+      - name: Upload the AAB to Google Play (production track)
         if: steps.play.outputs.ready == 'true'
         uses: r0adkll/upload-google-play@v1
         with:
           serviceAccountJsonPlainText: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
           packageName: dev.koukeneko.essentialkeytools
           releaseFiles: app/build/outputs/bundle/release/app-release.aab
-          track: internal
+          track: production
           status: completed
           whatsNewDirectory: distribution/whatsnew
