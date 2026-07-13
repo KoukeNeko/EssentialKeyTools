@@ -19,3 +19,13 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# Keep line numbers in stack traces (deobfuscate crashes via the uploaded mapping file), but hide
+# the original source file names.
+-keepattributes SourceFile,LineNumberTable
+-renamesourcefileattribute SourceFile
+
+# Shizuku: the app talks to Shizuku over its binder/AIDL (ShizukuProvider, API, and the AIDL stubs).
+# Keep its classes so R8 does not rename/strip anything the privileged IPC relies on.
+-keep class rikka.shizuku.** { *; }
+-keep class moe.shizuku.** { *; }
