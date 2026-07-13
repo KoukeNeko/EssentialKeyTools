@@ -1,4 +1,6 @@
-# Essential Key Tools
+<p align="center">
+  <img src="logo/github_social_preview.png" alt="Essential Key Tools" width="100%">
+</p>
 
 <p align="center">
   <a href="https://github.com/KoukeNeko/EssentialKeyTools/releases/latest"><img alt="Release" src="https://img.shields.io/github/v/release/KoukeNeko/EssentialKeyTools?style=for-the-badge&logo=github&label=RELEASE&color=2196F3"></a>
