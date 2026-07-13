@@ -1,7 +1,8 @@
 name: Release
 
-# On a version tag (e.g. v1.1) build a signed release APK and publish it to a GitHub release.
-# Can also be run manually (workflow_dispatch) against an existing tag to rebuild/replace its APK.
+# On a version tag (e.g. v1.1) build a signed release APK + AAB and publish them to a GitHub release.
+# The AAB is the Google Play upload bundle; the APK is for sideloading / F-Droid / IzzyOnDroid.
+# Can also be run manually (workflow_dispatch) against an existing tag to rebuild/replace its assets.
 # The signing keystore and passwords come from repository secrets, so the private key never lives in
 # the repository: RELEASE_KEYSTORE_BASE64 / RELEASE_STORE_PASSWORD / RELEASE_KEY_PASSWORD / RELEASE_KEY_ALIAS.
 on:
@@ -69,8 +70,8 @@ jobs:
             echo "keyPassword=$KEY_PASSWORD"
           } > app/keystore.properties
 
-      - name: Build the signed release APK
-        run: ./gradlew assembleRelease --stacktrace
+      - name: Build the signed release APK and AAB
+        run: ./gradlew assembleRelease bundleRelease --stacktrace
 
       - name: Remove signing material from the workspace
         if: always()
@@ -83,11 +84,13 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ steps.resolve.outputs.tag }}
         run: |
-          ASSET="EssentialKeyTools-${TAG}.apk"
-          cp app/build/outputs/apk/release/app-release.apk "$ASSET"
+          APK="EssentialKeyTools-${TAG}.apk"
+          AAB="EssentialKeyTools-${TAG}.aab"
+          cp app/build/outputs/apk/release/app-release.apk "$APK"
+          cp app/build/outputs/bundle/release/app-release.aab "$AAB"
           if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
-            gh release upload "$TAG" "$ASSET" --repo "$GITHUB_REPOSITORY" --clobber
+            gh release upload "$TAG" "$APK" "$AAB" --repo "$GITHUB_REPOSITORY" --clobber
           else
-            gh release create "$TAG" "$ASSET" --repo "$GITHUB_REPOSITORY" \
+            gh release create "$TAG" "$APK" "$AAB" --repo "$GITHUB_REPOSITORY" \
               --title "Essential Key Tools ${TAG}" --generate-notes
           fi
