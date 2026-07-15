@@ -7,7 +7,7 @@
 
     <!-- Accessibility service -->
     <string name="accessibility_service_label">Essential Key detection</string>
-    <string name="accessibility_service_description">Listens only for your hardware Essential Key so it can run the action you assigned to a single, double, triple, or long press. It does not read screen content or monitor any other key.</string>
+    <string name="accessibility_service_description">Processes hardware key events on your device to recognize Essential Key gestures and run your assigned actions. It does not read screen content or typed text.</string>
 
     <!-- Home navigation -->
     <string name="action_open_accessibility_settings">Enable service</string>
@@ -16,9 +16,11 @@
     <string name="section_navigation">Setup</string>
 
     <!-- Accessibility enable flow -->
-    <string name="a11y_disclosure_label">How this works</string>
-    <string name="a11y_disclosure_body">This service listens only for your hardware Essential Key. It does not read screen content, capture text, or monitor any other key. Android requires an accessibility service to observe hardware keys, so it must be enabled before the app can react to a press.</string>
-    <string name="a11y_show_details">Show details</string>
+    <string name="a11y_disclosure_title">Accessibility service data access</string>
+    <string name="a11y_disclosure_body">Essential Key Tools uses the Android accessibility service to access hardware key events, including key codes, scan codes, press or release state, and event time. Even when the app is not open, this data is processed only on your device to recognize single, double, triple, and long presses of the Essential Key and run the action you assigned. If you choose Screenshot or Lock screen, the service also invokes the corresponding Android accessibility system action. Only the scan code you confirm in Key Setup is stored on your device. The app does not read screen content or typed text, keep a history of hardware key events, or transmit or share this data.</string>
+    <string name="a11y_disclosure_decline">Decline</string>
+    <string name="a11y_disclosure_agree_enable">Agree and enable</string>
+    <string name="a11y_disclosure_agree_open_settings">Agree and open settings</string>
     <string name="a11y_shizuku_label">One-tap enable (Shizuku)</string>
     <string name="a11y_shizuku_body">Shizuku is ready. Enable the service directly, without opening Settings.</string>
     <string name="a11y_enable_via_shizuku">Enable via Shizuku</string>

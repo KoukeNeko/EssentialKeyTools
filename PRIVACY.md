@@ -21,13 +21,16 @@ data never leaves your device and is removed when you uninstall the app.
 
 ## Accessibility Service
 
-The app uses an Accessibility Service for one purpose: to detect a press of your hardware Essential
-Key so it can run the action you assigned to it. The service receives hardware key events only in
-order to recognise your Essential Key; it:
+The app uses an Accessibility Service to receive hardware key events, including the key code, scan
+code, press or release state, and event time. These events are processed on your device, including
+when the app is not open, to recognise a single, double, triple, or long press of your hardware
+Essential Key and run the action you assigned. If you assign Screenshot or Lock screen, the service
+also invokes the corresponding Android accessibility system action. The service:
 
-- ignores every other key and input;
-- does not read screen content, capture text, or log or store keystrokes;
-- transmits nothing off your device.
+- does not read screen content or typed text;
+- does not keep a history or log of hardware key events;
+- stores only the scan code you explicitly confirm in Key Setup, as described above;
+- does not transmit or share hardware key event data.
 
 Android requires an accessibility service to observe hardware keys, which is why the app needs this
 permission.

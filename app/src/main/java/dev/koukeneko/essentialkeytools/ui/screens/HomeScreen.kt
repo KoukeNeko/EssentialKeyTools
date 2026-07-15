@@ -28,6 +28,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -49,6 +50,7 @@ import dev.koukeneko.essentialkeytools.settings.SettingsRepository
 import dev.koukeneko.essentialkeytools.ui.AppLabelResolver
 import dev.koukeneko.essentialkeytools.ui.UiLabels
 import dev.koukeneko.essentialkeytools.ui.screenContentPadding
+import dev.koukeneko.essentialkeytools.ui.components.AccessibilityDisclosureDialog
 import dev.koukeneko.essentialkeytools.ui.components.NothingButton
 import dev.koukeneko.essentialkeytools.ui.components.NothingCard
 import dev.koukeneko.essentialkeytools.ui.components.NothingSectionLabel
@@ -74,7 +76,6 @@ private val GESTURE_ROW_VERTICAL_PADDING = 14.dp
 private val NAV_BUTTON_GAP = 12.dp
 private val STATUS_TO_ACTION_GAP = 16.dp
 private val DISCLOSURE_GAP = 12.dp
-private val ENABLE_PATH_GAP = 16.dp
 private val PROGRESS_HINT_GAP = 12.dp
 private val CONTRIBUTOR_SECTION_GAP = 20.dp
 
@@ -89,6 +90,12 @@ private const val SERVICE_STATE_POLL_TIMEOUT_MS = 3000L
 private const val URL_SCHEME_PREFIX = "https://"
 private const val REPOSITORY_DISPLAY_NAME = "KoukeNeko/EssentialKeyTools"
 private const val REPOSITORY_URL = "https://github.com/KoukeNeko/EssentialKeyTools"
+
+/** The enable operation held until the user affirmatively consents in the disclosure dialog. */
+internal enum class AccessibilityEnablePath {
+    SHIZUKU,
+    SYSTEM_SETTINGS
+}
 
 /**
  * The main control panel. Surfaces live service and single-press-unlock status, one card per
@@ -188,6 +195,9 @@ private fun ServiceStatusCard(serviceRunningState: MutableState<Boolean>) {
     val serviceRunning = serviceRunningState.value
     // A toggle is mid-flight: buttons are disabled so a double-tap can't fire the command twice.
     var toggleInFlight by remember { mutableStateOf(false) }
+    var pendingEnablePath by rememberSaveable {
+        mutableStateOf<AccessibilityEnablePath?>(null)
+    }
     // Re-key on the running flag so the Shizuku-readiness check re-evaluates after the state flips.
     val shizukuReady = remember(serviceRunning) {
         ShizukuGate.availability() == ShizukuAvailability.READY
@@ -224,36 +234,57 @@ private fun ServiceStatusCard(serviceRunningState: MutableState<Boolean>) {
             DisabledServiceControls(
                 shizukuReady = shizukuReady,
                 toggleInFlight = toggleInFlight,
-                onEnableViaShizuku = {
-                    toggleServiceViaShizuku(
+                onRequestEnableViaShizuku = {
+                    pendingEnablePath = AccessibilityEnablePath.SHIZUKU
+                },
+                onRequestOpenSettings = {
+                    pendingEnablePath = AccessibilityEnablePath.SYSTEM_SETTINGS
+                }
+            )
+        }
+    }
+
+    val requestedPath = pendingEnablePath
+    if (requestedPath != null) {
+        val confirmButtonTextRes = when (requestedPath) {
+            AccessibilityEnablePath.SHIZUKU -> R.string.a11y_disclosure_agree_enable
+            AccessibilityEnablePath.SYSTEM_SETTINGS -> R.string.a11y_disclosure_agree_open_settings
+        }
+        AccessibilityDisclosureDialog(
+            confirmButtonTextRes = confirmButtonTextRes,
+            onDecline = { pendingEnablePath = null },
+            onConsent = {
+                // Clear the pending operation before dispatch so a double tap cannot repeat it.
+                val consentedPath = pendingEnablePath
+                pendingEnablePath = null
+                when (consentedPath) {
+                    AccessibilityEnablePath.SHIZUKU -> toggleServiceViaShizuku(
                         context, coroutineScope, controller,
                         enable = true,
                         runningState = serviceRunningState,
                         onInFlightChange = { toggleInFlight = it }
                     )
-                },
-                onOpenSettings = { openAccessibilitySettings(context) }
-            )
-        }
+                    AccessibilityEnablePath.SYSTEM_SETTINGS -> openAccessibilitySettings(context)
+                    null -> Unit
+                }
+            }
+        )
     }
 }
 
 /**
- * The service is off: always disclose what it does first, then offer the Shizuku one-tap path (if
- * ready) and the Settings fallback. The disclosure is shown before any enabling path per the
- * accessibility-service disclosure requirement.
+ * The service is off: offer the Shizuku one-tap path (if ready) and the Settings fallback. Each
+ * callback only requests an enable path; [ServiceStatusCard] obtains consent before dispatching it.
  */
 @Composable
 private fun DisabledServiceControls(
     shizukuReady: Boolean,
     toggleInFlight: Boolean,
-    onEnableViaShizuku: () -> Unit,
-    onOpenSettings: () -> Unit
+    onRequestEnableViaShizuku: () -> Unit,
+    onRequestOpenSettings: () -> Unit
 ) {
     Spacer(modifier = Modifier.height(STATUS_TO_ACTION_GAP))
-    ServiceDisclosure()
     if (shizukuReady) {
-        Spacer(modifier = Modifier.height(ENABLE_PATH_GAP))
         Text(
             text = stringResource(R.string.a11y_shizuku_body),
             style = MaterialTheme.typography.bodyMedium,
@@ -262,7 +293,7 @@ private fun DisabledServiceControls(
         Spacer(modifier = Modifier.height(DISCLOSURE_GAP))
         NothingButton(
             text = stringResource(R.string.a11y_enable_via_shizuku),
-            onClick = onEnableViaShizuku,
+            onClick = onRequestEnableViaShizuku,
             enabled = !toggleInFlight,
             modifier = Modifier.fillMaxWidth()
         )
@@ -272,12 +303,11 @@ private fun DisabledServiceControls(
         Spacer(modifier = Modifier.height(DISCLOSURE_GAP))
         NothingButton(
             text = stringResource(R.string.a11y_open_settings),
-            onClick = onOpenSettings,
+            onClick = onRequestOpenSettings,
             outlined = true,
             modifier = Modifier.fillMaxWidth()
         )
     } else {
-        Spacer(modifier = Modifier.height(ENABLE_PATH_GAP))
         Text(
             text = stringResource(R.string.a11y_settings_body),
             style = MaterialTheme.typography.bodyMedium,
@@ -286,7 +316,7 @@ private fun DisabledServiceControls(
         Spacer(modifier = Modifier.height(DISCLOSURE_GAP))
         NothingButton(
             text = stringResource(R.string.action_open_accessibility_settings),
-            onClick = onOpenSettings,
+            onClick = onRequestOpenSettings,
             modifier = Modifier.fillMaxWidth()
         )
     }
@@ -324,33 +354,6 @@ private fun ToggleProgressHint(text: String) {
         style = MaterialTheme.typography.labelSmall,
         color = MaterialTheme.colorScheme.onSurfaceVariant
     )
-}
-
-/** Collapsible "what/why" disclosure of the accessibility service, expanded by tapping the header. */
-@Composable
-private fun ServiceDisclosure() {
-    var expanded by remember { mutableStateOf(false) }
-    Column(modifier = Modifier.fillMaxWidth()) {
-        Text(
-            text = stringResource(
-                if (expanded) R.string.a11y_disclosure_label else R.string.a11y_show_details
-            ),
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable { expanded = !expanded }
-                .padding(vertical = GESTURE_ROW_GAP)
-        )
-        if (expanded) {
-            Spacer(modifier = Modifier.height(DISCLOSURE_GAP))
-            Text(
-                text = stringResource(R.string.a11y_disclosure_body),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
-    }
 }
 
 @Composable

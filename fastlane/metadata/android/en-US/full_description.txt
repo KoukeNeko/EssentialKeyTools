@@ -18,5 +18,12 @@ Features:
 
 Requires a Nothing phone with the Essential Key, running Android 15 or newer.
 
-The accessibility service listens only for your hardware Essential Key so it can run
-the action you assigned; it does not read screen content or monitor any other key.
+Essential Key Tools uses the Android accessibility service to access hardware key events,
+including key codes, scan codes, press or release state, and event time. It processes these
+events on your device, including when the app is not open, to recognize Essential Key gestures
+and run the action you assigned. Screenshot and Lock screen mappings use the corresponding
+Android accessibility system actions.
+
+Only the scan code you confirm in Key Setup is stored on your device. The app does not read
+screen content or typed text, keep a history of hardware key events, or transmit or share this
+data.

@@ -7,7 +7,7 @@
 
     <!-- Accessibility service -->
     <string name="accessibility_service_label">Essential Key 偵測</string>
-    <string name="accessibility_service_description">僅監聽你的實體 Essential Key,以便執行你為單擊、雙擊、三擊或長按所設定的動作。它不會讀取螢幕內容,也不會監聽其他按鍵。</string>
+    <string name="accessibility_service_description">在裝置上處理硬體按鍵事件，以辨識 Essential Key 手勢並執行你指定的動作。它不會讀取螢幕內容或輸入文字。</string>
 
     <!-- Home navigation -->
     <string name="action_open_accessibility_settings">啟用服務</string>
@@ -16,9 +16,11 @@
     <string name="section_navigation">設定</string>
 
     <!-- Accessibility enable flow -->
-    <string name="a11y_disclosure_label">運作方式</string>
-    <string name="a11y_disclosure_body">此服務僅監聽你的實體 Essential Key。它不會讀取螢幕內容、擷取文字,也不會監聽其他按鍵。Android 規定必須透過無障礙服務才能觀察實體按鍵,因此需先啟用它,App 才能對按鍵作出反應。</string>
-    <string name="a11y_show_details">顯示詳情</string>
+    <string name="a11y_disclosure_title">無障礙服務資料存取</string>
+    <string name="a11y_disclosure_body">Essential Key Tools 使用 Android 無障礙服務存取硬體按鍵事件，包括按鍵代碼、掃描碼、按下或放開狀態，以及事件時間。即使 App 未開啟，這些資料也只會在裝置上即時處理，用來辨識 Essential Key 的單擊、雙擊、三擊與長按，並執行你指定的動作。若你選擇「螢幕截圖」或「鎖定畫面」，服務也會呼叫 Android 對應的無障礙系統動作。只有你在「按鍵設定」中確認的掃描碼會儲存在裝置上。App 不會讀取螢幕內容或輸入文字、不會保留硬體按鍵事件紀錄，也不會傳輸或分享這些資料。</string>
+    <string name="a11y_disclosure_decline">不同意</string>
+    <string name="a11y_disclosure_agree_enable">同意並啟用</string>
+    <string name="a11y_disclosure_agree_open_settings">同意並前往設定</string>
     <string name="a11y_shizuku_label">一鍵啟用(Shizuku)</string>
     <string name="a11y_shizuku_body">Shizuku 已就緒。可直接啟用服務,免開設定。</string>
     <string name="a11y_enable_via_shizuku">透過 Shizuku 啟用</string>
