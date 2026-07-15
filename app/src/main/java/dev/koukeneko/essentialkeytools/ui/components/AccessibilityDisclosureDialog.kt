@@ -1,6 +1,5 @@
 package dev.koukeneko.essentialkeytools.ui.components
 
-import androidx.annotation.StringRes
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
@@ -39,7 +38,8 @@ private val DIALOG_CONTENT_PADDING = 24.dp
 private val DIALOG_OUTLINE_WIDTH = 1.dp
 private const val DIALOG_OUTLINE_ALPHA = 0.3f
 private val TITLE_TO_BODY_GAP = 16.dp
-private val BODY_TO_ACTIONS_GAP = 24.dp
+private val BODY_TO_QUESTION_GAP = 16.dp
+private val QUESTION_TO_ACTIONS_GAP = 16.dp
 private val ACTION_GAP = 12.dp
 
 /**
@@ -48,7 +48,6 @@ private val ACTION_GAP = 12.dp
  */
 @Composable
 internal fun AccessibilityDisclosureDialog(
-    @StringRes confirmButtonTextRes: Int,
     onDecline: () -> Unit,
     onConsent: () -> Unit
 ) {
@@ -116,7 +115,13 @@ internal fun AccessibilityDisclosureDialog(
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
-                        Spacer(modifier = Modifier.height(BODY_TO_ACTIONS_GAP))
+                        Spacer(modifier = Modifier.height(BODY_TO_QUESTION_GAP))
+                        Text(
+                            text = stringResource(R.string.a11y_disclosure_question),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                        Spacer(modifier = Modifier.height(QUESTION_TO_ACTIONS_GAP))
                         NothingButton(
                             text = stringResource(R.string.a11y_disclosure_decline),
                             onClick = { decideOnce(onDecline) },
@@ -125,7 +130,7 @@ internal fun AccessibilityDisclosureDialog(
                         )
                         Spacer(modifier = Modifier.height(ACTION_GAP))
                         NothingButton(
-                            text = stringResource(confirmButtonTextRes),
+                            text = stringResource(R.string.a11y_disclosure_agree),
                             onClick = { decideOnce(onConsent) },
                             modifier = Modifier.fillMaxWidth()
                         )
@@ -141,7 +146,6 @@ internal fun AccessibilityDisclosureDialog(
 private fun AccessibilityDisclosureDialogPreview() {
     EssentialKeyToolsTheme {
         AccessibilityDisclosureDialog(
-            confirmButtonTextRes = R.string.a11y_disclosure_agree_enable,
             onDecline = {},
             onConsent = {}
         )

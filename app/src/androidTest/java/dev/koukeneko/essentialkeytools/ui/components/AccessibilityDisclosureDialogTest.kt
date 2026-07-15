@@ -31,15 +31,17 @@ class AccessibilityDisclosureDialogTest {
 
     @Test
     fun disclosure_showsFullCopyAndBothChoices() {
-        showDialog(confirmButtonTextRes = R.string.a11y_disclosure_agree_enable)
+        showDialog()
 
         composeRule.onNodeWithText(resources.getString(R.string.a11y_disclosure_title))
             .assertIsDisplayed()
         composeRule.onNodeWithText(resources.getString(R.string.a11y_disclosure_body))
             .assertIsDisplayed()
+        composeRule.onNodeWithText(resources.getString(R.string.a11y_disclosure_question))
+            .assertIsDisplayed()
         composeRule.onNodeWithText(buttonText(R.string.a11y_disclosure_decline))
             .assertIsDisplayed()
-        composeRule.onNodeWithText(buttonText(R.string.a11y_disclosure_agree_enable))
+        composeRule.onNodeWithText(buttonText(R.string.a11y_disclosure_agree))
             .assertIsDisplayed()
     }
 
@@ -48,7 +50,6 @@ class AccessibilityDisclosureDialogTest {
         val declined = AtomicInteger()
         val consented = AtomicInteger()
         showDialog(
-            confirmButtonTextRes = R.string.a11y_disclosure_agree_enable,
             onDecline = { declined.incrementAndGet() },
             onConsent = { consented.incrementAndGet() },
             hideOnDecision = false
@@ -71,14 +72,13 @@ class AccessibilityDisclosureDialogTest {
         val declined = AtomicInteger()
         val consented = AtomicInteger()
         showDialog(
-            confirmButtonTextRes = R.string.a11y_disclosure_agree_open_settings,
             onDecline = { declined.incrementAndGet() },
             onConsent = { consented.incrementAndGet() },
             hideOnDecision = false
         )
 
         val consentButton = composeRule.onNodeWithText(
-            buttonText(R.string.a11y_disclosure_agree_open_settings)
+            buttonText(R.string.a11y_disclosure_agree)
         )
         consentButton.assertIsDisplayed()
         consentButton.performClick()
@@ -95,7 +95,6 @@ class AccessibilityDisclosureDialogTest {
         val declined = AtomicInteger()
         val consented = AtomicInteger()
         showDialog(
-            confirmButtonTextRes = R.string.a11y_disclosure_agree_enable,
             onDecline = { declined.incrementAndGet() },
             onConsent = { consented.incrementAndGet() }
         )
@@ -109,7 +108,6 @@ class AccessibilityDisclosureDialogTest {
     }
 
     private fun showDialog(
-        confirmButtonTextRes: Int,
         onDecline: () -> Unit = {},
         onConsent: () -> Unit = {},
         hideOnDecision: Boolean = true
@@ -119,7 +117,6 @@ class AccessibilityDisclosureDialogTest {
                 var visible by remember { mutableStateOf(true) }
                 if (visible) {
                     AccessibilityDisclosureDialog(
-                        confirmButtonTextRes = confirmButtonTextRes,
                         onDecline = {
                             if (hideOnDecision) visible = false
                             onDecline()

@@ -1,6 +1,6 @@
 # Privacy Policy — Essential Key Tools
 
-_Last updated: 13 July 2026_
+_Last updated: 16 July 2026_
 
 Essential Key Tools ("the app") is a free, open-source Android app that remaps the Nothing Phone
 Essential Key. This policy explains what the app does — and does not do — with your data.
@@ -33,7 +33,9 @@ also invokes the corresponding Android accessibility system action. The service:
 - does not transmit or share hardware key event data.
 
 Android requires an accessibility service to observe hardware keys, which is why the app needs this
-permission.
+permission. Immediately before either enabling the service through Shizuku or opening Android's
+Accessibility Settings, the app presents a separate in-app disclosure and asks you to agree or
+decline. Declining or dismissing that disclosure does not enable the service or open Settings.
 
 ## Network access (INTERNET permission)
 

@@ -30,8 +30,8 @@ android {
         targetSdk = 36
         // CI derives these from the release tag and passes them as -PversionCode / -PversionName
         // (see release.yml); the literals below are only the fallback for local builds.
-        versionCode = (project.findProperty("versionCode") as String?)?.toInt() ?: 2
-        versionName = (project.findProperty("versionName") as String?) ?: "1.0.1"
+        versionCode = (project.findProperty("versionCode") as String?)?.toInt() ?: 10006
+        versionName = (project.findProperty("versionName") as String?) ?: "1.0.6"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

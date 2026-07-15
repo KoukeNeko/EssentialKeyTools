@@ -102,10 +102,16 @@ jobs:
           AAB="EssentialKeyTools-${TAG}.aab"
           cp app/build/outputs/apk/release/app-release.apk "$APK"
           cp app/build/outputs/bundle/release/app-release.aab "$AAB"
-          # Release body = the human "what's new" (same text as the Play listing) + a changelog link.
+          # Prefer version-specific detailed notes for GitHub. Play's short "what's new" text has a
+          # different audience and length limit, so it is only the fallback for older releases.
           # --generate-notes is not used: with direct-to-main commits and no PRs it produces nothing.
           NOTES="$(mktemp)"
-          cat distribution/whatsnew/whatsnew-en-US > "$NOTES"
+          RELEASE_NOTES="distribution/release-notes/${TAG}.md"
+          if [ -f "$RELEASE_NOTES" ]; then
+            cat "$RELEASE_NOTES" > "$NOTES"
+          else
+            cat distribution/whatsnew/whatsnew-en-US > "$NOTES"
+          fi
           printf '\n\n**Full changelog:** %s/%s/commits/%s\n' "$GITHUB_SERVER_URL" "$GITHUB_REPOSITORY" "$TAG" >> "$NOTES"
           if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             gh release upload "$TAG" "$APK" "$AAB" --repo "$GITHUB_REPOSITORY" --clobber
@@ -130,6 +136,35 @@ jobs:
             echo "ready=false" >> "$GITHUB_OUTPUT"
             echo "PLAY_SERVICE_ACCOUNT_JSON not set — skipping Play upload."
           fi
+
+      # upload-google-play publishes the binary and per-version notes, but not the store listing.
+      # Supply keeps the Play description in sync with the reviewed disclosure and commits the edit
+      # without requesting review, matching the app's current Play Console restriction.
+      - name: Set up Ruby for Play metadata
+        if: steps.play.outputs.ready == 'true'
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+
+      - name: Upload Play store listing metadata
+        if: steps.play.outputs.ready == 'true'
+        env:
+          PLAY_JSON: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+        run: |
+          JSON_KEY="$RUNNER_TEMP/play-service-account.json"
+          trap 'rm -f "$JSON_KEY"' EXIT
+          printf '%s' "$PLAY_JSON" > "$JSON_KEY"
+          gem install fastlane -v 2.237.0 --no-document
+          fastlane supply \
+            --json_key "$JSON_KEY" \
+            --package_name dev.koukeneko.essentialkeytools \
+            --metadata_path fastlane/metadata/android \
+            --skip_upload_apk \
+            --skip_upload_aab \
+            --skip_upload_changelogs \
+            --skip_upload_images \
+            --skip_upload_screenshots \
+            --changes_not_sent_for_review
 
       - name: Upload the AAB to Google Play (production track)
         if: steps.play.outputs.ready == 'true'

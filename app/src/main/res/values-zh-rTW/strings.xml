@@ -16,11 +16,11 @@
     <string name="section_navigation">設定</string>
 
     <!-- Accessibility enable flow -->
-    <string name="a11y_disclosure_title">無障礙服務資料存取</string>
-    <string name="a11y_disclosure_body">Essential Key Tools 使用 Android 無障礙服務存取硬體按鍵事件，包括按鍵代碼、掃描碼、按下或放開狀態，以及事件時間。即使 App 未開啟，這些資料也只會在裝置上即時處理，用來辨識 Essential Key 的單擊、雙擊、三擊與長按，並執行你指定的動作。若你選擇「螢幕截圖」或「鎖定畫面」，服務也會呼叫 Android 對應的無障礙系統動作。只有你在「按鍵設定」中確認的掃描碼會儲存在裝置上。App 不會讀取螢幕內容或輸入文字、不會保留硬體按鍵事件紀錄，也不會傳輸或分享這些資料。</string>
+    <string name="a11y_disclosure_title">同意使用無障礙服務</string>
+    <string name="a11y_disclosure_body">Essential Key Tools 需要使用 Android 無障礙服務，才能在 App 未開啟時接收 Essential Key 的硬體按鍵事件。這項功能可辨識單擊、雙擊、三擊與長按，並執行你選擇的快捷動作。\n\n服務啟用期間，Essential Key Tools 會存取按鍵代碼、掃描碼、按下或放開狀態，以及事件時間。這些資料只會在裝置上即時處理，用來辨識上述按鍵操作。若你選擇「螢幕截圖」或「鎖定畫面」，服務也會使用 Android 對應的無障礙系統動作。\n\n只有你在「按鍵設定」中確認的掃描碼會儲存在裝置上。App 不會讀取螢幕內容或輸入文字、不會保留硬體按鍵事件紀錄，也不會傳輸或分享硬體按鍵事件資料。</string>
+    <string name="a11y_disclosure_question">你是否同意 Essential Key Tools 使用 Android 無障礙服務，並依上述方式存取及處理這些資料？</string>
     <string name="a11y_disclosure_decline">不同意</string>
-    <string name="a11y_disclosure_agree_enable">同意並啟用</string>
-    <string name="a11y_disclosure_agree_open_settings">同意並前往設定</string>
+    <string name="a11y_disclosure_agree">同意</string>
     <string name="a11y_shizuku_label">一鍵啟用(Shizuku)</string>
     <string name="a11y_shizuku_body">Shizuku 已就緒。可直接啟用服務,免開設定。</string>
     <string name="a11y_enable_via_shizuku">透過 Shizuku 啟用</string>

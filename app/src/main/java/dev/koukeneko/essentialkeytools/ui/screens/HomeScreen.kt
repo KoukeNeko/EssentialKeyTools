@@ -246,12 +246,7 @@ private fun ServiceStatusCard(serviceRunningState: MutableState<Boolean>) {
 
     val requestedPath = pendingEnablePath
     if (requestedPath != null) {
-        val confirmButtonTextRes = when (requestedPath) {
-            AccessibilityEnablePath.SHIZUKU -> R.string.a11y_disclosure_agree_enable
-            AccessibilityEnablePath.SYSTEM_SETTINGS -> R.string.a11y_disclosure_agree_open_settings
-        }
         AccessibilityDisclosureDialog(
-            confirmButtonTextRes = confirmButtonTextRes,
             onDecline = { pendingEnablePath = null },
             onConsent = {
                 // Clear the pending operation before dispatch so a double tap cannot repeat it.
