@@ -53,7 +53,6 @@ import dev.koukeneko.essentialkeytools.ui.UiLabels
 import dev.koukeneko.essentialkeytools.ui.openExternalUrl
 import dev.koukeneko.essentialkeytools.ui.openPlayStoreListing
 import dev.koukeneko.essentialkeytools.ui.screenContentPadding
-import dev.koukeneko.essentialkeytools.ui.components.AccessibilityDisclosureDialog
 import dev.koukeneko.essentialkeytools.ui.components.NothingButton
 import dev.koukeneko.essentialkeytools.ui.components.NothingCard
 import dev.koukeneko.essentialkeytools.ui.components.NothingSectionLabel
@@ -108,6 +107,28 @@ fun HomeScreen(
     val actionMap by repository.gestureActionMap.collectAsState(initial = GestureActionMap.EMPTY)
     val serviceRunningState = rememberServiceRunningState()
     val unlockStatus = rememberUnlockStatus()
+    var showAccessibilityDisclosure by rememberSaveable { mutableStateOf(false) }
+
+    if (showAccessibilityDisclosure) {
+        AccessibilityDisclosureScreen(
+            onBackWithoutAccessibility = {
+                showAccessibilityDisclosure = false
+                Toast.makeText(
+                    context,
+                    R.string.a11y_disclosure_back_declined,
+                    Toast.LENGTH_SHORT
+                ).show()
+            },
+            onContinueWithoutAccessibility = { showAccessibilityDisclosure = false },
+            onUseAccessibility = {
+                showAccessibilityDisclosure = false
+                openAccessibilitySettings(context)
+            },
+            systemBarsPadding = systemBarsPadding,
+            modifier = modifier
+        )
+        return
+    }
 
     // Padding sits inside the scroll so the black canvas extends under the bars and the last card
     // clears the nav bar as the content scrolls past it.
@@ -124,7 +145,10 @@ fun HomeScreen(
         )
         Spacer(modifier = Modifier.height(TITLE_TO_CONTENT_GAP))
 
-        ServiceStatusCard(serviceRunning = serviceRunningState)
+        ServiceStatusCard(
+            serviceRunning = serviceRunningState,
+            onRequestOpenSettings = { showAccessibilityDisclosure = true }
+        )
         Spacer(modifier = Modifier.height(CARD_GAP))
         UnlockStatusCard(status = unlockStatus, onUnlockWizard = onUnlockWizard)
         Spacer(modifier = Modifier.height(CARD_GAP))
@@ -299,10 +323,10 @@ private fun OnResume(onResume: () -> Unit) {
 }
 
 @Composable
-private fun ServiceStatusCard(serviceRunning: Boolean) {
-    val context = LocalContext.current
-    var disclosureRequested by rememberSaveable { mutableStateOf(false) }
-
+private fun ServiceStatusCard(
+    serviceRunning: Boolean,
+    onRequestOpenSettings: () -> Unit
+) {
     NothingCard(modifier = Modifier.fillMaxWidth()) {
         NothingSectionLabel(text = stringResource(R.string.section_service))
         Spacer(modifier = Modifier.height(LABEL_GAP))
@@ -318,20 +342,8 @@ private fun ServiceStatusCard(serviceRunning: Boolean) {
             )
         }
         if (!serviceRunning) {
-            DisabledServiceControls(
-                onRequestOpenSettings = { disclosureRequested = true }
-            )
+            DisabledServiceControls(onRequestOpenSettings = onRequestOpenSettings)
         }
-    }
-
-    if (disclosureRequested) {
-        AccessibilityDisclosureDialog(
-            onContinueWithoutAccessibility = { disclosureRequested = false },
-            onUseAccessibility = {
-                disclosureRequested = false
-                openAccessibilitySettings(context)
-            }
-        )
     }
 }
 

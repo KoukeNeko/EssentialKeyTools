@@ -36,7 +36,6 @@
     <string name="onboarding_intro_setup_label">用兩個步驟完成設定</string>
     <string name="onboarding_intro_setup_body">1. 決定是否啟用「Essential Key 偵測」。&#10;2. 在「按鍵設定」中按一次按鍵，再選擇你的捷徑。</string>
     <string name="onboarding_continue">繼續</string>
-    <string name="onboarding_skip">暫時略過</string>
     <string name="onboarding_permission_title">權限</string>
     <string name="onboarding_step_permission">03 / 03 · 無障礙服務</string>
     <string name="onboarding_permission_headline">做出決定前請先閱讀</string>
@@ -59,6 +58,7 @@
     <string name="a11y_disclosure_question">你是否同意 Essential Key Tools 為了按鍵重新對應功能，使用 AccessibilityService API 存取及處理上述硬體按鍵事件資料？</string>
     <string name="a11y_disclosure_use_accessibility">同意：使用輔助功能</string>
     <string name="a11y_disclosure_continue_without_accessibility">不同意：不使用輔助功能</string>
+    <string name="a11y_disclosure_back_declined">已視為不同意，輔助功能服務未啟用。</string>
     <string name="a11y_settings_body">在無障礙清單中找到「Essential Key 偵測」並開啟它。</string>
 
     <!-- Key setup screen -->

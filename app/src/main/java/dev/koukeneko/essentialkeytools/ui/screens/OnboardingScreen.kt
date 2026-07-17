@@ -55,9 +55,9 @@ private val CONTENT_TO_ACTIONS_GAP = 24.dp
 /**
  * First-run setup. Language comes first so every following explanation is readable, followed by an
  * introduction and a separate prominent disclosure immediately before Android accessibility
- * settings can open. Each page transition reports its progress for persistence. Skipping or leaving
- * keeps that progress incomplete; either accessibility choice completes the guide, and only the
- * positive choice opens settings.
+ * settings can open. Each page transition reports its progress for persistence. Leaving keeps that
+ * progress incomplete; either accessibility choice completes the guide, and only the positive
+ * choice opens settings.
  */
 @Composable
 fun OnboardingScreen(
@@ -103,7 +103,6 @@ fun OnboardingScreen(
 
         OnboardingStep.INTRODUCTION -> OnboardingIntro(
             onContinue = { navigateTo(OnboardingStep.ACCESSIBILITY) },
-            onSkip = onLeaveOnboarding,
             systemBarsPadding = systemBarsPadding,
             modifier = modifier
         )
@@ -216,7 +215,6 @@ private fun LanguageOptionCard(
 @Composable
 private fun OnboardingIntro(
     onContinue: () -> Unit,
-    onSkip: () -> Unit,
     systemBarsPadding: PaddingValues,
     modifier: Modifier = Modifier
 ) {
@@ -241,13 +239,6 @@ private fun OnboardingIntro(
         NothingButton(
             text = stringResource(R.string.onboarding_continue),
             onClick = onContinue,
-            modifier = Modifier.fillMaxWidth()
-        )
-        Spacer(modifier = Modifier.height(ACTION_GAP))
-        NothingButton(
-            text = stringResource(R.string.onboarding_skip),
-            onClick = onSkip,
-            outlined = true,
             modifier = Modifier.fillMaxWidth()
         )
     }

@@ -1,10 +1,6 @@
-package dev.koukeneko.essentialkeytools.ui.components
+package dev.koukeneko.essentialkeytools.ui.screens
 
 import androidx.activity.ComponentActivity
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasClickAction
@@ -23,7 +19,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class AccessibilityDisclosureDialogTest {
+class AccessibilityDisclosureScreenTest {
 
     @get:Rule
     val composeRule = createAndroidComposeRule<ComponentActivity>()
@@ -32,8 +28,8 @@ class AccessibilityDisclosureDialogTest {
         get() = InstrumentationRegistry.getInstrumentation().targetContext.resources
 
     @Test
-    fun disclosure_showsFullCopyAndBothChoices() {
-        showDialog()
+    fun disclosurePage_showsFullCopyAndBothChoices() {
+        showScreen()
 
         composeRule.onNodeWithText(resources.getString(R.string.a11y_disclosure_title))
             .assertIsDisplayed()
@@ -45,8 +41,7 @@ class AccessibilityDisclosureDialogTest {
             .assertIsDisplayed()
         composeRule.onNodeWithText(
             buttonText(R.string.a11y_disclosure_continue_without_accessibility)
-        )
-            .assertIsDisplayed()
+        ).assertIsDisplayed()
         composeRule.onAllNodes(hasClickAction()).assertCountEquals(2)
     }
 
@@ -54,10 +49,9 @@ class AccessibilityDisclosureDialogTest {
     fun continueWithoutAccessibilityOnlyInvokesThatChoiceOnce() {
         val continuedWithoutAccessibility = AtomicInteger()
         val usedAccessibility = AtomicInteger()
-        showDialog(
+        showScreen(
             onContinueWithoutAccessibility = { continuedWithoutAccessibility.incrementAndGet() },
-            onUseAccessibility = { usedAccessibility.incrementAndGet() },
-            hideOnDecision = false
+            onUseAccessibility = { usedAccessibility.incrementAndGet() }
         )
 
         val continueButton = composeRule.onNodeWithText(
@@ -76,16 +70,14 @@ class AccessibilityDisclosureDialogTest {
     fun useAccessibilityOnlyInvokesThatChoiceOnce() {
         val continuedWithoutAccessibility = AtomicInteger()
         val usedAccessibility = AtomicInteger()
-        showDialog(
+        showScreen(
             onContinueWithoutAccessibility = { continuedWithoutAccessibility.incrementAndGet() },
-            onUseAccessibility = { usedAccessibility.incrementAndGet() },
-            hideOnDecision = false
+            onUseAccessibility = { usedAccessibility.incrementAndGet() }
         )
 
         val useAccessibilityButton = composeRule.onNodeWithText(
             buttonText(R.string.a11y_disclosure_use_accessibility)
         )
-        useAccessibilityButton.assertIsDisplayed()
         useAccessibilityButton.performClick()
         useAccessibilityButton.performClick()
 
@@ -96,10 +88,12 @@ class AccessibilityDisclosureDialogTest {
     }
 
     @Test
-    fun backPressContinuesWithoutAccessibility() {
+    fun backPressUsesTheDistinctDeclineCallback() {
+        val backDeclines = AtomicInteger()
         val continuedWithoutAccessibility = AtomicInteger()
         val usedAccessibility = AtomicInteger()
-        showDialog(
+        showScreen(
+            onBackWithoutAccessibility = { backDeclines.incrementAndGet() },
             onContinueWithoutAccessibility = { continuedWithoutAccessibility.incrementAndGet() },
             onUseAccessibility = { usedAccessibility.incrementAndGet() }
         )
@@ -107,31 +101,24 @@ class AccessibilityDisclosureDialogTest {
         Espresso.pressBack()
 
         composeRule.runOnIdle {
-            assertEquals(1, continuedWithoutAccessibility.get())
+            assertEquals(1, backDeclines.get())
+            assertEquals(0, continuedWithoutAccessibility.get())
             assertEquals(0, usedAccessibility.get())
         }
     }
 
-    private fun showDialog(
+    private fun showScreen(
+        onBackWithoutAccessibility: () -> Unit = {},
         onContinueWithoutAccessibility: () -> Unit = {},
-        onUseAccessibility: () -> Unit = {},
-        hideOnDecision: Boolean = true
+        onUseAccessibility: () -> Unit = {}
     ) {
         composeRule.setContent {
             EssentialKeyToolsTheme {
-                var visible by remember { mutableStateOf(true) }
-                if (visible) {
-                    AccessibilityDisclosureDialog(
-                        onContinueWithoutAccessibility = {
-                            if (hideOnDecision) visible = false
-                            onContinueWithoutAccessibility()
-                        },
-                        onUseAccessibility = {
-                            if (hideOnDecision) visible = false
-                            onUseAccessibility()
-                        }
-                    )
-                }
+                AccessibilityDisclosureScreen(
+                    onBackWithoutAccessibility = onBackWithoutAccessibility,
+                    onContinueWithoutAccessibility = onContinueWithoutAccessibility,
+                    onUseAccessibility = onUseAccessibility
+                )
             }
         }
     }

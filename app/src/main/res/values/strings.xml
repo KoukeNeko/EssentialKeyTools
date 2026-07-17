@@ -36,7 +36,6 @@
     <string name="onboarding_intro_setup_label">Finish setup in two steps</string>
     <string name="onboarding_intro_setup_body">1. Decide whether to enable Essential Key detection.&#10;2. Press the key once in Key Setup, then choose your shortcuts.</string>
     <string name="onboarding_continue">Continue</string>
-    <string name="onboarding_skip">Skip for now</string>
     <string name="onboarding_permission_title">PERMISSION</string>
     <string name="onboarding_step_permission">03 / 03 · Accessibility service</string>
     <string name="onboarding_permission_headline">READ BEFORE YOU DECIDE</string>
@@ -59,6 +58,7 @@
     <string name="a11y_disclosure_question">Do you agree to Essential Key Tools using the AccessibilityService API to access and process the hardware key-event data described above for its key-remapping feature?</string>
     <string name="a11y_disclosure_use_accessibility">Agree: use accessibility service</string>
     <string name="a11y_disclosure_continue_without_accessibility">Decline: don\'t use accessibility service</string>
+    <string name="a11y_disclosure_back_declined">Treated as declined. The accessibility service was not enabled.</string>
     <string name="a11y_settings_body">Find "Essential Key detection" in the accessibility list and turn it on.</string>
 
     <!-- Key setup screen -->

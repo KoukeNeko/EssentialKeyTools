@@ -56,6 +56,7 @@ class OnboardingScreenTest {
             .assertIsDisplayed()
         composeRule.onNodeWithText(resources.getString(R.string.onboarding_intro_setup_body))
             .assertIsDisplayed()
+        composeRule.onAllNodes(hasClickAction()).assertCountEquals(1)
 
         composeRule.onNodeWithText(buttonText(R.string.onboarding_continue)).performClick()
         composeRule.runOnIdle {
@@ -90,27 +91,6 @@ class OnboardingScreenTest {
         composeRule.onNodeWithText(buttonText(R.string.onboarding_use_accessibility))
             .performScrollTo()
             .assertIsDisplayed()
-    }
-
-    @Test
-    fun skipForNowLeavesTheSavedIntroductionIncomplete() {
-        val leaves = AtomicInteger()
-        val completions = AtomicInteger()
-        val persistedStep = AtomicReference<OnboardingStep>()
-        showOnboarding(
-            onStepChanged = persistedStep::set,
-            onLeaveOnboarding = { leaves.incrementAndGet() },
-            onContinueWithoutAccessibility = { completions.incrementAndGet() }
-        )
-
-        composeRule.onNodeWithText(buttonText(R.string.onboarding_continue)).performClick()
-        composeRule.onNodeWithText(buttonText(R.string.onboarding_skip)).performClick()
-
-        composeRule.runOnIdle {
-            assertEquals(OnboardingStep.INTRODUCTION, persistedStep.get())
-            assertEquals(1, leaves.get())
-            assertEquals(0, completions.get())
-        }
     }
 
     @Test
