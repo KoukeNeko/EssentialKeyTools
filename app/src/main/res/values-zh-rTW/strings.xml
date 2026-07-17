@@ -7,7 +7,7 @@
 
     <!-- Accessibility service -->
     <string name="accessibility_service_label">Essential Key 偵測</string>
-    <string name="accessibility_service_description">接收硬體按鍵事件，依你儲存的 Essential Key 掃描碼篩選，再執行指定動作。不會檢視螢幕內容或文字欄位。</string>
+    <string name="accessibility_service_description">偵測 Essential Key 的按鍵操作並執行你設定的捷徑。不會讀取螢幕內容或文字欄位。</string>
 
     <!-- Home navigation -->
     <string name="action_open_accessibility_settings">啟用服務</string>
@@ -39,13 +39,13 @@
     <string name="onboarding_permission_title">權限</string>
     <string name="onboarding_step_permission">03 / 03 · 無障礙服務</string>
     <string name="onboarding_permission_headline">做出決定前請先閱讀</string>
-    <string name="onboarding_permission_purpose">Essential Key Tools 的核心按鍵重新對應功能需要使用 Android AccessibilityService API，才能在 App 未開啟時接收 Essential Key 的硬體按鍵事件、辨識單擊、雙擊、三擊與長按，並執行你事先指定的固定快捷動作。</string>
-    <string name="onboarding_permission_data_label">透過 AccessibilityService 存取的資料</string>
-    <string name="onboarding_permission_data_body">服務啟用期間，Android 會提供每筆硬體按鍵事件的按鍵代碼、掃描碼、按下或放開狀態，以及事件時間。App 會將掃描碼與你儲存的 Essential Key 掃描碼比對，立即忽略不相符的事件，只在此裝置處理相符事件。</string>
-    <string name="onboarding_permission_actions_label">資料的使用方式</string>
-    <string name="onboarding_permission_actions_body">相符事件只用於辨識你的按法並執行你指定的固定動作；服務不會自行選擇或規劃動作。只有你把「螢幕截圖」或「鎖定螢幕」指定給該按法時，才會執行對應的 Android 無障礙系統動作。</string>
-    <string name="onboarding_permission_privacy_label">儲存與分享方式</string>
-    <string name="onboarding_permission_privacy_body">硬體按鍵事件內容不會被儲存，也不會傳輸或分享給開發人員或第三方。只有你在「按鍵設定」中確認的掃描碼會儲存在此裝置。服務不會檢視螢幕內容、文字欄位或輸入文字。</string>
+    <string name="onboarding_permission_purpose">為了讓 Essential Key 在你沒有開啟本 App 時也能執行捷徑，Essential Key Tools 需要使用 Android 的輔助功能服務（AccessibilityService API）。</string>
+    <string name="onboarding_permission_data_label">輔助功能會取得的資訊</string>
+    <string name="onboarding_permission_data_body">啟用後，App 會取得哪個硬體按鍵被按下或放開，以及事件發生的時間。這些資訊只用來確認是否為 Essential Key、辨識單擊、雙擊、三擊或長按，並執行你事先選擇的捷徑。</string>
+    <string name="onboarding_permission_actions_label">App 會做什麼</string>
+    <string name="onboarding_permission_actions_body">只有當你將「螢幕截圖」或「鎖定螢幕」設為捷徑時，App 才會使用輔助功能執行該動作。App 不會自行選擇或執行其他動作。</string>
+    <string name="onboarding_permission_privacy_label">資訊如何儲存與分享</string>
+    <string name="onboarding_permission_privacy_body">按鍵事件只會在裝置上即時處理，不會儲存、上傳或分享。只有你在「按鍵設定」確認的 Essential Key 識別碼會儲存在裝置上。App 不會讀取螢幕內容、文字欄位或你輸入的文字。</string>
     <string name="onboarding_permission_next_label">同意後會發生什麼</string>
     <string name="onboarding_permission_next_body">選擇「同意：使用輔助功能」後，系統會開啟 Android 無障礙設定。請選擇「Essential Key 偵測」、閱讀 Android 的系統警告，再開啟「使用 Essential Key 偵測」。返回、按下返回鍵或選擇不同意，都不會啟用服務。</string>
     <string name="onboarding_use_accessibility">同意：使用輔助功能</string>
@@ -53,9 +53,9 @@
     <string name="action_open_privacy_policy">查看隱私權政策</string>
 
     <!-- Accessibility enable flow -->
-    <string name="a11y_disclosure_title">輔助功能資料揭露與同意</string>
-    <string name="a11y_disclosure_body">Essential Key Tools 的核心按鍵重新對應功能需要使用 Android AccessibilityService API。服務會在 App 未開啟時接收 Essential Key 的硬體按鍵事件、辨識單擊、雙擊、三擊與長按，並只執行你事先指定的固定快捷動作。\n\n服務啟用期間，Android 會提供每筆事件的按鍵代碼、掃描碼、按下或放開狀態，以及事件時間。App 會比對掃描碼、立即忽略不相符的事件，只在此裝置處理相符事件以辨識按法。只有你明確指定「螢幕截圖」或「鎖定螢幕」時，才會執行對應動作。\n\n硬體按鍵事件內容不會被儲存，也不會傳輸或分享給開發人員或第三方。只有你確認的 Essential Key 掃描碼會儲存在此裝置。服務不會檢視螢幕內容、文字欄位或輸入文字。</string>
-    <string name="a11y_disclosure_question">你是否同意 Essential Key Tools 為了按鍵重新對應功能，使用 AccessibilityService API 存取及處理上述硬體按鍵事件資料？</string>
+    <string name="a11y_disclosure_title">使用輔助功能前請先了解</string>
+    <string name="a11y_disclosure_body">為了讓 Essential Key 在你沒有開啟本 App 時也能執行捷徑，Essential Key Tools 需要使用 Android 的輔助功能服務（AccessibilityService API）。\n\n啟用後，App 會取得哪個硬體按鍵被按下或放開，以及事件發生的時間。這些資訊只用來確認是否為 Essential Key、辨識單擊、雙擊、三擊或長按，並執行你事先選擇的捷徑。\n\n按鍵事件只會在裝置上即時處理，不會儲存、上傳或分享。只有你在「按鍵設定」確認的 Essential Key 識別碼會儲存在裝置上。App 不會讀取螢幕內容、文字欄位或你輸入的文字。\n\n只有當你將「螢幕截圖」或「鎖定螢幕」設為捷徑時，App 才會使用輔助功能執行該動作。App 不會自行選擇或執行其他動作。</string>
+    <string name="a11y_disclosure_question">你是否同意 Essential Key Tools 使用輔助功能服務，偵測 Essential Key 並執行你設定的捷徑？</string>
     <string name="a11y_disclosure_use_accessibility">同意：使用輔助功能</string>
     <string name="a11y_disclosure_continue_without_accessibility">不同意：不使用輔助功能</string>
     <string name="a11y_disclosure_back_declined">已視為不同意，輔助功能服務未啟用。</string>
