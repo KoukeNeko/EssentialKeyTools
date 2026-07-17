@@ -37,6 +37,7 @@ class EssentialKeyDetectionService : AccessibilityService() {
     private var classifier: KeyGestureClassifier? = null
     private var learnedScanCode = DEFAULT_ESSENTIAL_KEY_SCAN_CODE
     private var gestureActionMap = GestureActionMap.EMPTY
+    private var suppressNextClassifiedAction = false
 
     override fun onServiceConnected() {
         super.onServiceConnected()
@@ -62,6 +63,7 @@ class EssentialKeyDetectionService : AccessibilityService() {
 
     private fun rebuildClassifier(actionMap: GestureActionMap) {
         classifier?.reset()
+        suppressNextClassifiedAction = false
         // Only the gestures with a real mapping need recognising; this lets the classifier resolve
         // simpler gestures without waiting for the multi-tap window.
         classifier = KeyGestureClassifier(
@@ -98,6 +100,11 @@ class EssentialKeyDetectionService : AccessibilityService() {
         if (!KeyEventFilter.matchesLearnedKey(event.scanCode, learnedScanCode)) {
             return false
         }
+        // Remember that this gesture began on the test screen. Some gestures resolve after a short
+        // timeout, when the user may already have navigated away and cleared the screen-wide flag.
+        if (KeyEventStream.actionExecutionSuppressed) {
+            suppressNextClassifiedAction = true
+        }
         // Mirror matching events to the stream so the key-test screen can log them live.
         KeyEventStream.publishRawEvent(
             ObservedKeyEvent(
@@ -123,7 +130,11 @@ class EssentialKeyDetectionService : AccessibilityService() {
         KeyEventStream.publishGesture(
             ObservedGesture(gesture = gesture, timestampMs = System.currentTimeMillis())
         )
-        actionExecutor.execute(gestureActionMap.actionFor(gesture))
+        val actionSuppressed = KeyEventStream.actionExecutionSuppressed || suppressNextClassifiedAction
+        suppressNextClassifiedAction = false
+        if (!actionSuppressed) {
+            actionExecutor.execute(gestureActionMap.actionFor(gesture))
+        }
     }
 
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
@@ -132,6 +143,7 @@ class EssentialKeyDetectionService : AccessibilityService() {
 
     override fun onInterrupt() {
         classifier?.reset()
+        suppressNextClassifiedAction = false
     }
 
     override fun onUnbind(intent: android.content.Intent?): Boolean {
@@ -147,6 +159,7 @@ class EssentialKeyDetectionService : AccessibilityService() {
     private fun tearDown() {
         isRunning = false
         classifier?.reset()
+        suppressNextClassifiedAction = false
         mainHandler.removeCallbacksAndMessages(null)
         serviceScope.cancel()
     }

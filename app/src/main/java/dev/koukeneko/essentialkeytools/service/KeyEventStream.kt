@@ -25,7 +25,8 @@ data class ObservedGesture(
  * because the service and the activity live in the same process but cannot pass references directly.
  *
  * [detectionModeActive] is set by the learning screen. While true the service emits ALL key events
- * (so the user can capture the Essential Key's scanCode) and suppresses action execution.
+ * so the user can capture the Essential Key's scanCode. [actionExecutionSuppressed] is scoped to
+ * the key-test screen so gestures can still be classified and displayed without running mappings.
  */
 object KeyEventStream {
 
@@ -38,6 +39,9 @@ object KeyEventStream {
 
     @Volatile
     var detectionModeActive: Boolean = false
+
+    @Volatile
+    var actionExecutionSuppressed: Boolean = false
 
     fun publishRawEvent(event: ObservedKeyEvent) {
         rawEvents.tryEmit(event)

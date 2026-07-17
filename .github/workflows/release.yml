@@ -5,6 +5,7 @@ name: Release
 # Can also be run manually (workflow_dispatch) against an existing tag to rebuild/replace its assets.
 # The signing keystore and passwords come from repository secrets, so the private key never lives in
 # the repository: RELEASE_KEYSTORE_BASE64 / RELEASE_STORE_PASSWORD / RELEASE_KEY_PASSWORD / RELEASE_KEY_ALIAS.
+# Optional VT_API_KEY and KOODOUS_TOKEN secrets submit the public release APK for security analysis.
 on:
   push:
     tags:
@@ -91,12 +92,26 @@ jobs:
         if: always()
         run: rm -f app/keystore/release.jks app/keystore.properties
 
+      # Scanning is best-effort: a provider outage or missing optional secret must not block release.
+      - name: Submit signed APK for security analysis
+        id: security_scan
+        continue-on-error: true
+        env:
+          VT_API_KEY: ${{ secrets.VT_API_KEY }}
+          KOODOUS_TOKEN: ${{ secrets.KOODOUS_TOKEN }}
+        run: bash scripts/submit-security-analysis.sh app/build/outputs/apk/release/app-release.apk
+
       # Create the release for this tag, or attach to it if it already exists (clobbering the asset).
       # TAG comes through env so a crafted tag name cannot be interpreted as a shell command.
       - name: Publish the release
         env:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ steps.resolve.outputs.tag }}
+          APK_SHA256: ${{ steps.security_scan.outputs.sha256 }}
+          VIRUSTOTAL_STATUS: ${{ steps.security_scan.outputs.virustotal_status }}
+          VIRUSTOTAL_REPORT_URL: ${{ steps.security_scan.outputs.virustotal_report_url }}
+          KOODOUS_STATUS: ${{ steps.security_scan.outputs.koodous_status }}
+          KOODOUS_REPORT_URL: ${{ steps.security_scan.outputs.koodous_report_url }}
         run: |
           APK="EssentialKeyTools-${TAG}.apk"
           AAB="EssentialKeyTools-${TAG}.aab"
@@ -112,9 +127,29 @@ jobs:
           else
             cat distribution/whatsnew/whatsnew-en-US > "$NOTES"
           fi
+          {
+            printf '\n\n## Security analysis\n\n'
+            if [ -n "$APK_SHA256" ]; then
+              printf 'Signed APK SHA-256: `%s`\n\n' "$APK_SHA256"
+              if [ -n "$VIRUSTOTAL_REPORT_URL" ]; then
+                printf -- '- [VirusTotal](%s): `%s`\n' "$VIRUSTOTAL_REPORT_URL" "$VIRUSTOTAL_STATUS"
+              else
+                printf -- '- VirusTotal: `%s`\n' "${VIRUSTOTAL_STATUS:-unavailable}"
+              fi
+              if [ -n "$KOODOUS_REPORT_URL" ]; then
+                printf -- '- [Koodous](%s): `%s`\n' "$KOODOUS_REPORT_URL" "$KOODOUS_STATUS"
+              else
+                printf -- '- Koodous: `%s`\n' "${KOODOUS_STATUS:-unavailable}"
+              fi
+            else
+              printf 'The security-analysis step did not return results.\n'
+            fi
+          } >> "$NOTES"
           printf '\n\n**Full changelog:** %s/%s/commits/%s\n' "$GITHUB_SERVER_URL" "$GITHUB_REPOSITORY" "$TAG" >> "$NOTES"
           if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             gh release upload "$TAG" "$APK" "$AAB" --repo "$GITHUB_REPOSITORY" --clobber
+            gh release edit "$TAG" --repo "$GITHUB_REPOSITORY" \
+              --title "Essential Key Tools ${TAG}" --notes-file "$NOTES"
           else
             gh release create "$TAG" "$APK" "$AAB" --repo "$GITHUB_REPOSITORY" \
               --title "Essential Key Tools ${TAG}" --notes-file "$NOTES"
