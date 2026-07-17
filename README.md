@@ -79,13 +79,24 @@ The app collects no personal data and has no analytics, ads, or tracking. See th
 
 ## Development
 
-Build with the JBR shipped in Android Studio:
+Install Android Studio with the Android SDK and JDK 21 (Android Studio's bundled JBR works). If
+your shell does not already use JDK 21, set `JAVA_HOME` to that JDK before building.
+
+macOS / Linux:
 
 ```bash
-JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home" ./gradlew lint test assembleDebug
+./gradlew lint test assembleDebug
 ```
 
-Or use the verification harness (prints a PASS/FAIL summary, `JAVA_HOME` overridable):
+Windows PowerShell:
+
+```powershell
+.\gradlew.bat lint test assembleDebug
+```
+
+On macOS and Linux, the verification harness runs the same quality gate and prints a single
+PASS/FAIL summary. It uses `JAVA_HOME` when set, otherwise it detects Android Studio's macOS JBR or
+the Java installation on `PATH`:
 
 ```bash
 ./scripts/verify.sh
