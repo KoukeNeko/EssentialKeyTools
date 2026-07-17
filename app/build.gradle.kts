@@ -47,6 +47,11 @@ android {
         }
     }
     buildTypes {
+        debug {
+            // Preview builds install beside the Play/release app and are clearly labelled, so the
+            // user can test CI artifacts without replacing their production installation.
+            applicationIdSuffix = ".preview"
+        }
         release {
             isMinifyEnabled = true
             isShrinkResources = true

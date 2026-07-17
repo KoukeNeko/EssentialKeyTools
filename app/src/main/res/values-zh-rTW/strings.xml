@@ -7,17 +7,44 @@
 
     <!-- Accessibility service -->
     <string name="accessibility_service_label">Essential Key 偵測</string>
-    <string name="accessibility_service_description">在裝置上處理硬體按鍵事件，以辨識 Essential Key 手勢並執行你指定的動作。它不會讀取螢幕內容或輸入文字。</string>
+    <string name="accessibility_service_description">接收硬體按鍵事件，依你儲存的 Essential Key 掃描碼篩選，再執行指定動作。不會檢視螢幕內容或文字欄位。</string>
 
     <!-- Home navigation -->
     <string name="action_open_accessibility_settings">啟用服務</string>
     <string name="action_key_setup">按鍵設定</string>
     <string name="action_key_test">按鍵測試</string>
+    <string name="action_review_onboarding">重新查看設定指南</string>
     <string name="section_navigation">設定</string>
+
+    <!-- Onboarding -->
+    <string name="onboarding_title">開始設定</string>
+    <string name="onboarding_step_intro">01 / 02 · 歡迎</string>
+    <string name="onboarding_intro_headline">打造你的 ESSENTIAL KEY</string>
+    <string name="onboarding_intro_body">為 Essential Key 的不同按法指定個別捷徑，不必開啟本 App 也能執行。</string>
+    <string name="onboarding_intro_gestures_label">四種按法</string>
+    <string name="onboarding_intro_gestures_body">單擊 · 雙擊 · 三擊 · 長按</string>
+    <string name="onboarding_intro_setup_label">兩個設定步驟</string>
+    <string name="onboarding_intro_setup_body">1. 決定是否啟用「Essential Key 偵測」。&#10;2. 在「按鍵設定」中按一次按鍵，再選擇你的捷徑。</string>
+    <string name="onboarding_continue">繼續</string>
+    <string name="onboarding_skip">暫時略過</string>
+    <string name="onboarding_permission_title">權限</string>
+    <string name="onboarding_step_permission">02 / 02 · 無障礙服務</string>
+    <string name="onboarding_permission_headline">啟用前請先了解</string>
+    <string name="onboarding_permission_purpose">Essential Key Tools 會使用 Android 無障礙服務，在本 App 未開啟時接收硬體按鍵事件、篩選出 Essential Key、辨識你的按法，並執行你指定的捷徑。</string>
+    <string name="onboarding_permission_data_label">會存取的資料</string>
+    <string name="onboarding_permission_data_body">服務啟用期間，Android 會把硬體按鍵事件交給本服務；每筆事件包含按鍵代碼、掃描碼、按下或放開狀態，以及事件時間。App 會立即忽略掃描碼與你儲存的 Essential Key 掃描碼不符的事件，只在此裝置處理相符事件，以辨識單擊、雙擊、三擊與長按。</string>
+    <string name="onboarding_permission_actions_label">螢幕截圖與鎖定動作</string>
+    <string name="onboarding_permission_actions_body">服務不會自行截圖。只有當你把「螢幕截圖」或「鎖定螢幕」指定給某個按法時，辨識到該按法後才會呼叫 Android 對應的無障礙系統動作。</string>
+    <string name="onboarding_permission_privacy_label">不會進行的行為</string>
+    <string name="onboarding_permission_privacy_body">不會檢視螢幕內容或文字欄位、不會把按鍵代碼轉成輸入文字、不會保留硬體按鍵事件紀錄，也不會傳輸或分享硬體按鍵事件資料。只有你在「按鍵設定」中確認的掃描碼會儲存在此裝置。</string>
+    <string name="onboarding_permission_next_label">按下按鈕後會發生什麼</string>
+    <string name="onboarding_permission_next_body">系統會開啟 Android 無障礙設定。請選擇「Essential Key 偵測」、閱讀 Android 的系統警告，再開啟「使用 Essential Key 偵測」。你可以不啟用直接返回，也可以隨時將它關閉。</string>
+    <string name="onboarding_not_now">暫不啟用</string>
+    <string name="onboarding_agree_open_settings">同意並開啟設定</string>
 
     <!-- Accessibility enable flow -->
     <string name="a11y_disclosure_title">同意使用無障礙服務</string>
-    <string name="a11y_disclosure_body">Essential Key Tools 需要使用 Android 無障礙服務，才能在 App 未開啟時接收 Essential Key 的硬體按鍵事件。這項功能可辨識單擊、雙擊、三擊與長按，並執行你選擇的快捷動作。\n\n服務啟用期間，Essential Key Tools 會存取按鍵代碼、掃描碼、按下或放開狀態，以及事件時間。這些資料只會在裝置上即時處理，用來辨識上述按鍵操作。若你選擇「螢幕截圖」或「鎖定畫面」，服務也會使用 Android 對應的無障礙系統動作。\n\n只有你在「按鍵設定」中確認的掃描碼會儲存在裝置上。App 不會讀取螢幕內容或輸入文字、不會保留硬體按鍵事件紀錄，也不會傳輸或分享硬體按鍵事件資料。</string>
+    <string name="a11y_disclosure_body">Essential Key Tools 需要使用 Android 無障礙服務，才能在 App 未開啟時接收硬體按鍵事件、篩選出 Essential Key、辨識單擊、雙擊、三擊與長按，並執行你選擇的快捷動作。\n\n服務啟用期間，Android 會把包含按鍵代碼、掃描碼、按下或放開狀態，以及事件時間的硬體按鍵事件交給本服務。App 會立即忽略掃描碼與你儲存的 Essential Key 掃描碼不符的事件，只在裝置上即時處理相符事件。若你選擇「螢幕截圖」或「鎖定畫面」，只有辨識到對應按法時，才會呼叫該項 Android 無障礙系統動作。\n\n只有你在「按鍵設定」中確認的掃描碼會儲存在裝置上。App 不會檢視螢幕內容或文字欄位、不會把按鍵代碼轉成輸入文字、不會保留硬體按鍵事件紀錄，也不會傳輸或分享硬體按鍵事件資料。</string>
     <string name="a11y_disclosure_question">你是否同意 Essential Key Tools 使用 Android 無障礙服務，並依上述方式存取及處理這些資料？</string>
     <string name="a11y_disclosure_decline">不同意</string>
     <string name="a11y_disclosure_agree">同意</string>

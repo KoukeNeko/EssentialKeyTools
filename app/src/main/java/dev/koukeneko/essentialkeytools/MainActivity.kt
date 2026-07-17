@@ -9,19 +9,27 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import dev.koukeneko.essentialkeytools.core.KeyGesture
+import dev.koukeneko.essentialkeytools.settings.SettingsRepository
 import dev.koukeneko.essentialkeytools.ui.screens.ActionPickerScreen
 import dev.koukeneko.essentialkeytools.ui.screens.HomeScreen
 import dev.koukeneko.essentialkeytools.ui.screens.KeySetupScreen
 import dev.koukeneko.essentialkeytools.ui.screens.KeyTestScreen
+import dev.koukeneko.essentialkeytools.ui.screens.OnboardingScreen
 import dev.koukeneko.essentialkeytools.ui.screens.UnlockWizardScreen
+import dev.koukeneko.essentialkeytools.ui.screens.openAccessibilitySettings
 import dev.koukeneko.essentialkeytools.ui.theme.EssentialKeyToolsTheme
+import kotlinx.coroutines.launch
 
 /** The screens reachable from the home control panel via the explicit back stack. */
 private enum class Screen {
@@ -56,8 +64,39 @@ class MainActivity : ComponentActivity() {
  */
 @Composable
 private fun AppNavigation(systemBarsPadding: PaddingValues) {
+    val context = LocalContext.current
+    val repository = remember { SettingsRepository.getInstance(context) }
+    val onboardingCompleted: Boolean? by repository.onboardingCompleted.collectAsState(
+        initial = null
+    )
+    val coroutineScope = rememberCoroutineScope()
+
+    // Wait for DataStore before choosing the first screen so returning users never see a flash of
+    // onboarding while their saved completion state is loading.
+    if (onboardingCompleted == null) {
+        return
+    }
+
+    var showOnboarding by rememberSaveable { mutableStateOf(onboardingCompleted == false) }
     val backStack = remember { mutableStateListOf(Screen.HOME) }
     var gestureBeingEdited by remember { mutableStateOf(KeyGesture.SINGLE_PRESS) }
+
+    fun finishOnboarding() {
+        showOnboarding = false
+        coroutineScope.launch { repository.setOnboardingCompleted() }
+    }
+
+    if (showOnboarding) {
+        OnboardingScreen(
+            onExit = ::finishOnboarding,
+            onAgreeAndOpenSettings = {
+                finishOnboarding()
+                openAccessibilitySettings(context)
+            },
+            systemBarsPadding = systemBarsPadding
+        )
+        return
+    }
 
     fun navigateTo(screen: Screen) {
         backStack.add(screen)
@@ -83,6 +122,7 @@ private fun AppNavigation(systemBarsPadding: PaddingValues) {
             onUnlockWizard = { navigateTo(Screen.UNLOCK_WIZARD) },
             onKeySetup = { navigateTo(Screen.KEY_SETUP) },
             onKeyTest = { navigateTo(Screen.KEY_TEST) },
+            onReviewOnboarding = { showOnboarding = true },
             systemBarsPadding = systemBarsPadding
         )
 

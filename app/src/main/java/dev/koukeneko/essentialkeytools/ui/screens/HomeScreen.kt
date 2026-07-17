@@ -89,6 +89,7 @@ fun HomeScreen(
     onUnlockWizard: () -> Unit,
     onKeySetup: () -> Unit,
     onKeyTest: () -> Unit,
+    onReviewOnboarding: () -> Unit,
     systemBarsPadding: PaddingValues = PaddingValues(),
     modifier: Modifier = Modifier
 ) {
@@ -123,7 +124,11 @@ fun HomeScreen(
             onEditGesture = onEditGesture
         )
         Spacer(modifier = Modifier.height(CARD_GAP))
-        NavigationCard(onKeySetup = onKeySetup, onKeyTest = onKeyTest)
+        NavigationCard(
+            onKeySetup = onKeySetup,
+            onKeyTest = onKeyTest,
+            onReviewOnboarding = onReviewOnboarding
+        )
         Spacer(modifier = Modifier.height(CARD_GAP))
         LanguageCard()
         Spacer(modifier = Modifier.height(CARD_GAP))
@@ -333,7 +338,11 @@ private fun ActionLabel(action: KeyAction, context: Context) {
 }
 
 @Composable
-private fun NavigationCard(onKeySetup: () -> Unit, onKeyTest: () -> Unit) {
+private fun NavigationCard(
+    onKeySetup: () -> Unit,
+    onKeyTest: () -> Unit,
+    onReviewOnboarding: () -> Unit
+) {
     NothingCard(modifier = Modifier.fillMaxWidth()) {
         NothingSectionLabel(text = stringResource(R.string.section_navigation))
         Spacer(modifier = Modifier.height(LABEL_GAP))
@@ -347,6 +356,12 @@ private fun NavigationCard(onKeySetup: () -> Unit, onKeyTest: () -> Unit) {
             NothingButton(
                 text = stringResource(R.string.action_key_test),
                 onClick = onKeyTest,
+                outlined = true,
+                modifier = Modifier.fillMaxWidth()
+            )
+            NothingButton(
+                text = stringResource(R.string.action_review_onboarding),
+                onClick = onReviewOnboarding,
                 outlined = true,
                 modifier = Modifier.fillMaxWidth()
             )
@@ -527,7 +542,7 @@ private const val HIGHLIGHT_SHOW_FRAGMENT_ARGS = ":settings:show_fragment_args"
  * extras. Those extras are undocumented and rejected on some OEM builds, so a failure falls back to
  * the plain accessibility settings intent.
  */
-private fun openAccessibilitySettings(context: Context) {
+internal fun openAccessibilitySettings(context: Context) {
     val serviceComponent = ComponentName(
         context,
         EssentialKeyDetectionService::class.java
@@ -564,7 +579,8 @@ private fun HomeScreenPreview() {
             onEditGesture = {},
             onUnlockWizard = {},
             onKeySetup = {},
-            onKeyTest = {}
+            onKeyTest = {},
+            onReviewOnboarding = {}
         )
     }
 }
