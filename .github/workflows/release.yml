@@ -172,9 +172,21 @@ jobs:
             echo "PLAY_SERVICE_ACCOUNT_JSON not set — skipping Play upload."
           fi
 
+      # Create the version-specific production draft before Supply selects it for listing updates.
+      - name: Upload the AAB to Google Play (production track)
+        if: steps.play.outputs.ready == 'true'
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+          packageName: dev.koukeneko.essentialkeytools
+          releaseFiles: app/build/outputs/bundle/release/app-release.aab
+          tracks: production
+          status: draft
+          changesNotSentForReview: true
+          whatsNewDirectory: distribution/whatsnew
+
       # upload-google-play publishes the binary and per-version notes, but not the store listing.
-      # Supply keeps the Play description in sync with the reviewed disclosure and commits the edit
-      # without requesting review, matching the app's current Play Console restriction.
+      # Supply then syncs the reviewed description and screenshots without requesting review.
       - name: Set up Ruby for Play metadata
         if: steps.play.outputs.ready == 'true'
         uses: ruby/setup-ruby@v1
@@ -211,15 +223,3 @@ jobs:
             --skip_upload_changelogs \
             --skip_upload_images \
             --changes_not_sent_for_review
-
-      - name: Upload the AAB to Google Play (production track)
-        if: steps.play.outputs.ready == 'true'
-        uses: r0adkll/upload-google-play@v1
-        with:
-          serviceAccountJsonPlainText: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
-          packageName: dev.koukeneko.essentialkeytools
-          releaseFiles: app/build/outputs/bundle/release/app-release.aab
-          tracks: production
-          status: draft
-          changesNotSentForReview: true
-          whatsNewDirectory: distribution/whatsnew
