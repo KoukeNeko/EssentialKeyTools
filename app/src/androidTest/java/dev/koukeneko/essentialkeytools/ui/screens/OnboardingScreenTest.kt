@@ -1,7 +1,9 @@
 package dev.koukeneko.essentialkeytools.ui.screens
 
 import androidx.activity.ComponentActivity
+import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -76,6 +78,7 @@ class OnboardingScreenTest {
         )
             .performScrollTo()
             .assertIsDisplayed()
+        composeRule.onAllNodes(hasClickAction()).assertCountEquals(2)
     }
 
     @Test
@@ -107,29 +110,6 @@ class OnboardingScreenTest {
             assertEquals(OnboardingStep.INTRODUCTION, persistedStep.get())
             assertEquals(1, leaves.get())
             assertEquals(0, completions.get())
-        }
-    }
-
-    @Test
-    fun privacyPolicyCanOpenWithoutCompletingOrLeaving() {
-        val completions = AtomicInteger()
-        val settingsOpens = AtomicInteger()
-        val privacyOpens = AtomicInteger()
-        showOnboarding(
-            onContinueWithoutAccessibility = { completions.incrementAndGet() },
-            onUseAccessibility = { settingsOpens.incrementAndGet() },
-            onOpenPrivacyPolicy = { privacyOpens.incrementAndGet() }
-        )
-
-        openPermissionStep()
-        composeRule.onNodeWithText(buttonText(R.string.action_open_privacy_policy))
-            .performScrollTo()
-            .performClick()
-
-        composeRule.runOnIdle {
-            assertEquals(0, completions.get())
-            assertEquals(0, settingsOpens.get())
-            assertEquals(1, privacyOpens.get())
         }
     }
 
@@ -189,8 +169,7 @@ class OnboardingScreenTest {
         onLanguageSelected: (String) -> Unit = {},
         onLeaveOnboarding: () -> Unit = {},
         onContinueWithoutAccessibility: () -> Unit = {},
-        onUseAccessibility: () -> Unit = {},
-        onOpenPrivacyPolicy: () -> Unit = {}
+        onUseAccessibility: () -> Unit = {}
     ) {
         composeRule.setContent {
             EssentialKeyToolsTheme {
@@ -201,8 +180,7 @@ class OnboardingScreenTest {
                     onLanguageSelected = onLanguageSelected,
                     onLeaveOnboarding = onLeaveOnboarding,
                     onContinueWithoutAccessibility = onContinueWithoutAccessibility,
-                    onUseAccessibility = onUseAccessibility,
-                    onOpenPrivacyPolicy = onOpenPrivacyPolicy
+                    onUseAccessibility = onUseAccessibility
                 )
             }
         }

@@ -18,9 +18,9 @@ Features:
 
 Requires a Nothing phone with the Essential Key, running Android 15 or newer.
 
-Essential Key Tools needs the Android accessibility service so it can receive Essential Key
-hardware key events when the app is not open. This lets the app recognize single, double,
-triple, and long presses and run the shortcut you choose.
+Essential Key Tools needs the Android AccessibilityService API for its core key-remapping feature.
+The service receives Essential Key hardware key events when the app is not open, recognizes single,
+double, triple, and long presses, and runs only the fixed shortcut you assigned.
 
 While the service is enabled, Essential Key Tools accesses key codes, scan codes, press or release
 state, and event time. It processes this data on your device in real time to recognize those
@@ -28,6 +28,6 @@ gestures. Screenshot and Lock screen mappings use the corresponding Android acce
 actions. The service follows only the fixed gesture-to-action mapping you configure; it does not
 choose or plan actions.
 
-Only the scan code you confirm in Key Setup is stored on your device. The app does not read
-screen content or typed text, keep a history of hardware key events, or transmit or share this
-data.
+Hardware key-event details are not stored, transmitted, or shared with the developer or third
+parties. Only the scan code you confirm in Key Setup is stored on your device. The app does not read
+screen content, text fields, or typed text.

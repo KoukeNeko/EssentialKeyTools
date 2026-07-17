@@ -1,1 +1,1 @@
-Removed Shizuku and the ADB unlock path. Accessibility-service setup now uses Android Settings, while single-press unlock uses each package's App Info page for manual disable or restore. Privileged provider dependencies and outdated store content were also removed.
+Initial release.

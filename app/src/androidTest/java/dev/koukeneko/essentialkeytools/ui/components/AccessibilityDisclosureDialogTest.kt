@@ -5,7 +5,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -45,6 +47,7 @@ class AccessibilityDisclosureDialogTest {
             buttonText(R.string.a11y_disclosure_continue_without_accessibility)
         )
             .assertIsDisplayed()
+        composeRule.onAllNodes(hasClickAction()).assertCountEquals(2)
     }
 
     @Test

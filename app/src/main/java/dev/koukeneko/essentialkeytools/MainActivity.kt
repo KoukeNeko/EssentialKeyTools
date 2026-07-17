@@ -24,8 +24,6 @@ import androidx.compose.ui.platform.LocalContext
 import dev.koukeneko.essentialkeytools.core.KeyGesture
 import dev.koukeneko.essentialkeytools.settings.OnboardingState
 import dev.koukeneko.essentialkeytools.settings.SettingsRepository
-import dev.koukeneko.essentialkeytools.ui.PRIVACY_POLICY_URL
-import dev.koukeneko.essentialkeytools.ui.openExternalUrl
 import dev.koukeneko.essentialkeytools.ui.screens.ActionPickerScreen
 import dev.koukeneko.essentialkeytools.ui.screens.HomeScreen
 import dev.koukeneko.essentialkeytools.ui.screens.KeySetupScreen
@@ -116,7 +114,6 @@ private fun AppNavigation(systemBarsPadding: PaddingValues) {
                 finishOnboarding()
                 openAccessibilitySettings(context)
             },
-            onOpenPrivacyPolicy = { openExternalUrl(context, PRIVACY_POLICY_URL) },
             systemBarsPadding = systemBarsPadding
         )
         return

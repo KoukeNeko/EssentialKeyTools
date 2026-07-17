@@ -68,7 +68,6 @@ fun OnboardingScreen(
     onLeaveOnboarding: () -> Unit,
     onContinueWithoutAccessibility: () -> Unit,
     onUseAccessibility: () -> Unit,
-    onOpenPrivacyPolicy: () -> Unit,
     systemBarsPadding: PaddingValues = PaddingValues(),
     modifier: Modifier = Modifier
 ) {
@@ -112,7 +111,6 @@ fun OnboardingScreen(
         OnboardingStep.ACCESSIBILITY -> OnboardingPermission(
             onContinueWithoutAccessibility = onContinueWithoutAccessibility,
             onUseAccessibility = onUseAccessibility,
-            onOpenPrivacyPolicy = onOpenPrivacyPolicy,
             systemBarsPadding = systemBarsPadding,
             modifier = modifier
         )
@@ -259,7 +257,6 @@ private fun OnboardingIntro(
 private fun OnboardingPermission(
     onContinueWithoutAccessibility: () -> Unit,
     onUseAccessibility: () -> Unit,
-    onOpenPrivacyPolicy: () -> Unit,
     systemBarsPadding: PaddingValues,
     modifier: Modifier = Modifier
 ) {
@@ -298,13 +295,6 @@ private fun OnboardingPermission(
         OnboardingInfoCard(
             label = stringResource(R.string.onboarding_permission_next_label),
             body = stringResource(R.string.onboarding_permission_next_body)
-        )
-        Spacer(modifier = Modifier.height(CONTENT_TO_ACTIONS_GAP))
-        NothingButton(
-            text = stringResource(R.string.action_open_privacy_policy),
-            onClick = onOpenPrivacyPolicy,
-            outlined = true,
-            modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(CONTENT_TO_ACTIONS_GAP))
         Text(
@@ -392,8 +382,7 @@ private fun OnboardingScreenPreview() {
             onLanguageSelected = {},
             onLeaveOnboarding = {},
             onContinueWithoutAccessibility = {},
-            onUseAccessibility = {},
-            onOpenPrivacyPolicy = {}
+            onUseAccessibility = {}
         )
     }
 }
@@ -405,7 +394,6 @@ private fun OnboardingPermissionPreview() {
         OnboardingPermission(
             onContinueWithoutAccessibility = {},
             onUseAccessibility = {},
-            onOpenPrivacyPolicy = {},
             systemBarsPadding = PaddingValues()
         )
     }

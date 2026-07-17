@@ -43,8 +43,8 @@ assigned gesture. The service:
 
 Android requires an accessibility service to observe hardware keys, which is why the app needs this
 permission. Immediately before opening Android's Accessibility Settings, the app presents a separate
-in-app disclosure and asks you to choose "Use accessibility service" or "Don't use accessibility
-service." Choosing not to use it or dismissing the disclosure does not enable the service or open
+in-app disclosure and asks you to choose "Agree: use accessibility service" or "Decline: don't use
+accessibility service." Declining or dismissing the disclosure does not enable the service or open
 Settings.
 
 ## Network access (INTERNET permission)
