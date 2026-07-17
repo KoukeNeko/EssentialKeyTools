@@ -39,77 +39,79 @@ class AccessibilityDisclosureDialogTest {
             .assertIsDisplayed()
         composeRule.onNodeWithText(resources.getString(R.string.a11y_disclosure_question))
             .assertIsDisplayed()
-        composeRule.onNodeWithText(buttonText(R.string.a11y_disclosure_decline))
+        composeRule.onNodeWithText(buttonText(R.string.a11y_disclosure_use_accessibility))
             .assertIsDisplayed()
-        composeRule.onNodeWithText(buttonText(R.string.a11y_disclosure_agree))
+        composeRule.onNodeWithText(
+            buttonText(R.string.a11y_disclosure_continue_without_accessibility)
+        )
             .assertIsDisplayed()
     }
 
     @Test
-    fun decline_onlyInvokesDeclineOnce() {
-        val declined = AtomicInteger()
-        val consented = AtomicInteger()
+    fun continueWithoutAccessibilityOnlyInvokesThatChoiceOnce() {
+        val continuedWithoutAccessibility = AtomicInteger()
+        val usedAccessibility = AtomicInteger()
         showDialog(
-            onDecline = { declined.incrementAndGet() },
-            onConsent = { consented.incrementAndGet() },
+            onContinueWithoutAccessibility = { continuedWithoutAccessibility.incrementAndGet() },
+            onUseAccessibility = { usedAccessibility.incrementAndGet() },
             hideOnDecision = false
         )
 
-        val declineButton = composeRule.onNodeWithText(
-            buttonText(R.string.a11y_disclosure_decline)
+        val continueButton = composeRule.onNodeWithText(
+            buttonText(R.string.a11y_disclosure_continue_without_accessibility)
         )
-        declineButton.performClick()
-        declineButton.performClick()
+        continueButton.performClick()
+        continueButton.performClick()
 
         composeRule.runOnIdle {
-            assertEquals(1, declined.get())
-            assertEquals(0, consented.get())
+            assertEquals(1, continuedWithoutAccessibility.get())
+            assertEquals(0, usedAccessibility.get())
         }
     }
 
     @Test
-    fun consent_onlyInvokesConsentOnce() {
-        val declined = AtomicInteger()
-        val consented = AtomicInteger()
+    fun useAccessibilityOnlyInvokesThatChoiceOnce() {
+        val continuedWithoutAccessibility = AtomicInteger()
+        val usedAccessibility = AtomicInteger()
         showDialog(
-            onDecline = { declined.incrementAndGet() },
-            onConsent = { consented.incrementAndGet() },
+            onContinueWithoutAccessibility = { continuedWithoutAccessibility.incrementAndGet() },
+            onUseAccessibility = { usedAccessibility.incrementAndGet() },
             hideOnDecision = false
         )
 
-        val consentButton = composeRule.onNodeWithText(
-            buttonText(R.string.a11y_disclosure_agree)
+        val useAccessibilityButton = composeRule.onNodeWithText(
+            buttonText(R.string.a11y_disclosure_use_accessibility)
         )
-        consentButton.assertIsDisplayed()
-        consentButton.performClick()
-        consentButton.performClick()
+        useAccessibilityButton.assertIsDisplayed()
+        useAccessibilityButton.performClick()
+        useAccessibilityButton.performClick()
 
         composeRule.runOnIdle {
-            assertEquals(0, declined.get())
-            assertEquals(1, consented.get())
+            assertEquals(0, continuedWithoutAccessibility.get())
+            assertEquals(1, usedAccessibility.get())
         }
     }
 
     @Test
-    fun backPress_isDeclineAndNeverConsent() {
-        val declined = AtomicInteger()
-        val consented = AtomicInteger()
+    fun backPressContinuesWithoutAccessibility() {
+        val continuedWithoutAccessibility = AtomicInteger()
+        val usedAccessibility = AtomicInteger()
         showDialog(
-            onDecline = { declined.incrementAndGet() },
-            onConsent = { consented.incrementAndGet() }
+            onContinueWithoutAccessibility = { continuedWithoutAccessibility.incrementAndGet() },
+            onUseAccessibility = { usedAccessibility.incrementAndGet() }
         )
 
         Espresso.pressBack()
 
         composeRule.runOnIdle {
-            assertEquals(1, declined.get())
-            assertEquals(0, consented.get())
+            assertEquals(1, continuedWithoutAccessibility.get())
+            assertEquals(0, usedAccessibility.get())
         }
     }
 
     private fun showDialog(
-        onDecline: () -> Unit = {},
-        onConsent: () -> Unit = {},
+        onContinueWithoutAccessibility: () -> Unit = {},
+        onUseAccessibility: () -> Unit = {},
         hideOnDecision: Boolean = true
     ) {
         composeRule.setContent {
@@ -117,13 +119,13 @@ class AccessibilityDisclosureDialogTest {
                 var visible by remember { mutableStateOf(true) }
                 if (visible) {
                     AccessibilityDisclosureDialog(
-                        onDecline = {
+                        onContinueWithoutAccessibility = {
                             if (hideOnDecision) visible = false
-                            onDecline()
+                            onContinueWithoutAccessibility()
                         },
-                        onConsent = {
+                        onUseAccessibility = {
                             if (hideOnDecision) visible = false
-                            onConsent()
+                            onUseAccessibility()
                         }
                     )
                 }

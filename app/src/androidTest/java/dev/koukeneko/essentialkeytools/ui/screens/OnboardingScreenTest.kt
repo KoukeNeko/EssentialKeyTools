@@ -57,6 +57,14 @@ class OnboardingScreenTest {
         composeRule.onNodeWithText(resources.getString(R.string.onboarding_permission_next_body))
             .performScrollTo()
             .assertIsDisplayed()
+        composeRule.onNodeWithText(buttonText(R.string.onboarding_use_accessibility))
+            .performScrollTo()
+            .assertIsDisplayed()
+        composeRule.onNodeWithText(
+            buttonText(R.string.onboarding_continue_without_accessibility)
+        )
+            .performScrollTo()
+            .assertIsDisplayed()
     }
 
     @Test
@@ -66,7 +74,7 @@ class OnboardingScreenTest {
         val privacyOpens = AtomicInteger()
         showOnboarding(
             onExit = { exits.incrementAndGet() },
-            onAgreeAndOpenSettings = { settingsOpens.incrementAndGet() },
+            onUseAccessibility = { settingsOpens.incrementAndGet() },
             onOpenPrivacyPolicy = { privacyOpens.incrementAndGet() }
         )
 
@@ -83,16 +91,18 @@ class OnboardingScreenTest {
     }
 
     @Test
-    fun notNowExitsWithoutOpeningSettings() {
+    fun continueWithoutAccessibilityExitsWithoutOpeningSettings() {
         val exits = AtomicInteger()
         val settingsOpens = AtomicInteger()
         showOnboarding(
             onExit = { exits.incrementAndGet() },
-            onAgreeAndOpenSettings = { settingsOpens.incrementAndGet() }
+            onUseAccessibility = { settingsOpens.incrementAndGet() }
         )
 
         openPermissionStep()
-        composeRule.onNodeWithText(buttonText(R.string.onboarding_not_now))
+        composeRule.onNodeWithText(
+            buttonText(R.string.onboarding_continue_without_accessibility)
+        )
             .performScrollTo()
             .performClick()
 
@@ -103,21 +113,21 @@ class OnboardingScreenTest {
     }
 
     @Test
-    fun agreeOnlyOpensSettingsOnce() {
+    fun useAccessibilityOnlyOpensSettingsOnce() {
         val exits = AtomicInteger()
         val settingsOpens = AtomicInteger()
         showOnboarding(
             onExit = { exits.incrementAndGet() },
-            onAgreeAndOpenSettings = { settingsOpens.incrementAndGet() }
+            onUseAccessibility = { settingsOpens.incrementAndGet() }
         )
 
         openPermissionStep()
-        val agreeButton = composeRule.onNodeWithText(
-            buttonText(R.string.onboarding_agree_open_settings)
+        val useAccessibilityButton = composeRule.onNodeWithText(
+            buttonText(R.string.onboarding_use_accessibility)
         )
-        agreeButton.performScrollTo()
-        agreeButton.performClick()
-        agreeButton.performClick()
+        useAccessibilityButton.performScrollTo()
+        useAccessibilityButton.performClick()
+        useAccessibilityButton.performClick()
 
         composeRule.runOnIdle {
             assertEquals(0, exits.get())
@@ -133,7 +143,7 @@ class OnboardingScreenTest {
     private fun showOnboarding(
         onLanguageSelected: (String) -> Unit = {},
         onExit: () -> Unit = {},
-        onAgreeAndOpenSettings: () -> Unit = {},
+        onUseAccessibility: () -> Unit = {},
         onOpenPrivacyPolicy: () -> Unit = {}
     ) {
         composeRule.setContent {
@@ -142,7 +152,7 @@ class OnboardingScreenTest {
                     initialLanguageTag = "",
                     onLanguageSelected = onLanguageSelected,
                     onExit = onExit,
-                    onAgreeAndOpenSettings = onAgreeAndOpenSettings,
+                    onUseAccessibility = onUseAccessibility,
                     onOpenPrivacyPolicy = onOpenPrivacyPolicy
                 )
             }

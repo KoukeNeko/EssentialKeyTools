@@ -47,18 +47,18 @@
     <string name="onboarding_permission_actions_body">The service does not choose actions or take screenshots by itself. It follows only the fixed mapping you set. If you assign Screenshot or Lock screen to a gesture, only that recognized gesture invokes the corresponding Android accessibility system action.</string>
     <string name="onboarding_permission_privacy_label">What it does not do</string>
     <string name="onboarding_permission_privacy_body">It does not inspect screen content or text fields, convert key codes into typed text, keep a hardware key-event history, or transmit or share hardware key-event data. Only the scan code you confirm in Key Setup is stored on this device.</string>
-    <string name="onboarding_permission_next_label">What happens after you press the button</string>
-    <string name="onboarding_permission_next_body">Android Accessibility settings will open. Select “Essential Key detection,” review Android’s system warning, and turn on “Use Essential Key detection.” You can return without enabling it, and you can turn it off at any time.</string>
-    <string name="onboarding_not_now">Not now</string>
-    <string name="onboarding_agree_open_settings">Agree &amp; open settings</string>
+    <string name="onboarding_permission_next_label">What happens when you use accessibility</string>
+    <string name="onboarding_permission_next_body">Selecting “Use accessibility service” opens Android Accessibility settings. Select “Essential Key detection,” review Android’s system warning, and turn on “Use Essential Key detection.” You can return without enabling it, and you can turn it off at any time.</string>
+    <string name="onboarding_use_accessibility">Use accessibility service</string>
+    <string name="onboarding_continue_without_accessibility">Don\'t use accessibility service</string>
     <string name="action_open_privacy_policy">View privacy policy</string>
 
     <!-- Accessibility enable flow -->
-    <string name="a11y_disclosure_title">Consent to use the accessibility service</string>
+    <string name="a11y_disclosure_title">Choose whether to use accessibility</string>
     <string name="a11y_disclosure_body">Essential Key Tools needs the Android accessibility service so it can receive hardware key events when the app is not open, filter for the Essential Key, recognize single, double, triple, and long presses, and run the shortcut you choose.\n\nWhile the service is enabled, Android delivers hardware key events containing key code, scan code, press or release state, and event time. The app immediately ignores events whose scan code does not match your saved Essential Key scan code, then processes matching events on your device in real time. It follows only the fixed action mapping you set and never chooses or plans actions. If you choose Screenshot or Lock screen, only the corresponding recognized gesture invokes that Android accessibility system action.\n\nOnly the scan code you confirm in Key Setup is stored on your device. The app does not inspect screen content or text fields, convert key codes into typed text, keep a history of hardware key events, or transmit or share hardware key-event data.</string>
-    <string name="a11y_disclosure_question">Do you agree to Essential Key Tools using the Android accessibility service and accessing and processing the data described above?</string>
-    <string name="a11y_disclosure_decline">Decline</string>
-    <string name="a11y_disclosure_agree">Agree</string>
+    <string name="a11y_disclosure_question">Do you want to use the accessibility service with the access and on-device processing described above?</string>
+    <string name="a11y_disclosure_use_accessibility">Use accessibility service</string>
+    <string name="a11y_disclosure_continue_without_accessibility">Don\'t use accessibility service</string>
     <string name="a11y_settings_body">Find "Essential Key detection" in the accessibility list and turn it on.</string>
 
     <!-- Key setup screen -->

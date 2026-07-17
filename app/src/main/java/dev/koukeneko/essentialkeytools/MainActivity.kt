@@ -102,7 +102,7 @@ private fun AppNavigation(systemBarsPadding: PaddingValues) {
                 }
             },
             onExit = ::finishOnboarding,
-            onAgreeAndOpenSettings = {
+            onUseAccessibility = {
                 finishOnboarding()
                 openAccessibilitySettings(context)
             },

@@ -47,18 +47,18 @@
     <string name="onboarding_permission_actions_body">服務不會自行選擇動作或截圖，只會依照你設定的固定對應執行。若你將「螢幕截圖」或「鎖定螢幕」指定給某個按法，只有辨識到該按法時，才會呼叫 Android 對應的無障礙系統動作。</string>
     <string name="onboarding_permission_privacy_label">不會進行的行為</string>
     <string name="onboarding_permission_privacy_body">不會檢視螢幕內容或文字欄位、不會把按鍵代碼轉成輸入文字、不會保留硬體按鍵事件紀錄，也不會傳輸或分享硬體按鍵事件資料。只有你在「按鍵設定」中確認的掃描碼會儲存在此裝置。</string>
-    <string name="onboarding_permission_next_label">按下按鈕後會發生什麼</string>
-    <string name="onboarding_permission_next_body">系統會開啟 Android 無障礙設定。請選擇「Essential Key 偵測」、閱讀 Android 的系統警告，再開啟「使用 Essential Key 偵測」。你可以不啟用直接返回，也可以隨時將它關閉。</string>
-    <string name="onboarding_not_now">暫不啟用</string>
-    <string name="onboarding_agree_open_settings">同意並開啟設定</string>
+    <string name="onboarding_permission_next_label">使用輔助功能後會發生什麼</string>
+    <string name="onboarding_permission_next_body">選擇「使用輔助功能」後，系統會開啟 Android 無障礙設定。請選擇「Essential Key 偵測」、閱讀 Android 的系統警告，再開啟「使用 Essential Key 偵測」。你可以不啟用直接返回，也可以隨時將它關閉。</string>
+    <string name="onboarding_use_accessibility">使用輔助功能</string>
+    <string name="onboarding_continue_without_accessibility">不使用輔助功能</string>
     <string name="action_open_privacy_policy">查看隱私權政策</string>
 
     <!-- Accessibility enable flow -->
-    <string name="a11y_disclosure_title">同意使用無障礙服務</string>
+    <string name="a11y_disclosure_title">選擇是否使用輔助功能</string>
     <string name="a11y_disclosure_body">Essential Key Tools 需要使用 Android 無障礙服務，才能在 App 未開啟時接收硬體按鍵事件、篩選出 Essential Key、辨識單擊、雙擊、三擊與長按，並執行你選擇的快捷動作。\n\n服務啟用期間，Android 會把包含按鍵代碼、掃描碼、按下或放開狀態，以及事件時間的硬體按鍵事件交給本服務。App 會立即忽略掃描碼與你儲存的 Essential Key 掃描碼不符的事件，只在裝置上即時處理相符事件。服務只會依照你設定的固定動作對應執行，不會自行選擇或規劃動作。若你選擇「螢幕截圖」或「鎖定畫面」，只有辨識到對應按法時，才會呼叫該項 Android 無障礙系統動作。\n\n只有你在「按鍵設定」中確認的掃描碼會儲存在裝置上。App 不會檢視螢幕內容或文字欄位、不會把按鍵代碼轉成輸入文字、不會保留硬體按鍵事件紀錄，也不會傳輸或分享硬體按鍵事件資料。</string>
-    <string name="a11y_disclosure_question">你是否同意 Essential Key Tools 使用 Android 無障礙服務，並依上述方式存取及處理這些資料？</string>
-    <string name="a11y_disclosure_decline">不同意</string>
-    <string name="a11y_disclosure_agree">同意</string>
+    <string name="a11y_disclosure_question">你是否要使用輔助功能，並讓 Essential Key Tools 依上述方式在裝置上存取及處理資料？</string>
+    <string name="a11y_disclosure_use_accessibility">使用輔助功能</string>
+    <string name="a11y_disclosure_continue_without_accessibility">不使用輔助功能</string>
     <string name="a11y_settings_body">在無障礙清單中找到「Essential Key 偵測」並開啟它。</string>
 
     <!-- Key setup screen -->

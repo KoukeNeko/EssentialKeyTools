@@ -66,7 +66,7 @@ fun OnboardingScreen(
     initialLanguageTag: String,
     onLanguageSelected: (String) -> Unit,
     onExit: () -> Unit,
-    onAgreeAndOpenSettings: () -> Unit,
+    onUseAccessibility: () -> Unit,
     onOpenPrivacyPolicy: () -> Unit,
     systemBarsPadding: PaddingValues = PaddingValues(),
     modifier: Modifier = Modifier
@@ -104,8 +104,8 @@ fun OnboardingScreen(
         )
 
         else -> OnboardingPermission(
-            onNotNow = onExit,
-            onAgreeAndOpenSettings = onAgreeAndOpenSettings,
+            onContinueWithoutAccessibility = onExit,
+            onUseAccessibility = onUseAccessibility,
             onOpenPrivacyPolicy = onOpenPrivacyPolicy,
             systemBarsPadding = systemBarsPadding,
             modifier = modifier
@@ -251,8 +251,8 @@ private fun OnboardingIntro(
 
 @Composable
 private fun OnboardingPermission(
-    onNotNow: () -> Unit,
-    onAgreeAndOpenSettings: () -> Unit,
+    onContinueWithoutAccessibility: () -> Unit,
+    onUseAccessibility: () -> Unit,
     onOpenPrivacyPolicy: () -> Unit,
     systemBarsPadding: PaddingValues,
     modifier: Modifier = Modifier
@@ -308,15 +308,15 @@ private fun OnboardingPermission(
         )
         Spacer(modifier = Modifier.height(CONTENT_TO_ACTIONS_GAP))
         NothingButton(
-            text = stringResource(R.string.onboarding_not_now),
-            onClick = { decideOnce(onNotNow) },
-            outlined = true,
+            text = stringResource(R.string.onboarding_use_accessibility),
+            onClick = { decideOnce(onUseAccessibility) },
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(ACTION_GAP))
         NothingButton(
-            text = stringResource(R.string.onboarding_agree_open_settings),
-            onClick = { decideOnce(onAgreeAndOpenSettings) },
+            text = stringResource(R.string.onboarding_continue_without_accessibility),
+            onClick = { decideOnce(onContinueWithoutAccessibility) },
+            outlined = true,
             modifier = Modifier.fillMaxWidth()
         )
     }
@@ -383,7 +383,7 @@ private fun OnboardingScreenPreview() {
             initialLanguageTag = DEVICE_LANGUAGE_TAG,
             onLanguageSelected = {},
             onExit = {},
-            onAgreeAndOpenSettings = {},
+            onUseAccessibility = {},
             onOpenPrivacyPolicy = {}
         )
     }
@@ -394,8 +394,8 @@ private fun OnboardingScreenPreview() {
 private fun OnboardingPermissionPreview() {
     EssentialKeyToolsTheme {
         OnboardingPermission(
-            onNotNow = {},
-            onAgreeAndOpenSettings = {},
+            onContinueWithoutAccessibility = {},
+            onUseAccessibility = {},
             onOpenPrivacyPolicy = {},
             systemBarsPadding = PaddingValues()
         )

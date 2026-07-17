@@ -201,8 +201,8 @@ private fun ServiceStatusCard(serviceRunning: Boolean) {
 
     if (disclosureRequested) {
         AccessibilityDisclosureDialog(
-            onDecline = { disclosureRequested = false },
-            onConsent = {
+            onContinueWithoutAccessibility = { disclosureRequested = false },
+            onUseAccessibility = {
                 disclosureRequested = false
                 openAccessibilitySettings(context)
             }

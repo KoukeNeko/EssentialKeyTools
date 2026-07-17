@@ -44,12 +44,13 @@ private val ACTION_GAP = 12.dp
 
 /**
  * A dedicated prominent-disclosure surface shown immediately before an accessibility enable path.
- * Dismissing the dialog is deliberately equivalent to declining: only [onConsent] may continue.
+ * Dismissing the dialog continues without accessibility: only [onUseAccessibility] may open the
+ * system settings.
  */
 @Composable
 internal fun AccessibilityDisclosureDialog(
-    onDecline: () -> Unit,
-    onConsent: () -> Unit
+    onContinueWithoutAccessibility: () -> Unit,
+    onUseAccessibility: () -> Unit
 ) {
     var decisionMade by remember { mutableStateOf(false) }
 
@@ -61,7 +62,7 @@ internal fun AccessibilityDisclosureDialog(
     }
 
     Dialog(
-        onDismissRequest = { decideOnce(onDecline) },
+        onDismissRequest = { decideOnce(onContinueWithoutAccessibility) },
         properties = DialogProperties(
             dismissOnBackPress = true,
             dismissOnClickOutside = true,
@@ -75,7 +76,7 @@ internal fun AccessibilityDisclosureDialog(
                 modifier = Modifier
                     .fillMaxSize()
                     .pointerInput(Unit) {
-                        detectTapGestures { decideOnce(onDecline) }
+                        detectTapGestures { decideOnce(onContinueWithoutAccessibility) }
                     }
             )
             BoxWithConstraints(
@@ -123,15 +124,17 @@ internal fun AccessibilityDisclosureDialog(
                         )
                         Spacer(modifier = Modifier.height(QUESTION_TO_ACTIONS_GAP))
                         NothingButton(
-                            text = stringResource(R.string.a11y_disclosure_decline),
-                            onClick = { decideOnce(onDecline) },
-                            outlined = true,
+                            text = stringResource(R.string.a11y_disclosure_use_accessibility),
+                            onClick = { decideOnce(onUseAccessibility) },
                             modifier = Modifier.fillMaxWidth()
                         )
                         Spacer(modifier = Modifier.height(ACTION_GAP))
                         NothingButton(
-                            text = stringResource(R.string.a11y_disclosure_agree),
-                            onClick = { decideOnce(onConsent) },
+                            text = stringResource(
+                                R.string.a11y_disclosure_continue_without_accessibility
+                            ),
+                            onClick = { decideOnce(onContinueWithoutAccessibility) },
+                            outlined = true,
                             modifier = Modifier.fillMaxWidth()
                         )
                     }
@@ -146,8 +149,8 @@ internal fun AccessibilityDisclosureDialog(
 private fun AccessibilityDisclosureDialogPreview() {
     EssentialKeyToolsTheme {
         AccessibilityDisclosureDialog(
-            onDecline = {},
-            onConsent = {}
+            onContinueWithoutAccessibility = {},
+            onUseAccessibility = {}
         )
     }
 }
