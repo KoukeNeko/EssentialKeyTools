@@ -88,6 +88,8 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.datastore.preferences)
+    implementation(libs.play.app.update)
+    implementation(libs.play.app.update.ktx)
     testImplementation(libs.junit)
     // org.json ships with the Android runtime, so it is only needed on the JVM unit-test classpath
     // to exercise GitHubContributorsParser without a device.

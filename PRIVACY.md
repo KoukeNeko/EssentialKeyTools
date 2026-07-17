@@ -7,7 +7,8 @@ Essential Key. This policy explains what the app does — and does not do — wi
 
 **In short: the developer does not collect, store, or sell personal information. The app has no
 user accounts, analytics, advertising, or tracking. Its only automatic network request is the
-public GitHub contributor-list request described below.**
+public GitHub contributor-list request described below. A separate update check runs only when you
+press its button.**
 
 ## Data the app collects
 
@@ -49,16 +50,27 @@ Settings.
 
 ## Network access (INTERNET permission)
 
-The app makes one kind of network request: the home screen fetches the public list of the project's
-contributors from the GitHub API
-(`https://api.github.com/repos/KoukeNeko/EssentialKeyTools/contributors`) to display their names. This
-request sends no personal information. As with any web request, GitHub may process your device's IP
-address under its own privacy policy. This feature is cosmetic — every other part of the app works
+The home screen automatically fetches the public list of the project's contributors from the GitHub
+API (`https://api.github.com/repos/KoukeNeko/EssentialKeyTools/contributors`) to display their names.
+This request sends no personal information. As with any web request, GitHub may process your device's
+IP address under its own privacy policy. This feature is cosmetic — the app's core features work
 fully offline, and the app still functions if the request fails.
+
+The app also has a manual **Check for updates** button. It does not check until you press it:
+
+- a copy installed by Google Play asks Google Play whether an update is available and opens the
+  app's Play listing if you choose to continue;
+- a sideloaded stable copy requests the public stable-release list from the GitHub API; and
+- a Preview copy requests the public pre-release list from the GitHub API.
+
+GitHub receives ordinary connection metadata such as your IP address. Google Play processes update
+requests under Google's privacy policy. The app compares GitHub version numbers on your device and
+does not include your settings, mappings, scan code, or hardware key events in an update request. It
+never downloads or installs an APK itself.
 
 ## Permissions used
 
-- **INTERNET** — only to fetch the contributor list described above.
+- **INTERNET** — to fetch the contributor list and, only when requested, GitHub release metadata.
 - **Accessibility Service** (`BIND_ACCESSIBILITY_SERVICE`) — to detect your Essential Key press.
 - **Package visibility / queries** — to list your launchable apps in the action picker, and to check
   the enabled state of Nothing's Essential Space packages for the unlock wizard.
@@ -67,8 +79,9 @@ fully offline, and the app still functions if the request fails.
 
 The app does not share settings or hardware key-event data with third parties and has no backend
 server of its own. Its only automatic third-party connection is the GitHub contributor-list request
-described above; it contains no app data, although GitHub receives ordinary connection metadata such
-as the device's IP address.
+described above. A manual update check contacts Google Play or GitHub according to the app's install
+source. These requests contain no settings or hardware key-event data, although the service provider
+receives ordinary connection metadata.
 
 ## Children
 

@@ -1,7 +1,8 @@
 name: Build APK
 
-# Mirrors scripts/verify.sh (lint + unit tests + debug assembly) on every push and pull request,
-# then publishes the installable debug APK as a downloadable artifact.
+# Mirrors scripts/verify.sh (lint + unit tests + debug assembly) on every push and pull request.
+# A main-branch push also publishes the artifact as a GitHub pre-release when the matching signed
+# preview tag already exists and GitHub verifies that it points to the exact workflow commit.
 on:
   push:
     branches: [ main ]
@@ -10,6 +11,11 @@ on:
 
 permissions:
   contents: read
+
+env:
+  PRE_VERSION_NAME: 1.0.9-pre.${{ github.run_number }}
+  PRE_TAG: preview-v1.0.9-pre.${{ github.run_number }}
+  PRE_ARTIFACT_NAME: essential-key-tools-v1.0.9-pre.${{ github.run_number }}
 
 concurrency:
   group: build-apk-${{ github.ref }}
@@ -33,13 +39,141 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
 
       - name: Run quality gate and assemble the debug APK
-        env:
-          PRE_VERSION_NAME: 1.0.9-pre.${{ github.run_number }}
         run: ./gradlew lint test assembleDebug -PversionName="$PRE_VERSION_NAME" -PversionCode=10009 --stacktrace
 
       - name: Upload the debug APK
         uses: actions/upload-artifact@v4
         with:
-          name: essential-key-tools-v1.0.9-pre.${{ github.run_number }}
+          name: ${{ env.PRE_ARTIFACT_NAME }}
           path: app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
+
+  publish_preview:
+    name: Publish preview pre-release
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Check out release notes and scripts
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+
+      # A pre-release must attach only to the signed annotated tag prepared by the maintainer. The
+      # GitHub API verifies the signature and resolves the tag's target without relying on runner
+      # GPG/SSH configuration.
+      - name: Verify the signed preview tag
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EXPECTED_COMMIT: ${{ github.sha }}
+        run: |
+          REF_JSON="$(gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$PRE_TAG")"
+          TAG_TYPE="$(jq --raw-output '.object.type' <<< "$REF_JSON")"
+          TAG_OBJECT="$(jq --raw-output '.object.sha' <<< "$REF_JSON")"
+          if [ "$TAG_TYPE" != "tag" ]; then
+            echo "Preview tag must be a signed annotated tag: $PRE_TAG" >&2
+            exit 1
+          fi
+
+          TAG_JSON="$(gh api "repos/$GITHUB_REPOSITORY/git/tags/$TAG_OBJECT")"
+          TAG_COMMIT="$(jq --raw-output '.object.sha' <<< "$TAG_JSON")"
+          TAG_VERIFIED="$(jq --raw-output '.verification.verified' <<< "$TAG_JSON")"
+          if [ "$TAG_COMMIT" != "$EXPECTED_COMMIT" ]; then
+            echo "$PRE_TAG points to $TAG_COMMIT, expected $EXPECTED_COMMIT" >&2
+            exit 1
+          fi
+          if [ "$TAG_VERIFIED" != "true" ]; then
+            TAG_REASON="$(jq --raw-output '.verification.reason' <<< "$TAG_JSON")"
+            echo "GitHub did not verify $PRE_TAG: $TAG_REASON" >&2
+            exit 1
+          fi
+
+      - name: Download the verified APK artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ env.PRE_ARTIFACT_NAME }}
+          path: preview-artifact
+
+      - name: Prepare the versioned APK
+        id: package
+        run: |
+          SOURCE_APK="preview-artifact/app-debug.apk"
+          RELEASE_APK="EssentialKeyTools-v${PRE_VERSION_NAME}.apk"
+          if [ ! -f "$SOURCE_APK" ]; then
+            echo "Missing workflow artifact: $SOURCE_APK" >&2
+            exit 1
+          fi
+          mv "$SOURCE_APK" "$RELEASE_APK"
+          SHA256="$(sha256sum "$RELEASE_APK" | awk '{print $1}')"
+          {
+            echo "apk=$RELEASE_APK"
+            echo "sha256=$SHA256"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Submit preview APK for security analysis
+        id: security_scan
+        continue-on-error: true
+        env:
+          VT_API_KEY: ${{ secrets.VT_API_KEY }}
+          KOODOUS_TOKEN: ${{ secrets.KOODOUS_TOKEN }}
+        run: bash scripts/submit-security-analysis.sh "${{ steps.package.outputs.apk }}"
+
+      - name: Publish the GitHub pre-release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_APK: ${{ steps.package.outputs.apk }}
+          APK_SHA256: ${{ steps.package.outputs.sha256 }}
+          VIRUSTOTAL_STATUS: ${{ steps.security_scan.outputs.virustotal_status }}
+          VIRUSTOTAL_REPORT_URL: ${{ steps.security_scan.outputs.virustotal_report_url }}
+          KOODOUS_STATUS: ${{ steps.security_scan.outputs.koodous_status }}
+          KOODOUS_REPORT_URL: ${{ steps.security_scan.outputs.koodous_report_url }}
+        run: |
+          RELEASE_NOTES="distribution/release-notes/${PRE_TAG}.md"
+          if [ ! -f "$RELEASE_NOTES" ]; then
+            echo "Missing version-specific release notes: $RELEASE_NOTES" >&2
+            exit 1
+          fi
+          if grep --fixed-strings '\n' "$RELEASE_NOTES"; then
+            echo "Release notes contain an escaped newline sequence." >&2
+            exit 1
+          fi
+
+          NOTES="$(mktemp)"
+          cp "$RELEASE_NOTES" "$NOTES"
+          RELEASE_TITLE="Essential Key Tools ${PRE_VERSION_NAME/-pre./ pre.}"
+          {
+            printf '\n## Security analysis\n\n'
+            printf 'Preview APK SHA-256: `%s`\n\n' "$APK_SHA256"
+            if [ -n "$VIRUSTOTAL_REPORT_URL" ]; then
+              printf -- '- [VirusTotal](%s): `%s`\n' "$VIRUSTOTAL_REPORT_URL" "$VIRUSTOTAL_STATUS"
+            else
+              printf -- '- VirusTotal: `%s`\n' "${VIRUSTOTAL_STATUS:-unavailable}"
+            fi
+            if [ -n "$KOODOUS_REPORT_URL" ]; then
+              printf -- '- [Koodous](%s): `%s`\n' "$KOODOUS_REPORT_URL" "$KOODOUS_STATUS"
+            else
+              printf -- '- Koodous: `%s`\n' "${KOODOUS_STATUS:-unavailable}"
+            fi
+          } >> "$NOTES"
+          if ! awk '
+            BEGIN { blank = 0; invalid = 0 }
+            /^$/ { blank++; if (blank > 1) invalid = 1; next }
+            { blank = 0 }
+            END { exit invalid }
+          ' "$NOTES"; then
+            echo "Release notes contain repeated blank lines." >&2
+            exit 1
+          fi
+
+          if gh release view "$PRE_TAG" >/dev/null 2>&1; then
+            gh release upload "$PRE_TAG" "$RELEASE_APK" --clobber
+            gh release edit "$PRE_TAG" \
+              --title "$RELEASE_TITLE" \
+              --notes-file "$NOTES" --prerelease --verify-tag
+          else
+            gh release create "$PRE_TAG" "$RELEASE_APK" \
+              --title "$RELEASE_TITLE" \
+              --notes-file "$NOTES" --prerelease --verify-tag --latest=false
+          fi

@@ -26,6 +26,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -50,6 +51,7 @@ import dev.koukeneko.essentialkeytools.ui.AppLabelResolver
 import dev.koukeneko.essentialkeytools.ui.PRIVACY_POLICY_URL
 import dev.koukeneko.essentialkeytools.ui.UiLabels
 import dev.koukeneko.essentialkeytools.ui.openExternalUrl
+import dev.koukeneko.essentialkeytools.ui.openPlayStoreListing
 import dev.koukeneko.essentialkeytools.ui.screenContentPadding
 import dev.koukeneko.essentialkeytools.ui.components.AccessibilityDisclosureDialog
 import dev.koukeneko.essentialkeytools.ui.components.NothingButton
@@ -59,6 +61,11 @@ import dev.koukeneko.essentialkeytools.ui.components.StatusDot
 import dev.koukeneko.essentialkeytools.ui.theme.EssentialKeyToolsTheme
 import dev.koukeneko.essentialkeytools.unlock.UnlockStatus
 import dev.koukeneko.essentialkeytools.unlock.UnlockerFactory
+import dev.koukeneko.essentialkeytools.updates.AppUpdateCheckerFactory
+import dev.koukeneko.essentialkeytools.updates.UpdateCheckResult
+import dev.koukeneko.essentialkeytools.updates.UpdateDestination
+import dev.koukeneko.essentialkeytools.updates.UpdateSource
+import kotlinx.coroutines.launch
 
 private val SCREEN_PADDING = 24.dp
 private val TITLE_TO_CONTENT_GAP = 32.dp
@@ -71,6 +78,7 @@ private val NAV_BUTTON_GAP = 12.dp
 private val STATUS_TO_ACTION_GAP = 16.dp
 private val DISCLOSURE_GAP = 12.dp
 private val CONTRIBUTOR_SECTION_GAP = 20.dp
+private val UPDATE_ACTION_GAP = 12.dp
 
 // The repository is a proper noun, not translatable copy, so it lives in code; only the captions
 // rendered around it come from string resources. The contributor list itself is fetched from the
@@ -132,10 +140,127 @@ fun HomeScreen(
             onReviewOnboarding = onReviewOnboarding
         )
         Spacer(modifier = Modifier.height(CARD_GAP))
+        UpdateCard()
+        Spacer(modifier = Modifier.height(CARD_GAP))
         LanguageCard()
         Spacer(modifier = Modifier.height(CARD_GAP))
         ContributionCard()
     }
+}
+
+/** Manual, source-aware update check. No executable content is downloaded by the app itself. */
+@Composable
+private fun UpdateCard() {
+    val context = LocalContext.current
+    val checker = remember(context) { AppUpdateCheckerFactory.create(context) }
+    val coroutineScope = rememberCoroutineScope()
+    var state by remember { mutableStateOf<UpdateUiState>(UpdateUiState.Idle) }
+
+    fun checkForUpdate() {
+        if (state == UpdateUiState.Checking) return
+        state = UpdateUiState.Checking
+        coroutineScope.launch {
+            state = checker.check().fold(
+                onSuccess = { result ->
+                    when (result) {
+                        UpdateCheckResult.UpToDate -> UpdateUiState.UpToDate
+                        is UpdateCheckResult.Available -> UpdateUiState.Available(
+                            versionName = result.versionName,
+                            destination = result.destination
+                        )
+                    }
+                },
+                onFailure = { UpdateUiState.Error }
+            )
+        }
+    }
+
+    NothingCard(modifier = Modifier.fillMaxWidth()) {
+        NothingSectionLabel(text = stringResource(R.string.section_updates))
+        Spacer(modifier = Modifier.height(LABEL_GAP))
+        Text(
+            text = stringResource(R.string.update_current_version, checker.currentVersionName),
+            style = MaterialTheme.typography.titleLarge,
+            color = MaterialTheme.colorScheme.onSurface
+        )
+        Text(
+            text = stringResource(updateSourceLabelRes(checker.source)),
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        Spacer(modifier = Modifier.height(STATUS_TO_ACTION_GAP))
+        Text(
+            text = updateStatusText(state),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        Spacer(modifier = Modifier.height(STATUS_TO_ACTION_GAP))
+
+        val availableState = state as? UpdateUiState.Available
+        if (availableState != null) {
+            NothingButton(
+                text = stringResource(
+                    when (availableState.destination) {
+                        UpdateDestination.PlayStore -> R.string.action_update_on_play
+                        is UpdateDestination.GitHubRelease -> R.string.action_view_github_release
+                    }
+                ),
+                onClick = {
+                    when (val destination = availableState.destination) {
+                        UpdateDestination.PlayStore -> openPlayStoreListing(context)
+                        is UpdateDestination.GitHubRelease ->
+                            openExternalUrl(context, destination.url)
+                    }
+                },
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(modifier = Modifier.height(UPDATE_ACTION_GAP))
+        }
+
+        NothingButton(
+            text = stringResource(
+                if (state == UpdateUiState.Idle) {
+                    R.string.action_check_updates
+                } else {
+                    R.string.action_check_updates_again
+                }
+            ),
+            onClick = ::checkForUpdate,
+            outlined = availableState != null,
+            enabled = state != UpdateUiState.Checking,
+            modifier = Modifier.fillMaxWidth()
+        )
+    }
+}
+
+private sealed interface UpdateUiState {
+    data object Idle : UpdateUiState
+    data object Checking : UpdateUiState
+    data object UpToDate : UpdateUiState
+    data object Error : UpdateUiState
+    data class Available(
+        val versionName: String?,
+        val destination: UpdateDestination
+    ) : UpdateUiState
+}
+
+@Composable
+private fun updateStatusText(state: UpdateUiState): String = when (state) {
+    UpdateUiState.Idle -> stringResource(R.string.update_status_idle)
+    UpdateUiState.Checking -> stringResource(R.string.update_status_checking)
+    UpdateUiState.UpToDate -> stringResource(R.string.update_status_up_to_date)
+    UpdateUiState.Error -> stringResource(R.string.update_status_error)
+    is UpdateUiState.Available -> if (state.versionName == null) {
+        stringResource(R.string.update_status_available_play)
+    } else {
+        stringResource(R.string.update_status_available_version, state.versionName)
+    }
+}
+
+private fun updateSourceLabelRes(source: UpdateSource): Int = when (source) {
+    UpdateSource.PLAY_STORE -> R.string.update_source_play
+    UpdateSource.GITHUB_STABLE -> R.string.update_source_github_stable
+    UpdateSource.GITHUB_PREVIEW -> R.string.update_source_github_preview
 }
 
 /**

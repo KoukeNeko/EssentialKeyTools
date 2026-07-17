@@ -142,6 +142,23 @@
     <string name="action_open_language_settings">Open language settings</string>
     <string name="language_settings_unavailable">Could not open language settings.</string>
 
+    <!-- Updates -->
+    <string name="section_updates">Updates</string>
+    <string name="update_current_version">Current version: %1$s</string>
+    <string name="update_source_play">Source: Google Play</string>
+    <string name="update_source_github_stable">Source: stable GitHub releases</string>
+    <string name="update_source_github_preview">Source: GitHub pre-releases</string>
+    <string name="update_status_idle">Check manually to see whether a newer version is available.</string>
+    <string name="update_status_checking">Checking for updates…</string>
+    <string name="update_status_up_to_date">You’re using the latest version.</string>
+    <string name="update_status_available_play">A newer version is available on Google Play.</string>
+    <string name="update_status_available_version">Version %1$s is available.</string>
+    <string name="update_status_error">Couldn’t check for updates. Check your connection and try again.</string>
+    <string name="action_check_updates">Check for updates</string>
+    <string name="action_check_updates_again">Check again</string>
+    <string name="action_update_on_play">Update on Google Play</string>
+    <string name="action_view_github_release">View GitHub release</string>
+
     <!-- Contribution -->
     <string name="section_contribute">Contribute</string>
     <string name="contribute_repository_caption">View source on GitHub</string>

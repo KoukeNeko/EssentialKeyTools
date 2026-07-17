@@ -142,6 +142,23 @@
     <string name="action_open_language_settings">開啟語言設定</string>
     <string name="language_settings_unavailable">無法開啟語言設定。</string>
 
+    <!-- Updates -->
+    <string name="section_updates">更新</string>
+    <string name="update_current_version">目前版本：%1$s</string>
+    <string name="update_source_play">更新來源：Google Play</string>
+    <string name="update_source_github_stable">更新來源：GitHub 正式版本</string>
+    <string name="update_source_github_preview">更新來源：GitHub 測試版本</string>
+    <string name="update_status_idle">手動檢查是否有較新的版本。</string>
+    <string name="update_status_checking">正在檢查更新…</string>
+    <string name="update_status_up_to_date">目前使用的是最新版本。</string>
+    <string name="update_status_available_play">Google Play 上有較新的版本。</string>
+    <string name="update_status_available_version">版本 %1$s 已可使用。</string>
+    <string name="update_status_error">無法檢查更新，請確認網路連線後再試一次。</string>
+    <string name="action_check_updates">檢查更新</string>
+    <string name="action_check_updates_again">重新檢查</string>
+    <string name="action_update_on_play">前往 Google Play 更新</string>
+    <string name="action_view_github_release">查看 GitHub Release</string>
+
     <!-- Contribution -->
     <string name="section_contribute">貢獻</string>
     <string name="contribute_repository_caption">在 GitHub 檢視原始碼</string>

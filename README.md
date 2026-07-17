@@ -46,14 +46,16 @@ outlines, uppercase monospace section labels, and red used at most once per scre
   which renders in one page scroll with no nested list.
 - **Live status** — home screen shows whether the accessibility service is running and whether the
   single press is freed, re-checked on resume to catch drift from an OS update.
+- **Source-aware update checks** — a manual home-screen check uses Google Play for Play-installed
+  builds, stable GitHub Releases for sideloaded production builds, and GitHub pre-releases for
+  Preview builds. The app never downloads or installs an APK itself.
 
 ## Permissions
 
-- **`INTERNET`** — used for one thing only: the home screen's contribution card fetches the
-  repository's contributor list from the public GitHub API
-  (`api.github.com/repos/KoukeNeko/EssentialKeyTools/contributors`). No account, analytics, or
-  tracking is involved. Every other feature works fully offline — if the request fails the card just
-  falls back to the repository link.
+- **`INTERNET`** — the home screen's contribution card fetches the repository's contributor list
+  from the public GitHub API (`api.github.com/repos/KoukeNeko/EssentialKeyTools/contributors`). A
+  separate update request runs only when you press **Check for updates**. No account, analytics, or
+  tracking is involved, and the app never downloads or installs an APK itself.
 - **Accessibility service** — observes only your hardware Essential Key to run the mapped action; it
   does not read screen content or monitor any other key (see the in-app disclosure and *Background*
   below).
