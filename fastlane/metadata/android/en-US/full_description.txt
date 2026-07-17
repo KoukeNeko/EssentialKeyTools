@@ -9,11 +9,11 @@ Features:
 * Four gestures, four independent actions.
 * "Learn your key" setup captures the key's scan code at runtime, so it adapts to any
   model or firmware.
-* One-tap accessibility-service enable via Shizuku, or a guided jump into Settings.
+* Guided accessibility-service enablement through Android Settings.
 * Single-press unlock wizard: freeing the single press requires Nothing's Essential
-  Space packages to be disabled — the app does it on-device in one tap via Shizuku
-  (no PC needed), with manual and ADB paths, live per-package status, and one-tap
-  restore. Double, triple, and long press work without this step.
+  Space packages to be disabled. The wizard opens each package's App Info page for
+  manual disable or restore and shows live per-package status. Double, triple, and
+  long press work without this step.
 * Nothing OS design language: pure-black canvas, hairline cards, monospaced labels.
 
 Requires a Nothing phone with the Essential Key, running Android 15 or newer.

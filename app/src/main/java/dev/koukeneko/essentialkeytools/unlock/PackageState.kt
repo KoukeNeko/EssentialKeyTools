@@ -2,8 +2,7 @@ package dev.koukeneko.essentialkeytools.unlock
 
 /**
  * The install/enabled state of one Nothing consumer package on the device, gathered from
- * [android.content.pm.PackageManager] without needing Shizuku. Only [installed] packages carry a
- * meaningful [enabled] value.
+ * [android.content.pm.PackageManager]. Only [installed] packages carry a meaningful [enabled] value.
  *
  * A package still installed but not enabled has been "freed" — its handler no longer intercepts the
  * Essential Key. A package not installed at all was never a consumer on this model.

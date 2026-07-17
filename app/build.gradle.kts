@@ -30,8 +30,8 @@ android {
         targetSdk = 36
         // CI derives these from the release tag and passes them as -PversionCode / -PversionName
         // (see release.yml); the literals below are only the fallback for local builds.
-        versionCode = (project.findProperty("versionCode") as String?)?.toInt() ?: 10006
-        versionName = (project.findProperty("versionName") as String?) ?: "1.0.6"
+        versionCode = (project.findProperty("versionCode") as String?)?.toInt() ?: 10007
+        versionName = (project.findProperty("versionName") as String?) ?: "1.0.7"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -83,8 +83,6 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.datastore.preferences)
-    implementation(libs.shizuku.api)
-    implementation(libs.shizuku.provider)
     testImplementation(libs.junit)
     // org.json ships with the Android runtime, so it is only needed on the JVM unit-test classpath
     // to exercise GitHubContributorsParser without a device.

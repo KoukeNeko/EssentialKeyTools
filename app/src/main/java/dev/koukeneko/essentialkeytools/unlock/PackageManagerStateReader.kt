@@ -4,8 +4,8 @@ import android.content.Context
 import android.content.pm.PackageManager
 
 /**
- * Reads consumer-package state from the system [PackageManager]. This needs no Shizuku, so the
- * home-screen unlock card can show the live status even when the privileged shell is unavailable.
+ * Reads consumer-package state from the system [PackageManager], allowing the home-screen unlock
+ * card to show live status without invoking a privileged command.
  *
  * A package disabled by another app (`disable-user`) reports its enabled setting as one of the
  * disabled states, which is exactly what we treat as "freed".

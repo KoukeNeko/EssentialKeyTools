@@ -1,5 +1,6 @@
 package dev.koukeneko.essentialkeytools.ui.screens
 
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.provider.Settings
@@ -20,14 +21,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -56,15 +55,8 @@ import dev.koukeneko.essentialkeytools.ui.components.NothingCard
 import dev.koukeneko.essentialkeytools.ui.components.NothingSectionLabel
 import dev.koukeneko.essentialkeytools.ui.components.StatusDot
 import dev.koukeneko.essentialkeytools.ui.theme.EssentialKeyToolsTheme
-import dev.koukeneko.essentialkeytools.unlock.ServiceToggleResult
-import dev.koukeneko.essentialkeytools.unlock.ShizukuAvailability
-import dev.koukeneko.essentialkeytools.unlock.ShizukuGate
 import dev.koukeneko.essentialkeytools.unlock.UnlockStatus
 import dev.koukeneko.essentialkeytools.unlock.UnlockerFactory
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 private val SCREEN_PADDING = 24.dp
 private val TITLE_TO_CONTENT_GAP = 32.dp
@@ -76,13 +68,7 @@ private val GESTURE_ROW_VERTICAL_PADDING = 14.dp
 private val NAV_BUTTON_GAP = 12.dp
 private val STATUS_TO_ACTION_GAP = 16.dp
 private val DISCLOSURE_GAP = 12.dp
-private val PROGRESS_HINT_GAP = 12.dp
 private val CONTRIBUTOR_SECTION_GAP = 20.dp
-
-// The OS starts/stops the AccessibilityService asynchronously after the secure-settings write, so a
-// single immediate re-read of isRunning can race the transition. Poll until it settles or we give up.
-private const val SERVICE_STATE_POLL_INTERVAL_MS = 100L
-private const val SERVICE_STATE_POLL_TIMEOUT_MS = 3000L
 
 // The repository is a proper noun, not translatable copy, so it lives in code; only the captions
 // rendered around it come from string resources. The contributor list itself is fetched from the
@@ -90,12 +76,6 @@ private const val SERVICE_STATE_POLL_TIMEOUT_MS = 3000L
 private const val URL_SCHEME_PREFIX = "https://"
 private const val REPOSITORY_DISPLAY_NAME = "KoukeNeko/EssentialKeyTools"
 private const val REPOSITORY_URL = "https://github.com/KoukeNeko/EssentialKeyTools"
-
-/** The enable operation held until the user affirmatively consents in the disclosure dialog. */
-internal enum class AccessibilityEnablePath {
-    SHIZUKU,
-    SYSTEM_SETTINGS
-}
 
 /**
  * The main control panel. Surfaces live service and single-press-unlock status, one card per
@@ -133,7 +113,7 @@ fun HomeScreen(
         )
         Spacer(modifier = Modifier.height(TITLE_TO_CONTENT_GAP))
 
-        ServiceStatusCard(serviceRunningState = serviceRunningState)
+        ServiceStatusCard(serviceRunning = serviceRunningState)
         Spacer(modifier = Modifier.height(CARD_GAP))
         UnlockStatusCard(status = unlockStatus, onUnlockWizard = onUnlockWizard)
         Spacer(modifier = Modifier.height(CARD_GAP))
@@ -152,14 +132,13 @@ fun HomeScreen(
 }
 
 /**
- * Holds [EssentialKeyDetectionService.isRunning] as a hoisted state so the in-app Shizuku toggle can
- * push the new value the moment its command lands, and refreshes it each time the screen resumes so
- * the status is current after the user returns from the system accessibility settings.
+ * Reads [EssentialKeyDetectionService.isRunning] and refreshes it whenever the screen resumes so the
+ * status is current after the user returns from the system accessibility settings.
  */
 @Composable
-private fun rememberServiceRunningState(): MutableState<Boolean> {
-    val running = remember { mutableStateOf(EssentialKeyDetectionService.isRunning) }
-    OnResume { running.value = EssentialKeyDetectionService.isRunning }
+private fun rememberServiceRunningState(): Boolean {
+    var running by remember { mutableStateOf(EssentialKeyDetectionService.isRunning) }
+    OnResume { running = EssentialKeyDetectionService.isRunning }
     return running
 }
 
@@ -188,20 +167,9 @@ private fun OnResume(onResume: () -> Unit) {
 }
 
 @Composable
-private fun ServiceStatusCard(serviceRunningState: MutableState<Boolean>) {
+private fun ServiceStatusCard(serviceRunning: Boolean) {
     val context = LocalContext.current
-    val coroutineScope = rememberCoroutineScope()
-    val controller = remember { UnlockerFactory.createServiceController() }
-    val serviceRunning = serviceRunningState.value
-    // A toggle is mid-flight: buttons are disabled so a double-tap can't fire the command twice.
-    var toggleInFlight by remember { mutableStateOf(false) }
-    var pendingEnablePath by rememberSaveable {
-        mutableStateOf<AccessibilityEnablePath?>(null)
-    }
-    // Re-key on the running flag so the Shizuku-readiness check re-evaluates after the state flips.
-    val shizukuReady = remember(serviceRunning) {
-        ShizukuGate.availability() == ShizukuAvailability.READY
-    }
+    var disclosureRequested by rememberSaveable { mutableStateOf(false) }
 
     NothingCard(modifier = Modifier.fillMaxWidth()) {
         NothingSectionLabel(text = stringResource(R.string.section_service))
@@ -217,137 +185,40 @@ private fun ServiceStatusCard(serviceRunningState: MutableState<Boolean>) {
                 color = MaterialTheme.colorScheme.onSurface
             )
         }
-        if (serviceRunning) {
-            EnabledServiceControls(
-                shizukuReady = shizukuReady,
-                toggleInFlight = toggleInFlight,
-                onDisable = {
-                    toggleServiceViaShizuku(
-                        context, coroutineScope, controller,
-                        enable = false,
-                        runningState = serviceRunningState,
-                        onInFlightChange = { toggleInFlight = it }
-                    )
-                }
-            )
-        } else {
+        if (!serviceRunning) {
             DisabledServiceControls(
-                shizukuReady = shizukuReady,
-                toggleInFlight = toggleInFlight,
-                onRequestEnableViaShizuku = {
-                    pendingEnablePath = AccessibilityEnablePath.SHIZUKU
-                },
-                onRequestOpenSettings = {
-                    pendingEnablePath = AccessibilityEnablePath.SYSTEM_SETTINGS
-                }
+                onRequestOpenSettings = { disclosureRequested = true }
             )
         }
     }
 
-    val requestedPath = pendingEnablePath
-    if (requestedPath != null) {
+    if (disclosureRequested) {
         AccessibilityDisclosureDialog(
-            onDecline = { pendingEnablePath = null },
+            onDecline = { disclosureRequested = false },
             onConsent = {
-                // Clear the pending operation before dispatch so a double tap cannot repeat it.
-                val consentedPath = pendingEnablePath
-                pendingEnablePath = null
-                when (consentedPath) {
-                    AccessibilityEnablePath.SHIZUKU -> toggleServiceViaShizuku(
-                        context, coroutineScope, controller,
-                        enable = true,
-                        runningState = serviceRunningState,
-                        onInFlightChange = { toggleInFlight = it }
-                    )
-                    AccessibilityEnablePath.SYSTEM_SETTINGS -> openAccessibilitySettings(context)
-                    null -> Unit
-                }
+                disclosureRequested = false
+                openAccessibilitySettings(context)
             }
         )
     }
 }
 
-/**
- * The service is off: offer the Shizuku one-tap path (if ready) and the Settings fallback. Each
- * callback only requests an enable path; [ServiceStatusCard] obtains consent before dispatching it.
- */
+/** The service is off: explain the system-settings path and request consent before opening it. */
 @Composable
 private fun DisabledServiceControls(
-    shizukuReady: Boolean,
-    toggleInFlight: Boolean,
-    onRequestEnableViaShizuku: () -> Unit,
     onRequestOpenSettings: () -> Unit
 ) {
     Spacer(modifier = Modifier.height(STATUS_TO_ACTION_GAP))
-    if (shizukuReady) {
-        Text(
-            text = stringResource(R.string.a11y_shizuku_body),
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-        Spacer(modifier = Modifier.height(DISCLOSURE_GAP))
-        NothingButton(
-            text = stringResource(R.string.a11y_enable_via_shizuku),
-            onClick = onRequestEnableViaShizuku,
-            enabled = !toggleInFlight,
-            modifier = Modifier.fillMaxWidth()
-        )
-        if (toggleInFlight) {
-            ToggleProgressHint(text = stringResource(R.string.a11y_enabling))
-        }
-        Spacer(modifier = Modifier.height(DISCLOSURE_GAP))
-        NothingButton(
-            text = stringResource(R.string.a11y_open_settings),
-            onClick = onRequestOpenSettings,
-            outlined = true,
-            modifier = Modifier.fillMaxWidth()
-        )
-    } else {
-        Text(
-            text = stringResource(R.string.a11y_settings_body),
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-        Spacer(modifier = Modifier.height(DISCLOSURE_GAP))
-        NothingButton(
-            text = stringResource(R.string.action_open_accessibility_settings),
-            onClick = onRequestOpenSettings,
-            modifier = Modifier.fillMaxWidth()
-        )
-    }
-}
-
-/** The service is on: offer a symmetric one-tap disable via Shizuku only when Shizuku is ready. */
-@Composable
-private fun EnabledServiceControls(
-    shizukuReady: Boolean,
-    toggleInFlight: Boolean,
-    onDisable: () -> Unit
-) {
-    if (!shizukuReady) {
-        return
-    }
-    Spacer(modifier = Modifier.height(STATUS_TO_ACTION_GAP))
-    NothingButton(
-        text = stringResource(R.string.a11y_disable_via_shizuku),
-        onClick = onDisable,
-        outlined = true,
-        enabled = !toggleInFlight,
-        modifier = Modifier.fillMaxWidth()
-    )
-    if (toggleInFlight) {
-        ToggleProgressHint(text = stringResource(R.string.a11y_disabling))
-    }
-}
-
-/** A subtle inline hint shown while a Shizuku toggle command is running. */
-@Composable
-private fun ToggleProgressHint(text: String) {
-    Spacer(modifier = Modifier.height(PROGRESS_HINT_GAP))
     Text(
-        text = text,
-        style = MaterialTheme.typography.labelSmall,
+        text = stringResource(R.string.a11y_settings_body),
+        style = MaterialTheme.typography.bodyMedium,
         color = MaterialTheme.colorScheme.onSurfaceVariant
+    )
+    Spacer(modifier = Modifier.height(DISCLOSURE_GAP))
+    NothingButton(
+        text = stringResource(R.string.action_open_accessibility_settings),
+        onClick = onRequestOpenSettings,
+        modifier = Modifier.fillMaxWidth()
     )
 }
 
@@ -652,71 +523,20 @@ private const val HIGHLIGHT_FRAGMENT_ARG_KEY = ":settings:fragment_args_key"
 private const val HIGHLIGHT_SHOW_FRAGMENT_ARGS = ":settings:show_fragment_args"
 
 /**
- * Runs the enable/disable through Shizuku off the main thread, then flips the hoisted running state
- * so the card re-renders into the opposite set of controls without waiting for a resume. On any
- * non-success outcome (shell unavailable or a command failure) it falls back to the settings path
- * with a toast, so the user is never left without a way forward.
- */
-private fun toggleServiceViaShizuku(
-    context: Context,
-    coroutineScope: kotlinx.coroutines.CoroutineScope,
-    controller: dev.koukeneko.essentialkeytools.unlock.AccessibilityServiceController,
-    enable: Boolean,
-    runningState: MutableState<Boolean>,
-    onInFlightChange: (Boolean) -> Unit
-) {
-    onInFlightChange(true)
-    coroutineScope.launch {
-        try {
-            val result = withContext(Dispatchers.IO) {
-                if (enable) controller.enable() else controller.disable()
-            }
-            when (result) {
-                ServiceToggleResult.SUCCEEDED -> {
-                    val message = if (enable) R.string.a11y_enabled else R.string.a11y_disabled
-                    Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
-                    // The OS toggles the service asynchronously; poll until isRunning catches up.
-                    runningState.value = awaitServiceState(expectedRunning = enable)
-                }
-                ServiceToggleResult.SHELL_UNAVAILABLE,
-                ServiceToggleResult.COMMAND_FAILED -> {
-                    Toast.makeText(context, R.string.a11y_shizuku_failed, Toast.LENGTH_LONG).show()
-                    openAccessibilitySettings(context)
-                }
-            }
-        } finally {
-            onInFlightChange(false)
-        }
-    }
-}
-
-/**
- * Polls [EssentialKeyDetectionService.isRunning] until it matches [expectedRunning] or the timeout
- * elapses, returning whatever the flag reads at that point so the card shows the true current state
- * even if the transition never lands.
- */
-private suspend fun awaitServiceState(expectedRunning: Boolean): Boolean {
-    var elapsedMs = 0L
-    while (EssentialKeyDetectionService.isRunning != expectedRunning &&
-        elapsedMs < SERVICE_STATE_POLL_TIMEOUT_MS
-    ) {
-        delay(SERVICE_STATE_POLL_INTERVAL_MS)
-        elapsedMs += SERVICE_STATE_POLL_INTERVAL_MS
-    }
-    return EssentialKeyDetectionService.isRunning
-}
-
-/**
  * Opens the accessibility settings, best-effort highlighting our service via the settings-highlight
  * extras. Those extras are undocumented and rejected on some OEM builds, so a failure falls back to
  * the plain accessibility settings intent.
  */
 private fun openAccessibilitySettings(context: Context) {
+    val serviceComponent = ComponentName(
+        context,
+        EssentialKeyDetectionService::class.java
+    ).flattenToString()
     val highlighted = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS).apply {
         addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        putExtra(HIGHLIGHT_FRAGMENT_ARG_KEY, ourServiceComponent)
+        putExtra(HIGHLIGHT_FRAGMENT_ARG_KEY, serviceComponent)
         val highlightBundle = android.os.Bundle()
-        highlightBundle.putString(HIGHLIGHT_FRAGMENT_ARG_KEY, ourServiceComponent)
+        highlightBundle.putString(HIGHLIGHT_FRAGMENT_ARG_KEY, serviceComponent)
         putExtra(HIGHLIGHT_SHOW_FRAGMENT_ARGS, highlightBundle)
     }
     try {
@@ -735,9 +555,6 @@ private fun openPlainAccessibilitySettings(context: Context) {
         Toast.makeText(context, R.string.a11y_settings_body, Toast.LENGTH_LONG).show()
     }
 }
-
-private val ourServiceComponent: String
-    get() = dev.koukeneko.essentialkeytools.unlock.AccessibilityServiceController.OUR_SERVICE_COMPONENT
 
 @Preview(showBackground = true, backgroundColor = 0xFF000000)
 @Composable

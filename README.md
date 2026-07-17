@@ -23,9 +23,7 @@ outlines, uppercase monospace section labels, and red used at most once per scre
 ## Screenshots
 
 <p align="center">
-  <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/1.png" width="19%" alt="Home" />
   <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/2.png" width="19%" alt="Action picker" />
-  <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/3.png" width="19%" alt="Unlock wizard" />
   <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/4.png" width="19%" alt="Key setup" />
   <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/5.png" width="19%" alt="Key test" />
 </p>
@@ -37,13 +35,11 @@ outlines, uppercase monospace section labels, and red used at most once per scre
   media, cycle ringer mode.
 - **Runtime scanCode learning** — a "press your key" setup flow captures the scanCode instead of
   hard-coding `250`, so it adapts to any model or firmware.
-- **In-app service enablement** — a disclosure card explains what the service does, then either a
-  **one-tap Shizuku enable/disable** (writes the secure setting directly, no settings hunt) or a
-  deep link that highlights the service in system settings.
+- **Guided service enablement** — a disclosure card explains what the service does, then opens
+  Android's accessibility settings and highlights the service when the system supports it.
 - **Single-press unlock wizard** — Nothing OS owns the single press until its consumer packages are
-  disabled. Three paths: **Shizuku** (on-device, one tap), **manual** (opens each package's App Info
-  page to disable by hand), or **ADB** (copyable commands) — with one-tap restore and live
-  per-package status.
+  disabled. The wizard opens each package's App Info page for manual disable or restore and shows
+  live per-package status.
 - **Searchable action picker** — a search field filters built-in actions and the full app list,
   which renders in one page scroll with no nested list.
 - **Live status** — home screen shows whether the accessibility service is running and whether the
@@ -66,23 +62,15 @@ The app collects no personal data and has no analytics, ads, or tracking. See th
 ## Setup
 
 1. **Enable the accessibility service** — the home card walks you through it: read the disclosure,
-   then one-tap enable via Shizuku, or jump to the highlighted entry in system settings. The service
-   listens only for your hardware key.
+   then jump to the highlighted entry in system settings. The service listens only for your hardware
+   key.
 2. **Learn your key** — Home → *Key setup* → press the Essential Key → save the captured scanCode.
    Use *Key test* to confirm gestures are classified correctly.
 3. **Map actions** — tap any gesture card on the home screen to assign its action.
 4. **(Optional) Free the single press** — Home → *Unlock wizard*:
-   - **Shizuku path** — install & start [Shizuku](https://shizuku.rikka.app) (works on-device via
-     Wireless debugging, no PC), grant permission, tap *Free single press*. *Restore* re-enables the
-     packages.
-   - **Manual path** — open each Nothing package's App Info page from the wizard and disable it
-     there (the Disable button may be greyed out on some builds — use Shizuku or ADB then).
-   - **ADB path** — from a PC:
-     ```
-     adb shell pm disable-user --user 0 com.nothing.ntessentialspace
-     adb shell pm disable-user --user 0 com.nothing.ntessentialrecorder
-     ```
-     Revert with `pm enable <pkg>`. The wizard shows the exact copyable commands.
+   - Open each Nothing package's App Info page from the wizard and disable it there. Return to the
+     same pages and tap *Enable* if you want to restore the packages. On some OS builds the Disable
+     button may be unavailable for system apps.
 
    Freeing the single press disables Nothing's Essential Space and Recorder entirely; an OS update
    may re-enable them. Double / triple / long press work without unlocking.
@@ -105,8 +93,8 @@ Or use the verification harness (prints a PASS/FAIL summary, `JAVA_HOME` overrid
 `adb sendevent` for on-device testing (needs the correct input node and usually root on stock
 firmware — see the script's header).
 
-Pure logic (gesture classifier, settings serialization, unlock status/command mapping) is covered by
-JVM unit tests and has no Android dependency, so it is verified without a device.
+Pure logic (gesture classifier, settings serialization, and unlock status mapping) is covered by JVM
+unit tests and has no Android dependency, so it is verified without a device.
 
 ## Background
 

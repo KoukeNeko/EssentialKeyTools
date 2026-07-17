@@ -24,8 +24,3 @@
 # the original source file names.
 -keepattributes SourceFile,LineNumberTable
 -renamesourcefileattribute SourceFile
-
-# Shizuku: the app talks to Shizuku over its binder/AIDL (ShizukuProvider, API, and the AIDL stubs).
-# Keep its classes so R8 does not rename/strip anything the privileged IPC relies on.
--keep class rikka.shizuku.** { *; }
--keep class moe.shizuku.** { *; }

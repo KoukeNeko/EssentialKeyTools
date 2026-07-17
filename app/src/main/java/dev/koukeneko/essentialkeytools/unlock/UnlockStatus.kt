@@ -2,7 +2,7 @@ package dev.koukeneko.essentialkeytools.unlock
 
 /**
  * Whether the Essential Key's single press has been freed from Nothing OS. Derived purely from the
- * per-package states so the mapping can be unit-tested without Android or Shizuku.
+ * per-package states so the mapping can be unit-tested without Android.
  */
 enum class UnlockStatus {
     /** No consumer packages were found — nothing to unlock (unusual, treated as informational). */
