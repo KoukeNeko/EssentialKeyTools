@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">Essential Key Tools 預覽版</string>
+    <string name="accessibility_service_label">Essential Key 偵測（預覽版）</string>
+    <string name="a11y_settings_body">在無障礙清單中找到「Essential Key 偵測（預覽版）」並開啟它。</string>
+    <string name="onboarding_permission_next_body">系統會開啟 Android 無障礙設定。請選擇「Essential Key 偵測（預覽版）」、閱讀 Android 的系統警告，再開啟「使用 Essential Key 偵測（預覽版）」。你可以不啟用直接返回，也可以隨時將它關閉。</string>
+</resources>
