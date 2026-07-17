@@ -47,7 +47,9 @@ import dev.koukeneko.essentialkeytools.service.EssentialKeyDetectionService
 import dev.koukeneko.essentialkeytools.settings.GestureActionMap
 import dev.koukeneko.essentialkeytools.settings.SettingsRepository
 import dev.koukeneko.essentialkeytools.ui.AppLabelResolver
+import dev.koukeneko.essentialkeytools.ui.PRIVACY_POLICY_URL
 import dev.koukeneko.essentialkeytools.ui.UiLabels
+import dev.koukeneko.essentialkeytools.ui.openExternalUrl
 import dev.koukeneko.essentialkeytools.ui.screenContentPadding
 import dev.koukeneko.essentialkeytools.ui.components.AccessibilityDisclosureDialog
 import dev.koukeneko.essentialkeytools.ui.components.NothingButton
@@ -428,14 +430,19 @@ private fun ContributionCard() {
         ContributionLinkRow(
             title = REPOSITORY_DISPLAY_NAME,
             caption = stringResource(R.string.contribute_repository_caption),
-            onClick = { openUrl(context, REPOSITORY_URL) }
+            onClick = { openExternalUrl(context, REPOSITORY_URL) }
+        )
+        ContributionLinkRow(
+            title = stringResource(R.string.privacy_policy_title),
+            caption = stringResource(R.string.privacy_policy_caption),
+            onClick = { openExternalUrl(context, PRIVACY_POLICY_URL) }
         )
         Spacer(modifier = Modifier.height(CONTRIBUTOR_SECTION_GAP))
         NothingSectionLabel(text = stringResource(R.string.contribute_contributors))
         Spacer(modifier = Modifier.height(LABEL_GAP))
         ContributorsSection(
             state = contributorsState,
-            onOpenProfile = { profileUrl -> openUrl(context, profileUrl) }
+            onOpenProfile = { profileUrl -> openExternalUrl(context, profileUrl) }
         )
     }
 }
@@ -517,20 +524,6 @@ private fun ContributionLinkRow(title: String, caption: String, onClick: () -> U
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
-    }
-}
-
-/**
- * Opens an external URL in the user's browser. A device with no browser is the only expected
- * failure, so it surfaces a toast instead of crashing.
- */
-private fun openUrl(context: Context, url: String) {
-    val intent = Intent(Intent.ACTION_VIEW, android.net.Uri.parse(url))
-        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-    try {
-        context.startActivity(intent)
-    } catch (error: android.content.ActivityNotFoundException) {
-        Toast.makeText(context, R.string.contribute_open_failed, Toast.LENGTH_LONG).show()
     }
 }
 

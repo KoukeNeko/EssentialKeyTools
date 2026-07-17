@@ -11,6 +11,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import dev.koukeneko.essentialkeytools.R
 import dev.koukeneko.essentialkeytools.ui.theme.EssentialKeyToolsTheme
 import java.util.concurrent.atomic.AtomicInteger
+import java.util.concurrent.atomic.AtomicReference
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
@@ -26,8 +27,20 @@ class OnboardingScreenTest {
         get() = InstrumentationRegistry.getInstrumentation().targetContext.resources
 
     @Test
-    fun introExplainsTheFlowAndCanOpenThePermissionStep() {
-        showOnboarding()
+    fun languageIntroductionAndDisclosureAppearInOrder() {
+        val selectedLanguage = AtomicReference<String>()
+        showOnboarding(onLanguageSelected = selectedLanguage::set)
+
+        composeRule.onNodeWithText(resources.getString(R.string.onboarding_language_headline))
+            .assertIsDisplayed()
+        composeRule.onNodeWithText(
+            resources.getString(R.string.onboarding_language_traditional_chinese)
+        ).performClick()
+        composeRule.runOnIdle {
+            assertEquals("zh-TW", selectedLanguage.get())
+        }
+
+        composeRule.onNodeWithText(buttonText(R.string.onboarding_continue)).performClick()
 
         composeRule.onNodeWithText(resources.getString(R.string.onboarding_intro_headline))
             .assertIsDisplayed()
@@ -44,6 +57,29 @@ class OnboardingScreenTest {
         composeRule.onNodeWithText(resources.getString(R.string.onboarding_permission_next_body))
             .performScrollTo()
             .assertIsDisplayed()
+    }
+
+    @Test
+    fun privacyPolicyCanOpenWithoutAcceptingOrLeaving() {
+        val exits = AtomicInteger()
+        val settingsOpens = AtomicInteger()
+        val privacyOpens = AtomicInteger()
+        showOnboarding(
+            onExit = { exits.incrementAndGet() },
+            onAgreeAndOpenSettings = { settingsOpens.incrementAndGet() },
+            onOpenPrivacyPolicy = { privacyOpens.incrementAndGet() }
+        )
+
+        openPermissionStep()
+        composeRule.onNodeWithText(buttonText(R.string.action_open_privacy_policy))
+            .performScrollTo()
+            .performClick()
+
+        composeRule.runOnIdle {
+            assertEquals(0, exits.get())
+            assertEquals(0, settingsOpens.get())
+            assertEquals(1, privacyOpens.get())
+        }
     }
 
     @Test
@@ -91,17 +127,23 @@ class OnboardingScreenTest {
 
     private fun openPermissionStep() {
         composeRule.onNodeWithText(buttonText(R.string.onboarding_continue)).performClick()
+        composeRule.onNodeWithText(buttonText(R.string.onboarding_continue)).performClick()
     }
 
     private fun showOnboarding(
+        onLanguageSelected: (String) -> Unit = {},
         onExit: () -> Unit = {},
-        onAgreeAndOpenSettings: () -> Unit = {}
+        onAgreeAndOpenSettings: () -> Unit = {},
+        onOpenPrivacyPolicy: () -> Unit = {}
     ) {
         composeRule.setContent {
             EssentialKeyToolsTheme {
                 OnboardingScreen(
+                    initialLanguageTag = "",
+                    onLanguageSelected = onLanguageSelected,
                     onExit = onExit,
-                    onAgreeAndOpenSettings = onAgreeAndOpenSettings
+                    onAgreeAndOpenSettings = onAgreeAndOpenSettings,
+                    onOpenPrivacyPolicy = onOpenPrivacyPolicy
                 )
             }
         }

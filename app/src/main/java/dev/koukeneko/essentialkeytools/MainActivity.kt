@@ -1,6 +1,8 @@
 package dev.koukeneko.essentialkeytools
 
+import android.app.LocaleManager
 import android.os.Bundle
+import android.os.LocaleList
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.compose.BackHandler
@@ -21,6 +23,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import dev.koukeneko.essentialkeytools.core.KeyGesture
 import dev.koukeneko.essentialkeytools.settings.SettingsRepository
+import dev.koukeneko.essentialkeytools.ui.PRIVACY_POLICY_URL
+import dev.koukeneko.essentialkeytools.ui.openExternalUrl
 import dev.koukeneko.essentialkeytools.ui.screens.ActionPickerScreen
 import dev.koukeneko.essentialkeytools.ui.screens.HomeScreen
 import dev.koukeneko.essentialkeytools.ui.screens.KeySetupScreen
@@ -65,6 +69,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 private fun AppNavigation(systemBarsPadding: PaddingValues) {
     val context = LocalContext.current
+    val localeManager = remember(context) { context.getSystemService(LocaleManager::class.java) }
     val repository = remember { SettingsRepository.getInstance(context) }
     val onboardingCompleted: Boolean? by repository.onboardingCompleted.collectAsState(
         initial = null
@@ -88,11 +93,20 @@ private fun AppNavigation(systemBarsPadding: PaddingValues) {
 
     if (showOnboarding) {
         OnboardingScreen(
+            initialLanguageTag = localeManager.applicationLocales.toLanguageTags(),
+            onLanguageSelected = { languageTag ->
+                localeManager.applicationLocales = if (languageTag.isEmpty()) {
+                    LocaleList.getEmptyLocaleList()
+                } else {
+                    LocaleList.forLanguageTags(languageTag)
+                }
+            },
             onExit = ::finishOnboarding,
             onAgreeAndOpenSettings = {
                 finishOnboarding()
                 openAccessibilitySettings(context)
             },
+            onOpenPrivacyPolicy = { openExternalUrl(context, PRIVACY_POLICY_URL) },
             systemBarsPadding = systemBarsPadding
         )
         return

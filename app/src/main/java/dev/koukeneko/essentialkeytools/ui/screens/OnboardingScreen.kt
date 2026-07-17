@@ -1,15 +1,20 @@
 package dev.koukeneko.essentialkeytools.ui.screens
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -18,8 +23,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import dev.koukeneko.essentialkeytools.R
@@ -29,8 +36,12 @@ import dev.koukeneko.essentialkeytools.ui.components.NothingSectionLabel
 import dev.koukeneko.essentialkeytools.ui.screenContentPadding
 import dev.koukeneko.essentialkeytools.ui.theme.EssentialKeyToolsTheme
 
-private const val INTRO_STEP = 0
-private const val PERMISSION_STEP = 1
+private const val LANGUAGE_STEP = 0
+private const val INTRO_STEP = 1
+private const val PERMISSION_STEP = 2
+private const val DEVICE_LANGUAGE_TAG = ""
+private const val ENGLISH_LANGUAGE_TAG = "en-US"
+private const val TRADITIONAL_CHINESE_LANGUAGE_TAG = "zh-TW"
 
 private val SCREEN_PADDING = 24.dp
 private val TITLE_TO_STEP_GAP = 12.dp
@@ -39,32 +50,52 @@ private val HEADLINE_TO_BODY_GAP = 12.dp
 private val BODY_TO_CARD_GAP = 24.dp
 private val CARD_GAP = 16.dp
 private val LABEL_GAP = 12.dp
+private val LANGUAGE_OPTION_GAP = 12.dp
+private val RADIO_TO_TEXT_GAP = 16.dp
 private val ACTION_GAP = 12.dp
 private val CONTENT_TO_ACTIONS_GAP = 24.dp
 
 /**
- * First-run setup. The second page is the prominent disclosure and affirmative consent step that
- * appears before Android accessibility settings are opened. Declining, skipping, or pressing Back
- * never opens settings and still leaves the same setup guide reachable from the home screen.
+ * First-run setup. Language comes first so every following explanation is readable, followed by an
+ * introduction and a separate prominent disclosure immediately before Android accessibility
+ * settings can open. Declining, skipping, or pressing Back never opens settings, and the guide
+ * remains reachable from the home screen.
  */
 @Composable
 fun OnboardingScreen(
+    initialLanguageTag: String,
+    onLanguageSelected: (String) -> Unit,
     onExit: () -> Unit,
     onAgreeAndOpenSettings: () -> Unit,
+    onOpenPrivacyPolicy: () -> Unit,
     systemBarsPadding: PaddingValues = PaddingValues(),
     modifier: Modifier = Modifier
 ) {
-    var step by rememberSaveable { mutableIntStateOf(INTRO_STEP) }
+    var step by rememberSaveable { mutableIntStateOf(LANGUAGE_STEP) }
+    var selectedLanguageTag by rememberSaveable {
+        mutableStateOf(supportedLanguageTag(initialLanguageTag))
+    }
 
     BackHandler {
-        if (step == PERMISSION_STEP) {
-            step = INTRO_STEP
-        } else {
-            onExit()
+        when (step) {
+            PERMISSION_STEP -> step = INTRO_STEP
+            INTRO_STEP -> step = LANGUAGE_STEP
+            else -> onExit()
         }
     }
 
     when (step) {
+        LANGUAGE_STEP -> OnboardingLanguage(
+            selectedLanguageTag = selectedLanguageTag,
+            onLanguageSelected = { languageTag ->
+                selectedLanguageTag = languageTag
+                onLanguageSelected(languageTag)
+            },
+            onContinue = { step = INTRO_STEP },
+            systemBarsPadding = systemBarsPadding,
+            modifier = modifier
+        )
+
         INTRO_STEP -> OnboardingIntro(
             onContinue = { step = PERMISSION_STEP },
             onSkip = onExit,
@@ -75,9 +106,106 @@ fun OnboardingScreen(
         else -> OnboardingPermission(
             onNotNow = onExit,
             onAgreeAndOpenSettings = onAgreeAndOpenSettings,
+            onOpenPrivacyPolicy = onOpenPrivacyPolicy,
             systemBarsPadding = systemBarsPadding,
             modifier = modifier
         )
+    }
+}
+
+private fun supportedLanguageTag(languageTags: String): String {
+    val primaryLanguageTag = languageTags.substringBefore(',')
+    return when {
+        primaryLanguageTag.startsWith("en", ignoreCase = true) -> ENGLISH_LANGUAGE_TAG
+        primaryLanguageTag.startsWith("zh", ignoreCase = true) ->
+            TRADITIONAL_CHINESE_LANGUAGE_TAG
+        else -> DEVICE_LANGUAGE_TAG
+    }
+}
+
+@Composable
+private fun OnboardingLanguage(
+    selectedLanguageTag: String,
+    onLanguageSelected: (String) -> Unit,
+    onContinue: () -> Unit,
+    systemBarsPadding: PaddingValues,
+    modifier: Modifier = Modifier
+) {
+    OnboardingPage(
+        title = stringResource(R.string.onboarding_language_title),
+        step = stringResource(R.string.onboarding_step_language),
+        headline = stringResource(R.string.onboarding_language_headline),
+        body = stringResource(R.string.onboarding_language_body),
+        systemBarsPadding = systemBarsPadding,
+        modifier = modifier
+    ) {
+        LanguageOptionCard(
+            title = stringResource(R.string.onboarding_language_device),
+            body = stringResource(R.string.onboarding_language_device_body),
+            selected = selectedLanguageTag == DEVICE_LANGUAGE_TAG,
+            onClick = { onLanguageSelected(DEVICE_LANGUAGE_TAG) }
+        )
+        Spacer(modifier = Modifier.height(LANGUAGE_OPTION_GAP))
+        LanguageOptionCard(
+            title = stringResource(R.string.onboarding_language_english),
+            body = stringResource(R.string.onboarding_language_english_body),
+            selected = selectedLanguageTag == ENGLISH_LANGUAGE_TAG,
+            onClick = { onLanguageSelected(ENGLISH_LANGUAGE_TAG) }
+        )
+        Spacer(modifier = Modifier.height(LANGUAGE_OPTION_GAP))
+        LanguageOptionCard(
+            title = stringResource(R.string.onboarding_language_traditional_chinese),
+            body = stringResource(R.string.onboarding_language_traditional_chinese_body),
+            selected = selectedLanguageTag == TRADITIONAL_CHINESE_LANGUAGE_TAG,
+            onClick = { onLanguageSelected(TRADITIONAL_CHINESE_LANGUAGE_TAG) }
+        )
+        Spacer(modifier = Modifier.height(CONTENT_TO_ACTIONS_GAP))
+        NothingButton(
+            text = stringResource(R.string.onboarding_continue),
+            onClick = onContinue,
+            modifier = Modifier.fillMaxWidth()
+        )
+    }
+}
+
+@Composable
+private fun LanguageOptionCard(
+    title: String,
+    body: String,
+    selected: Boolean,
+    onClick: () -> Unit
+) {
+    NothingCard(
+        modifier = Modifier
+            .fillMaxWidth()
+            .selectable(
+                selected = selected,
+                role = Role.RadioButton,
+                onClick = onClick
+            )
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            RadioButton(
+                selected = selected,
+                onClick = null,
+                colors = RadioButtonDefaults.colors(
+                    selectedColor = MaterialTheme.colorScheme.tertiary
+                )
+            )
+            Spacer(modifier = Modifier.width(RADIO_TO_TEXT_GAP))
+            Column {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Text(
+                    text = body,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
     }
 }
 
@@ -125,6 +253,7 @@ private fun OnboardingIntro(
 private fun OnboardingPermission(
     onNotNow: () -> Unit,
     onAgreeAndOpenSettings: () -> Unit,
+    onOpenPrivacyPolicy: () -> Unit,
     systemBarsPadding: PaddingValues,
     modifier: Modifier = Modifier
 ) {
@@ -163,6 +292,13 @@ private fun OnboardingPermission(
         OnboardingInfoCard(
             label = stringResource(R.string.onboarding_permission_next_label),
             body = stringResource(R.string.onboarding_permission_next_body)
+        )
+        Spacer(modifier = Modifier.height(CONTENT_TO_ACTIONS_GAP))
+        NothingButton(
+            text = stringResource(R.string.action_open_privacy_policy),
+            onClick = onOpenPrivacyPolicy,
+            outlined = true,
+            modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(CONTENT_TO_ACTIONS_GAP))
         Text(
@@ -244,8 +380,11 @@ private fun OnboardingInfoCard(label: String, body: String) {
 private fun OnboardingScreenPreview() {
     EssentialKeyToolsTheme {
         OnboardingScreen(
+            initialLanguageTag = DEVICE_LANGUAGE_TAG,
+            onLanguageSelected = {},
             onExit = {},
-            onAgreeAndOpenSettings = {}
+            onAgreeAndOpenSettings = {},
+            onOpenPrivacyPolicy = {}
         )
     }
 }
@@ -257,6 +396,7 @@ private fun OnboardingPermissionPreview() {
         OnboardingPermission(
             onNotNow = {},
             onAgreeAndOpenSettings = {},
+            onOpenPrivacyPolicy = {},
             systemBarsPadding = PaddingValues()
         )
     }

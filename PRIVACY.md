@@ -5,13 +5,14 @@ _Last updated: 17 July 2026_
 Essential Key Tools ("the app") is a free, open-source Android app that remaps the Nothing Phone
 Essential Key. This policy explains what the app does — and does not do — with your data.
 
-**In short: the app does not collect, store, or share any personal information. It has no user
-accounts, no analytics, no advertising, and no tracking.**
+**In short: the developer does not collect, store, or sell personal information. The app has no
+user accounts, analytics, advertising, or tracking. Its only automatic network request is the
+public GitHub contributor-list request described below.**
 
 ## Data the app collects
 
-None. The app does not collect, transmit, or sell any personal or usage data. There are no analytics
-SDKs, no advertising, no crash/telemetry reporting, and no accounts or sign-in.
+The developer collects none. The app has no analytics SDKs, advertising, crash or telemetry
+reporting, accounts, or sign-in. It does not send your settings or hardware key-event data anywhere.
 
 ## Data stored on your device
 
@@ -19,13 +20,21 @@ Your settings — which action each gesture (single, double, triple, or long pre
 the learned scan code of your key — are stored locally on your device using Android's DataStore. This
 data never leaves your device and is removed when you uninstall the app.
 
+## Data retention, deletion, and security
+
+The local settings described above remain only until you change them, clear the app's storage, or
+uninstall the app. The developer has no server-side copy to retain or delete. Android protects these
+settings inside the app's private storage, and the app sends none of them over a network.
+
 ## Accessibility Service
 
 The app uses an Accessibility Service to receive hardware key events, including the key code, scan
 code, press or release state, and event time. These events are processed on your device, including
 when the app is not open, to recognise a single, double, triple, or long press of your hardware
-Essential Key and run the action you assigned. If you assign Screenshot or Lock screen, the service
-also invokes the corresponding Android accessibility system action. The service:
+Essential Key and run the action you assigned. The service follows only the fixed gesture-to-action
+mapping you set; it does not choose or plan actions. If you assign Screenshot or Lock screen, the
+service invokes the corresponding Android accessibility system action only after it recognises that
+assigned gesture. The service:
 
 - does not read screen content or typed text;
 - does not keep a history or log of hardware key events;
@@ -55,7 +64,10 @@ fully offline, and the app still functions if the request fails.
 
 ## Data sharing
 
-The app does not share any data with third parties. It has no backend server of its own.
+The app does not share settings or hardware key-event data with third parties and has no backend
+server of its own. Its only automatic third-party connection is the GitHub contributor-list request
+described above; it contains no app data, although GitHub receives ordinary connection metadata such
+as the device's IP address.
 
 ## Children
 
@@ -68,7 +80,8 @@ If this policy changes, the updated version will be published in this repository
 
 ## Contact
 
-Questions about this policy? Please open an issue at
+The developer is KoukeNeko. Questions or privacy requests can be submitted through the public issue
+tracker at
 <https://github.com/KoukeNeko/EssentialKeyTools/issues>.
 
 ---
