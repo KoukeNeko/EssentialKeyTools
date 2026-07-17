@@ -128,7 +128,7 @@ jobs:
             cat distribution/whatsnew/whatsnew-en-US > "$NOTES"
           fi
           {
-            printf '\n\n## Security analysis\n\n'
+            printf '\n## Security analysis\n\n'
             if [ -n "$APK_SHA256" ]; then
               printf 'Signed APK SHA-256: `%s`\n\n' "$APK_SHA256"
               if [ -n "$VIRUSTOTAL_REPORT_URL" ]; then
@@ -145,7 +145,7 @@ jobs:
               printf 'The security-analysis step did not return results.\n'
             fi
           } >> "$NOTES"
-          printf '\n\n**Full changelog:** %s/%s/commits/%s\n' "$GITHUB_SERVER_URL" "$GITHUB_REPOSITORY" "$TAG" >> "$NOTES"
+          printf '\n**Full changelog:** %s/%s/commits/%s\n' "$GITHUB_SERVER_URL" "$GITHUB_REPOSITORY" "$TAG" >> "$NOTES"
           if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             gh release upload "$TAG" "$APK" "$AAB" --repo "$GITHUB_REPOSITORY" --clobber
             gh release edit "$TAG" --repo "$GITHUB_REPOSITORY" \
@@ -181,10 +181,21 @@ jobs:
         with:
           ruby-version: '3.3'
 
+      # Manual reruns use the latest reviewed listing assets while rebuilding the immutable tag.
+      - name: Check out current Play metadata for a manual rerun
+        if: steps.play.outputs.ready == 'true' && github.event_name == 'workflow_dispatch'
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+          sparse-checkout: fastlane/metadata/android
+          path: current-play-metadata
+
       - name: Upload Play store listing metadata
         if: steps.play.outputs.ready == 'true'
         env:
           PLAY_JSON: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+          PLAY_METADATA_PATH: ${{ github.event_name == 'workflow_dispatch' && 'current-play-metadata/fastlane/metadata/android' || 'fastlane/metadata/android' }}
+          VERSION_CODE: ${{ steps.resolve.outputs.version_code }}
         run: |
           JSON_KEY="$RUNNER_TEMP/play-service-account.json"
           trap 'rm -f "$JSON_KEY"' EXIT
@@ -193,12 +204,12 @@ jobs:
           fastlane supply \
             --json_key "$JSON_KEY" \
             --package_name dev.koukeneko.essentialkeytools \
-            --metadata_path fastlane/metadata/android \
+            --version_code "$VERSION_CODE" \
+            --metadata_path "$PLAY_METADATA_PATH" \
             --skip_upload_apk \
             --skip_upload_aab \
             --skip_upload_changelogs \
             --skip_upload_images \
-            --skip_upload_screenshots \
             --changes_not_sent_for_review
 
       - name: Upload the AAB to Google Play (production track)
