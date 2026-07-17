@@ -27,21 +27,25 @@ private val Context.settingsDataStore: DataStore<Preferences> by preferencesData
 )
 
 /**
- * Persists the app's configuration: onboarding completion, the learned Essential Key scanCode, and
- * the gesture -> action mapping. Exposes reactive [Flow]s for observers (service, UI) and suspend
- * writers.
+ * Persists the app's configuration: onboarding completion and progress, the learned Essential Key
+ * scanCode, and the gesture -> action mapping. Exposes reactive [Flow]s for observers (service, UI)
+ * and suspend writers.
  *
  * No DI framework: a manual process-wide singleton via [getInstance] keeps it simple while still
  * sharing one DataStore across the service and the activity.
  */
-class SettingsRepository private constructor(
+class SettingsRepository internal constructor(
     private val dataStore: DataStore<Preferences>
 ) {
     private val scanCodeKey = intPreferencesKey("essential_key_scan_code")
     private val onboardingCompletedKey = booleanPreferencesKey("onboarding_completed")
+    private val onboardingStepKey = intPreferencesKey("onboarding_step")
 
-    val onboardingCompleted: Flow<Boolean> = dataStore.data.map { preferences ->
-        preferences[onboardingCompletedKey] ?: false
+    val onboardingState: Flow<OnboardingState> = dataStore.data.map { preferences ->
+        OnboardingState(
+            completed = preferences[onboardingCompletedKey] ?: false,
+            step = OnboardingStep.fromStorageValue(preferences[onboardingStepKey])
+        )
     }
 
     val essentialKeyScanCode: Flow<Int> = dataStore.data.map { preferences ->
@@ -63,6 +67,13 @@ class SettingsRepository private constructor(
     suspend fun setOnboardingCompleted() {
         dataStore.edit { preferences ->
             preferences[onboardingCompletedKey] = true
+            preferences.remove(onboardingStepKey)
+        }
+    }
+
+    suspend fun setOnboardingStep(step: OnboardingStep) {
+        dataStore.edit { preferences ->
+            preferences[onboardingStepKey] = step.storageValue
         }
     }
 

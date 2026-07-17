@@ -22,6 +22,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import dev.koukeneko.essentialkeytools.core.KeyGesture
+import dev.koukeneko.essentialkeytools.settings.OnboardingState
 import dev.koukeneko.essentialkeytools.settings.SettingsRepository
 import dev.koukeneko.essentialkeytools.ui.PRIVACY_POLICY_URL
 import dev.koukeneko.essentialkeytools.ui.openExternalUrl
@@ -71,18 +72,16 @@ private fun AppNavigation(systemBarsPadding: PaddingValues) {
     val context = LocalContext.current
     val localeManager = remember(context) { context.getSystemService(LocaleManager::class.java) }
     val repository = remember { SettingsRepository.getInstance(context) }
-    val onboardingCompleted: Boolean? by repository.onboardingCompleted.collectAsState(
+    val persistedOnboardingState: OnboardingState? by repository.onboardingState.collectAsState(
         initial = null
     )
     val coroutineScope = rememberCoroutineScope()
 
     // Wait for DataStore before choosing the first screen so returning users never see a flash of
-    // onboarding while their saved completion state is loading.
-    if (onboardingCompleted == null) {
-        return
-    }
+    // onboarding while their saved completion and page are loading.
+    val onboardingState = persistedOnboardingState ?: return
 
-    var showOnboarding by rememberSaveable { mutableStateOf(onboardingCompleted == false) }
+    var showOnboarding by rememberSaveable { mutableStateOf(!onboardingState.completed) }
     val backStack = remember { mutableStateListOf(Screen.HOME) }
     var gestureBeingEdited by remember { mutableStateOf(KeyGesture.SINGLE_PRESS) }
 
@@ -91,8 +90,18 @@ private fun AppNavigation(systemBarsPadding: PaddingValues) {
         coroutineScope.launch { repository.setOnboardingCompleted() }
     }
 
+    fun leaveOnboardingForNow() {
+        showOnboarding = false
+    }
+
     if (showOnboarding) {
         OnboardingScreen(
+            initialStep = onboardingState.step,
+            onStepChanged = { step ->
+                if (!onboardingState.completed) {
+                    coroutineScope.launch { repository.setOnboardingStep(step) }
+                }
+            },
             initialLanguageTag = localeManager.applicationLocales.toLanguageTags(),
             onLanguageSelected = { languageTag ->
                 localeManager.applicationLocales = if (languageTag.isEmpty()) {
@@ -101,7 +110,8 @@ private fun AppNavigation(systemBarsPadding: PaddingValues) {
                     LocaleList.forLanguageTags(languageTag)
                 }
             },
-            onExit = ::finishOnboarding,
+            onLeaveOnboarding = ::leaveOnboardingForNow,
+            onContinueWithoutAccessibility = ::finishOnboarding,
             onUseAccessibility = {
                 finishOnboarding()
                 openAccessibilitySettings(context)

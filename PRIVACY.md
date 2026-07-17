@@ -16,9 +16,9 @@ reporting, accounts, or sign-in. It does not send your settings or hardware key-
 
 ## Data stored on your device
 
-Your settings — which action each gesture (single, double, triple, or long press) is mapped to, and
-the learned scan code of your key — are stored locally on your device using Android's DataStore. This
-data never leaves your device and is removed when you uninstall the app.
+Your onboarding progress and settings — which action each gesture (single, double, triple, or long
+press) is mapped to, and the learned scan code of your key — are stored locally on your device using
+Android's DataStore. This data never leaves your device and is removed when you uninstall the app.
 
 ## Data retention, deletion, and security
 

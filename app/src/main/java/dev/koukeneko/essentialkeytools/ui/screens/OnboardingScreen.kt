@@ -18,7 +18,6 @@ import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -30,15 +29,13 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import dev.koukeneko.essentialkeytools.R
+import dev.koukeneko.essentialkeytools.settings.OnboardingStep
 import dev.koukeneko.essentialkeytools.ui.components.NothingButton
 import dev.koukeneko.essentialkeytools.ui.components.NothingCard
 import dev.koukeneko.essentialkeytools.ui.components.NothingSectionLabel
 import dev.koukeneko.essentialkeytools.ui.screenContentPadding
 import dev.koukeneko.essentialkeytools.ui.theme.EssentialKeyToolsTheme
 
-private const val LANGUAGE_STEP = 0
-private const val INTRO_STEP = 1
-private const val PERMISSION_STEP = 2
 private const val DEVICE_LANGUAGE_TAG = ""
 private const val ENGLISH_LANGUAGE_TAG = "en-US"
 private const val TRADITIONAL_CHINESE_LANGUAGE_TAG = "zh-TW"
@@ -58,53 +55,62 @@ private val CONTENT_TO_ACTIONS_GAP = 24.dp
 /**
  * First-run setup. Language comes first so every following explanation is readable, followed by an
  * introduction and a separate prominent disclosure immediately before Android accessibility
- * settings can open. Declining, skipping, or pressing Back never opens settings, and the guide
- * remains reachable from the home screen.
+ * settings can open. Each page transition reports its progress for persistence. Skipping or leaving
+ * keeps that progress incomplete; either accessibility choice completes the guide, and only the
+ * positive choice opens settings.
  */
 @Composable
 fun OnboardingScreen(
+    initialStep: OnboardingStep,
+    onStepChanged: (OnboardingStep) -> Unit,
     initialLanguageTag: String,
     onLanguageSelected: (String) -> Unit,
-    onExit: () -> Unit,
+    onLeaveOnboarding: () -> Unit,
+    onContinueWithoutAccessibility: () -> Unit,
     onUseAccessibility: () -> Unit,
     onOpenPrivacyPolicy: () -> Unit,
     systemBarsPadding: PaddingValues = PaddingValues(),
     modifier: Modifier = Modifier
 ) {
-    var step by rememberSaveable { mutableIntStateOf(LANGUAGE_STEP) }
+    var step by rememberSaveable { mutableStateOf(initialStep) }
     var selectedLanguageTag by rememberSaveable {
         mutableStateOf(supportedLanguageTag(initialLanguageTag))
     }
 
+    fun navigateTo(nextStep: OnboardingStep) {
+        step = nextStep
+        onStepChanged(nextStep)
+    }
+
     BackHandler {
         when (step) {
-            PERMISSION_STEP -> step = INTRO_STEP
-            INTRO_STEP -> step = LANGUAGE_STEP
-            else -> onExit()
+            OnboardingStep.ACCESSIBILITY -> navigateTo(OnboardingStep.INTRODUCTION)
+            OnboardingStep.INTRODUCTION -> navigateTo(OnboardingStep.LANGUAGE)
+            OnboardingStep.LANGUAGE -> onLeaveOnboarding()
         }
     }
 
     when (step) {
-        LANGUAGE_STEP -> OnboardingLanguage(
+        OnboardingStep.LANGUAGE -> OnboardingLanguage(
             selectedLanguageTag = selectedLanguageTag,
             onLanguageSelected = { languageTag ->
                 selectedLanguageTag = languageTag
                 onLanguageSelected(languageTag)
             },
-            onContinue = { step = INTRO_STEP },
+            onContinue = { navigateTo(OnboardingStep.INTRODUCTION) },
             systemBarsPadding = systemBarsPadding,
             modifier = modifier
         )
 
-        INTRO_STEP -> OnboardingIntro(
-            onContinue = { step = PERMISSION_STEP },
-            onSkip = onExit,
+        OnboardingStep.INTRODUCTION -> OnboardingIntro(
+            onContinue = { navigateTo(OnboardingStep.ACCESSIBILITY) },
+            onSkip = onLeaveOnboarding,
             systemBarsPadding = systemBarsPadding,
             modifier = modifier
         )
 
-        else -> OnboardingPermission(
-            onContinueWithoutAccessibility = onExit,
+        OnboardingStep.ACCESSIBILITY -> OnboardingPermission(
+            onContinueWithoutAccessibility = onContinueWithoutAccessibility,
             onUseAccessibility = onUseAccessibility,
             onOpenPrivacyPolicy = onOpenPrivacyPolicy,
             systemBarsPadding = systemBarsPadding,
@@ -380,9 +386,12 @@ private fun OnboardingInfoCard(label: String, body: String) {
 private fun OnboardingScreenPreview() {
     EssentialKeyToolsTheme {
         OnboardingScreen(
+            initialStep = OnboardingStep.LANGUAGE,
+            onStepChanged = {},
             initialLanguageTag = DEVICE_LANGUAGE_TAG,
             onLanguageSelected = {},
-            onExit = {},
+            onLeaveOnboarding = {},
+            onContinueWithoutAccessibility = {},
             onUseAccessibility = {},
             onOpenPrivacyPolicy = {}
         )

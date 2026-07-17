@@ -9,6 +9,7 @@ import androidx.compose.ui.test.performScrollTo
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import dev.koukeneko.essentialkeytools.R
+import dev.koukeneko.essentialkeytools.settings.OnboardingStep
 import dev.koukeneko.essentialkeytools.ui.theme.EssentialKeyToolsTheme
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicReference
@@ -29,7 +30,11 @@ class OnboardingScreenTest {
     @Test
     fun languageIntroductionAndDisclosureAppearInOrder() {
         val selectedLanguage = AtomicReference<String>()
-        showOnboarding(onLanguageSelected = selectedLanguage::set)
+        val persistedStep = AtomicReference<OnboardingStep>()
+        showOnboarding(
+            onLanguageSelected = selectedLanguage::set,
+            onStepChanged = persistedStep::set
+        )
 
         composeRule.onNodeWithText(resources.getString(R.string.onboarding_language_headline))
             .assertIsDisplayed()
@@ -41,6 +46,9 @@ class OnboardingScreenTest {
         }
 
         composeRule.onNodeWithText(buttonText(R.string.onboarding_continue)).performClick()
+        composeRule.runOnIdle {
+            assertEquals(OnboardingStep.INTRODUCTION, persistedStep.get())
+        }
 
         composeRule.onNodeWithText(resources.getString(R.string.onboarding_intro_headline))
             .assertIsDisplayed()
@@ -48,6 +56,9 @@ class OnboardingScreenTest {
             .assertIsDisplayed()
 
         composeRule.onNodeWithText(buttonText(R.string.onboarding_continue)).performClick()
+        composeRule.runOnIdle {
+            assertEquals(OnboardingStep.ACCESSIBILITY, persistedStep.get())
+        }
 
         composeRule.onNodeWithText(resources.getString(R.string.onboarding_permission_headline))
             .assertIsDisplayed()
@@ -68,12 +79,44 @@ class OnboardingScreenTest {
     }
 
     @Test
-    fun privacyPolicyCanOpenWithoutAcceptingOrLeaving() {
-        val exits = AtomicInteger()
+    fun persistedAccessibilityStepRestoresTheDisclosure() {
+        showOnboarding(initialStep = OnboardingStep.ACCESSIBILITY)
+
+        composeRule.onNodeWithText(resources.getString(R.string.onboarding_permission_headline))
+            .assertIsDisplayed()
+        composeRule.onNodeWithText(buttonText(R.string.onboarding_use_accessibility))
+            .performScrollTo()
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun skipForNowLeavesTheSavedIntroductionIncomplete() {
+        val leaves = AtomicInteger()
+        val completions = AtomicInteger()
+        val persistedStep = AtomicReference<OnboardingStep>()
+        showOnboarding(
+            onStepChanged = persistedStep::set,
+            onLeaveOnboarding = { leaves.incrementAndGet() },
+            onContinueWithoutAccessibility = { completions.incrementAndGet() }
+        )
+
+        composeRule.onNodeWithText(buttonText(R.string.onboarding_continue)).performClick()
+        composeRule.onNodeWithText(buttonText(R.string.onboarding_skip)).performClick()
+
+        composeRule.runOnIdle {
+            assertEquals(OnboardingStep.INTRODUCTION, persistedStep.get())
+            assertEquals(1, leaves.get())
+            assertEquals(0, completions.get())
+        }
+    }
+
+    @Test
+    fun privacyPolicyCanOpenWithoutCompletingOrLeaving() {
+        val completions = AtomicInteger()
         val settingsOpens = AtomicInteger()
         val privacyOpens = AtomicInteger()
         showOnboarding(
-            onExit = { exits.incrementAndGet() },
+            onContinueWithoutAccessibility = { completions.incrementAndGet() },
             onUseAccessibility = { settingsOpens.incrementAndGet() },
             onOpenPrivacyPolicy = { privacyOpens.incrementAndGet() }
         )
@@ -84,18 +127,18 @@ class OnboardingScreenTest {
             .performClick()
 
         composeRule.runOnIdle {
-            assertEquals(0, exits.get())
+            assertEquals(0, completions.get())
             assertEquals(0, settingsOpens.get())
             assertEquals(1, privacyOpens.get())
         }
     }
 
     @Test
-    fun continueWithoutAccessibilityExitsWithoutOpeningSettings() {
-        val exits = AtomicInteger()
+    fun continueWithoutAccessibilityCompletesWithoutOpeningSettings() {
+        val completions = AtomicInteger()
         val settingsOpens = AtomicInteger()
         showOnboarding(
-            onExit = { exits.incrementAndGet() },
+            onContinueWithoutAccessibility = { completions.incrementAndGet() },
             onUseAccessibility = { settingsOpens.incrementAndGet() }
         )
 
@@ -107,17 +150,17 @@ class OnboardingScreenTest {
             .performClick()
 
         composeRule.runOnIdle {
-            assertEquals(1, exits.get())
+            assertEquals(1, completions.get())
             assertEquals(0, settingsOpens.get())
         }
     }
 
     @Test
     fun useAccessibilityOnlyOpensSettingsOnce() {
-        val exits = AtomicInteger()
+        val completions = AtomicInteger()
         val settingsOpens = AtomicInteger()
         showOnboarding(
-            onExit = { exits.incrementAndGet() },
+            onContinueWithoutAccessibility = { completions.incrementAndGet() },
             onUseAccessibility = { settingsOpens.incrementAndGet() }
         )
 
@@ -130,7 +173,7 @@ class OnboardingScreenTest {
         useAccessibilityButton.performClick()
 
         composeRule.runOnIdle {
-            assertEquals(0, exits.get())
+            assertEquals(0, completions.get())
             assertEquals(1, settingsOpens.get())
         }
     }
@@ -141,17 +184,23 @@ class OnboardingScreenTest {
     }
 
     private fun showOnboarding(
+        initialStep: OnboardingStep = OnboardingStep.LANGUAGE,
+        onStepChanged: (OnboardingStep) -> Unit = {},
         onLanguageSelected: (String) -> Unit = {},
-        onExit: () -> Unit = {},
+        onLeaveOnboarding: () -> Unit = {},
+        onContinueWithoutAccessibility: () -> Unit = {},
         onUseAccessibility: () -> Unit = {},
         onOpenPrivacyPolicy: () -> Unit = {}
     ) {
         composeRule.setContent {
             EssentialKeyToolsTheme {
                 OnboardingScreen(
+                    initialStep = initialStep,
+                    onStepChanged = onStepChanged,
                     initialLanguageTag = "",
                     onLanguageSelected = onLanguageSelected,
-                    onExit = onExit,
+                    onLeaveOnboarding = onLeaveOnboarding,
+                    onContinueWithoutAccessibility = onContinueWithoutAccessibility,
                     onUseAccessibility = onUseAccessibility,
                     onOpenPrivacyPolicy = onOpenPrivacyPolicy
                 )
