@@ -32,16 +32,16 @@
     <string name="onboarding_intro_headline">打造你的 ESSENTIAL KEY</string>
     <string name="onboarding_intro_body">為 Essential Key 的不同按法指定個別捷徑，不必開啟本 App 也能執行。</string>
     <string name="onboarding_intro_gestures_label">四種按法</string>
-    <string name="onboarding_intro_gestures_body">單擊 · 雙擊 · 三擊 · 長按</string>
+    <string name="onboarding_intro_gestures_body">按一下 · 按兩下 · 按三下 · 長按</string>
     <string name="onboarding_intro_setup_label">用兩個步驟完成設定</string>
-    <string name="onboarding_intro_setup_body">1. 決定是否啟用「Essential Key 偵測」。&#10;2. 在「按鍵設定」中按一次按鍵，再選擇你的捷徑。</string>
+    <string name="onboarding_intro_setup_body">1. 決定是否啟用「Essential Key 偵測」。&#10;2. 在「按鍵設定」中按一下 Essential Key，再選擇你的捷徑。</string>
     <string name="onboarding_continue">繼續</string>
     <string name="onboarding_permission_title">權限</string>
     <string name="onboarding_step_permission">03 / 03 · 無障礙服務</string>
     <string name="onboarding_permission_headline">做出決定前請先閱讀</string>
     <string name="onboarding_permission_purpose">為了讓 Essential Key 在你沒有開啟本 App 時也能執行捷徑，Essential Key Tools 需要使用 Android 的輔助功能服務（AccessibilityService API）。</string>
     <string name="onboarding_permission_data_label">輔助功能會取得的資訊</string>
-    <string name="onboarding_permission_data_body">啟用後，App 會取得哪個硬體按鍵被按下或放開，以及事件發生的時間。這些資訊只用來確認是否為 Essential Key、辨識單擊、雙擊、三擊或長按，並執行你事先選擇的捷徑。</string>
+    <string name="onboarding_permission_data_body">啟用後，App 會取得哪個硬體按鍵被按下或放開，以及事件發生的時間。這些資訊只用來確認是否為 Essential Key、辨識按一下、按兩下、按三下或長按，並執行你事先選擇的捷徑。</string>
     <string name="onboarding_permission_actions_label">App 會做什麼</string>
     <string name="onboarding_permission_actions_body">只有當你將「螢幕截圖」或「鎖定螢幕」設為捷徑時，App 才會使用輔助功能執行該動作。App 不會自行選擇或執行其他動作。</string>
     <string name="onboarding_permission_privacy_label">資訊如何儲存與分享</string>
@@ -54,7 +54,7 @@
 
     <!-- Accessibility enable flow -->
     <string name="a11y_disclosure_title">使用輔助功能前請先了解</string>
-    <string name="a11y_disclosure_body">為了讓 Essential Key 在你沒有開啟本 App 時也能執行捷徑，Essential Key Tools 需要使用 Android 的輔助功能服務（AccessibilityService API）。\n\n啟用後，App 會取得哪個硬體按鍵被按下或放開，以及事件發生的時間。這些資訊只用來確認是否為 Essential Key、辨識單擊、雙擊、三擊或長按，並執行你事先選擇的捷徑。\n\n按鍵事件只會在裝置上即時處理，不會儲存、上傳或分享。只有你在「按鍵設定」確認的 Essential Key 識別碼會儲存在裝置上。App 不會讀取螢幕內容、文字欄位或你輸入的文字。\n\n只有當你將「螢幕截圖」或「鎖定螢幕」設為捷徑時，App 才會使用輔助功能執行該動作。App 不會自行選擇或執行其他動作。</string>
+    <string name="a11y_disclosure_body">為了讓 Essential Key 在你沒有開啟本 App 時也能執行捷徑，Essential Key Tools 需要使用 Android 的輔助功能服務（AccessibilityService API）。\n\n啟用後，App 會取得哪個硬體按鍵被按下或放開，以及事件發生的時間。這些資訊只用來確認是否為 Essential Key、辨識按一下、按兩下、按三下或長按，並執行你事先選擇的捷徑。\n\n按鍵事件只會在裝置上即時處理，不會儲存、上傳或分享。只有你在「按鍵設定」確認的 Essential Key 識別碼會儲存在裝置上。App 不會讀取螢幕內容、文字欄位或你輸入的文字。\n\n只有當你將「螢幕截圖」或「鎖定螢幕」設為捷徑時，App 才會使用輔助功能執行該動作。App 不會自行選擇或執行其他動作。</string>
     <string name="a11y_disclosure_question">你是否同意 Essential Key Tools 使用輔助功能服務，偵測 Essential Key 並執行你設定的捷徑？</string>
     <string name="a11y_disclosure_use_accessibility">同意：使用輔助功能</string>
     <string name="a11y_disclosure_continue_without_accessibility">不同意：不使用輔助功能</string>
@@ -81,9 +81,9 @@
     <string name="test_edit_mapping">編輯動作對應</string>
 
     <!-- Gestures -->
-    <string name="gesture_single_press">單擊</string>
-    <string name="gesture_double_press">雙擊</string>
-    <string name="gesture_triple_press">三擊</string>
+    <string name="gesture_single_press">按一下</string>
+    <string name="gesture_double_press">按兩下</string>
+    <string name="gesture_triple_press">按三下</string>
     <string name="gesture_long_press">長按</string>
 
     <!-- Action picker -->
@@ -105,19 +105,19 @@
 
     <!-- Home: gestures + unlock -->
     <string name="section_gestures">手勢</string>
-    <string name="section_unlock">單擊解鎖</string>
+    <string name="section_unlock">解鎖按一下功能</string>
     <string name="action_none_caption">無</string>
     <string name="home_locked_by_nothing">已被 NOTHING OS 鎖定</string>
     <string name="action_open_unlock_wizard">解鎖精靈</string>
-    <string name="unlock_status_freed">單擊 — 已釋放</string>
-    <string name="unlock_status_partial">單擊 — 部分釋放</string>
-    <string name="unlock_status_locked">單擊 — 已鎖定</string>
+    <string name="unlock_status_freed">按一下 — 已釋放</string>
+    <string name="unlock_status_partial">按一下 — 部分釋放</string>
+    <string name="unlock_status_locked">按一下 — 已鎖定</string>
     <string name="unlock_status_none">找不到消費者套件</string>
 
     <!-- Unlock wizard -->
     <string name="unlock_title">解鎖</string>
     <string name="unlock_warning_label">解鎖前請注意</string>
-    <string name="unlock_warning_body">釋放單擊會完全停用 Nothing 的 Essential Space 與 Recorder。你可以從相同的應用程式資訊頁面重新啟用。系統更新後可能重新啟用它們 — 若狀態變動，請重新執行手動步驟。</string>
+    <string name="unlock_warning_body">釋放按一下功能會完全停用 Nothing 的 Essential Space 與 Recorder。你可以從相同的應用程式資訊頁面重新啟用。系統更新後可能重新啟用它們 — 若狀態變動，請重新執行手動步驟。</string>
     <string name="unlock_packages_label">消費者套件</string>
     <string name="unlock_package_freed">已釋放</string>
     <string name="unlock_package_active">運作中</string>

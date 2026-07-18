@@ -1,33 +1,21 @@
-Remap the Nothing Phone Essential Key to your own actions — no root required.
+Make the Nothing Phone Essential Key work your way — no root or computer required.
 
-Single, double, triple, and long press each get their own action: launch an app,
-toggle the flashlight, take a screenshot, lock the screen, play/pause media, or cycle
-the ringer mode.
+Choose a different shortcut for a single, double, triple, or long press. Open an app, toggle the flashlight, take a screenshot, lock the screen, control media, or change the ringer mode.
 
-Features:
+What you can do
 
-* Four gestures, four independent actions.
-* "Learn your key" setup captures the key's scan code at runtime, so it adapts to any
-  model or firmware.
-* Guided accessibility-service enablement through Android Settings.
-* Single-press unlock wizard: freeing the single press requires Nothing's Essential
-  Space packages to be disabled. The wizard opens each package's App Info page for
-  manual disable or restore and shows live per-package status. Double, triple, and
-  long press work without this step.
-* Nothing OS design language: pure-black canvas, hairline cards, monospaced labels.
+* Give each press pattern its own shortcut.
+* Teach the app which button is your Essential Key with a quick guided setup.
+* Change your shortcuts whenever you want.
+* Use the optional single-press wizard to open Nothing's App Info pages, where you can manually disable or restore Essential Space and Recorder.
+* Enjoy a clean interface inspired by Nothing OS.
 
-Requires a Nothing phone with the Essential Key, running Android 15 or newer.
+Essential Key Tools requires a Nothing Phone with an Essential Key and Android 15 or later.
 
-Essential Key Tools needs the Android AccessibilityService API for its core key-remapping feature.
-The service receives Essential Key hardware key events when the app is not open, recognizes single,
-double, triple, and long presses, and runs only the fixed shortcut you assigned.
+Why the app asks for accessibility access
 
-While the service is enabled, Essential Key Tools accesses key codes, scan codes, press or release
-state, and event time. It processes this data on your device in real time to recognize those
-gestures. Screenshot and Lock screen mappings use the corresponding Android accessibility system
-actions. The service follows only the fixed gesture-to-action mapping you configure; it does not
-choose or plan actions.
+Essential Key Tools uses Android's AccessibilityService API only to detect Essential Key presses while the app is not open and run the shortcut you selected. When enabled, it receives which hardware button was pressed or released and when. This lets it tell a single, double, triple, or long press apart.
 
-Hardware key-event details are not stored, transmitted, or shared with the developer or third
-parties. Only the scan code you confirm in Key Setup is stored on your device. The app does not read
-screen content, text fields, or typed text.
+Key presses are processed immediately on your device. Hardware key-event details are not saved, uploaded, or shared. Your shortcuts and the Essential Key identifier you confirm during setup are stored only on your device. The app does not read screen content, text fields, or anything you type. Screenshot and Lock screen run only when you choose one of them as a shortcut.
+
+You decide whether to use accessibility access during setup. Choosing not to use it does not enable the service.

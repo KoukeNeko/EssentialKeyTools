@@ -1,0 +1,21 @@
+讓 Nothing Phone 的 Essential Key 真正照你的方式運作，無需 Root，也不需要電腦。
+
+按一下、按兩下、按三下與長按都能設定不同捷徑。你可以開啟 App、切換手電筒、擷取螢幕截圖、鎖定螢幕、控制媒體，或切換鈴聲模式。
+
+你可以做到
+
+* 為四種按法設定各自的捷徑。
+* 透過簡單的引導，讓 App 認得你的 Essential Key。
+* 隨時更換每種按法的動作。
+* 如要自訂按一下，選用的解鎖精靈會開啟 Nothing App 的「應用程式資訊」頁面，再由你手動停用或還原 Essential Space 與 Recorder。
+* 使用貼近 Nothing OS 風格的簡潔介面。
+
+需要具備 Essential Key 且執行 Android 15 或更新版本的 Nothing Phone。
+
+為什麼 App 會要求輔助功能權限
+
+Essential Key Tools 只使用 Android AccessibilityService API，在 App 未開啟時偵測 Essential Key，並執行你選擇的捷徑。啟用後，App 會知道哪個硬體按鍵在什麼時候被按下或放開，藉此分辨按一下、按兩下、按三下與長按。
+
+按鍵資訊只會在裝置上即時處理，硬體按鍵事件不會儲存、上傳或分享。你設定的捷徑與確認的 Essential Key 識別碼只會儲存在裝置上。App 不會讀取螢幕內容、文字欄位或你輸入的文字。「螢幕截圖」與「鎖定螢幕」也只會在你把它們設成捷徑時執行。
+
+你可以在設定過程中自行決定是否使用輔助功能；選擇不使用不會啟用服務。

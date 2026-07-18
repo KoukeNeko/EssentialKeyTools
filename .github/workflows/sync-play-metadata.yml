@@ -1,0 +1,46 @@
+name: Sync Play store metadata
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  sync_metadata:
+    name: Sync Play store metadata
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+
+      - name: Upload Play store listing metadata
+        env:
+          PLAY_JSON: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+        run: |
+          if [ -z "$PLAY_JSON" ]; then
+            echo "PLAY_SERVICE_ACCOUNT_JSON is not configured." >&2
+            exit 1
+          fi
+
+          JSON_KEY="$RUNNER_TEMP/play-service-account.json"
+          trap 'rm -f "$JSON_KEY"' EXIT
+          printf '%s' "$PLAY_JSON" > "$JSON_KEY"
+
+          gem install fastlane -v 2.237.0 --no-document
+          fastlane supply \
+            --json_key "$JSON_KEY" \
+            --package_name dev.koukeneko.essentialkeytools \
+            --metadata_path fastlane/metadata/android \
+            --skip_upload_apk \
+            --skip_upload_aab \
+            --skip_upload_changelogs \
+            --skip_upload_images \
+            --skip_upload_screenshots \
+            --changes_not_sent_for_review
