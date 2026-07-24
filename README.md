@@ -10,14 +10,16 @@
 </p>
 
 <p align="center">
+  <a href="https://play.google.com/store/apps/details?id=dev.koukeneko.essentialkeytools"><img alt="Google Play" src="https://img.shields.io/badge/GET_IT_ON-GOOGLE_PLAY-414141?style=for-the-badge&logo=googleplay&logoColor=white"></a>
   <a href="https://github.com/KoukeNeko/EssentialKeyTools/releases/latest"><img alt="Release" src="https://img.shields.io/github/v/release/KoukeNeko/EssentialKeyTools?style=for-the-badge&logo=github&label=RELEASE&color=2196F3"></a>
-  <a href="https://github.com/KoukeNeko/EssentialKeyTools/releases"><img alt="Downloads" src="https://img.shields.io/github/downloads/KoukeNeko/EssentialKeyTools/total?style=for-the-badge&logo=github&label=DOWNLOADS&color=4CAF50"></a>
+  <a href="https://github.com/KoukeNeko/EssentialKeyTools/releases"><img alt="GitHub downloads" src="https://img.shields.io/github/downloads/KoukeNeko/EssentialKeyTools/total?style=for-the-badge&logo=github&label=GITHUB%20DOWNLOADS&color=4CAF50"></a>
   <img alt="Android 15+" src="https://img.shields.io/badge/ANDROID-15%2B-3DDC84?style=for-the-badge&logo=android&logoColor=white">
   <a href="https://github.com/KoukeNeko/EssentialKeyTools/stargazers"><img alt="Stars" src="https://img.shields.io/github/stars/KoukeNeko/EssentialKeyTools?style=for-the-badge&logo=github&label=STARS&color=2196F3"></a>
 </p>
 
 <p align="center">
-  <a href="https://github.com/KoukeNeko/EssentialKeyTools/releases/latest"><strong>Download the latest release</strong></a>
+  <a href="https://play.google.com/store/apps/details?id=dev.koukeneko.essentialkeytools"><strong>Get it on Google Play</strong></a>
+  · <a href="https://github.com/KoukeNeko/EssentialKeyTools/releases/latest">Download the APK</a>
   · <a href="#getting-started">Getting started</a>
   · <a href="PRIVACY.md">Privacy</a>
 </p>
@@ -118,7 +120,11 @@ depends on the Nothing OS build.
 
 ## Get the app
 
-Download the signed APK from the
+Install Essential Key Tools from
+[Google Play](https://play.google.com/store/apps/details?id=dev.koukeneko.essentialkeytools) for the
+official release and updates delivered through Google Play.
+
+For manual installation, download the signed APK from the
 [latest GitHub Release](https://github.com/KoukeNeko/EssentialKeyTools/releases/latest). Every stable
 release includes its APK SHA-256 digest plus VirusTotal and Koodous submission status. Preview builds
 use a separate application ID and can be installed beside the stable app.
