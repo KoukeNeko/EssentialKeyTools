@@ -157,9 +157,10 @@ jobs:
 
       # Continuous deployment to Google Play. Runs only when the Play service-account secret is set,
       # so tagging still works before CD is configured. Uploads to the PRODUCTION track as a DRAFT.
-      # Play currently requires this app's edits to remain unsent for review, so the release must be
-      # submitted from Play Console after CI commits the edit. The Play "what's new" text comes from
-      # distribution/whatsnew/whatsnew-<lang>.
+      # Play now sends this app's edits for review automatically and rejects the request outright if
+      # changesNotSentForReview is set, so the parameter is gone. The release is still uploaded as a
+      # draft, which does not roll out on its own: completing it stays a Play Console action. The
+      # Play "what's new" text comes from distribution/whatsnew/whatsnew-<lang>.
       - name: Check for Play credentials
         id: play
         env:
@@ -182,7 +183,6 @@ jobs:
           releaseFiles: app/build/outputs/bundle/release/app-release.aab
           tracks: production
           status: draft
-          changesNotSentForReview: true
           whatsNewDirectory: distribution/whatsnew
 
       # upload-google-play publishes the binary and per-version notes, but not the store listing.
