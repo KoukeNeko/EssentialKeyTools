@@ -65,6 +65,9 @@ jobs:
       # A release-preparation commit is pushed to main together with its stable tag. In that case
       # the Release workflow owns publication; this job should remain a successful quality build
       # instead of requiring an unrelated preview tag for the same commit.
+      # An absent preview tag means no preview was requested for this commit, which is the normal
+      # state of a push to main and not a failure. A tag that exists but does not verify still fails
+      # the run loudly below: only absence is treated as "nothing to publish".
       - name: Select the publication mode
         id: publication
         run: |
@@ -72,6 +75,9 @@ jobs:
             grep -Eq '^v[0-9]+\.[0-9]+(\.[0-9]+)?$'; then
             echo "publish_preview=false" >> "$GITHUB_OUTPUT"
             echo "Stable release tag found; skipping preview publication."
+          elif [ -z "$(git tag --list "$PRE_TAG")" ]; then
+            echo "publish_preview=false" >> "$GITHUB_OUTPUT"
+            echo "No preview tag $PRE_TAG for this commit; skipping preview publication."
           else
             echo "publish_preview=true" >> "$GITHUB_OUTPUT"
           fi
