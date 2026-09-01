@@ -1,14 +1,25 @@
-Make the Nothing Phone Essential Key work your way — no root or computer required.
+Remap the Essential Key on supported Nothing phones. Assign single, double, triple and long presses to the shortcuts you actually use.
 
-Choose a different shortcut for a single, double, triple, or long press. Open an app, toggle the flashlight, take a screenshot, lock the screen, control media, or change the ringer mode.
+No root. No computer. No ADB.
 
-What you can do
+Keep Essential Space
 
-* Give each press pattern its own shortcut.
-* Teach the app which button is your Essential Key with a quick guided setup.
-* Change your shortcuts whenever you want.
-* Use the optional single-press wizard to open Nothing's App Info pages, where you can manually disable or restore Essential Space and Recorder.
-* Enjoy a clean interface inspired by Nothing OS.
+Double press, triple press and long press are yours straight away, with nothing to disable. Essential Space and the Recorder keep working exactly as they do now. You only need the optional unlock wizard if you also want the single press, and it walks you through Nothing's own App Info screens — and back again if you change your mind.
+
+What each press can do
+
+* Open any installed app
+* Toggle the flashlight
+* Take a screenshot
+* Lock the screen
+* Play or pause, skip to the next or previous track
+* Cycle the ringer between ring, vibrate and silent
+
+Built for the key you have
+
+A guided setup teaches the app which button is your Essential Key, rather than assuming a fixed hardware code, so it adapts across models and firmware updates. A key test screen shows exactly what the app receives, so you can see it working.
+
+No ads. No analytics. No tracking. No account. Open source, so you can read every line at github.com/KoukeNeko/EssentialKeyTools.
 
 Essential Key Tools requires a Nothing Phone with an Essential Key and Android 15 or later.
 
