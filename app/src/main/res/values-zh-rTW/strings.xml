@@ -15,6 +15,21 @@
     <string name="action_key_test">按鍵測試</string>
     <string name="action_review_onboarding">重新查看設定指南</string>
     <string name="section_navigation">設定</string>
+    <string name="action_open_diagnostics">診斷</string>
+
+    <!-- Diagnostics -->
+    <string name="diagnostics_title">診斷</string>
+    <string name="diagnostics_crash_label">最近一次當機</string>
+    <string name="diagnostics_crash_empty">這台裝置上沒有記錄到當機。</string>
+    <string name="diagnostics_crash_body">只留在這台裝置上。除非你主動分享,否則不會送到任何地方。</string>
+    <string name="diagnostics_action_copy">複製報告</string>
+    <string name="diagnostics_action_share">分享報告</string>
+    <string name="diagnostics_action_report">到 GitHub 回報</string>
+    <string name="diagnostics_action_clear">清除報告</string>
+    <string name="diagnostics_share_failed">無法分享報告。</string>
+    <string name="diagnostics_exits_label">最近的程序結束記錄</string>
+    <string name="diagnostics_exits_caption">由 Android 記錄,涵蓋 App 自己看不到的結束原因,例如 ANR 與記憶體不足被系統終止。</string>
+    <string name="diagnostics_exits_empty">系統尚未記錄任何結束事件。</string>
 
     <!-- Onboarding -->
     <string name="onboarding_language_title">語言</string>

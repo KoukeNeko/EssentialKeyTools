@@ -99,6 +99,7 @@ fun HomeScreen(
     onUnlockWizard: () -> Unit,
     onKeySetup: () -> Unit,
     onKeyTest: () -> Unit,
+    onDiagnostics: () -> Unit,
     onReviewOnboarding: () -> Unit,
     systemBarsPadding: PaddingValues = PaddingValues(),
     modifier: Modifier = Modifier
@@ -167,6 +168,7 @@ fun HomeScreen(
         NavigationCard(
             onKeySetup = onKeySetup,
             onKeyTest = onKeyTest,
+            onDiagnostics = onDiagnostics,
             onReviewOnboarding = onReviewOnboarding
         )
         Spacer(modifier = Modifier.height(CARD_GAP))
@@ -550,6 +552,7 @@ private fun ActionLabel(action: KeyAction, context: Context) {
 private fun NavigationCard(
     onKeySetup: () -> Unit,
     onKeyTest: () -> Unit,
+    onDiagnostics: () -> Unit,
     onReviewOnboarding: () -> Unit
 ) {
     NothingCard(modifier = Modifier.fillMaxWidth()) {
@@ -565,6 +568,12 @@ private fun NavigationCard(
             NothingButton(
                 text = stringResource(R.string.action_key_test),
                 onClick = onKeyTest,
+                outlined = true,
+                modifier = Modifier.fillMaxWidth()
+            )
+            NothingButton(
+                text = stringResource(R.string.action_open_diagnostics),
+                onClick = onDiagnostics,
                 outlined = true,
                 modifier = Modifier.fillMaxWidth()
             )
@@ -780,6 +789,7 @@ private fun HomeScreenPreview() {
             onUnlockWizard = {},
             onKeySetup = {},
             onKeyTest = {},
+            onDiagnostics = {},
             onReviewOnboarding = {}
         )
     }

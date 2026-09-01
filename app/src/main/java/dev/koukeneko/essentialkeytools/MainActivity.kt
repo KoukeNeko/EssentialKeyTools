@@ -25,6 +25,7 @@ import dev.koukeneko.essentialkeytools.core.KeyGesture
 import dev.koukeneko.essentialkeytools.settings.OnboardingState
 import dev.koukeneko.essentialkeytools.settings.SettingsRepository
 import dev.koukeneko.essentialkeytools.ui.screens.ActionPickerScreen
+import dev.koukeneko.essentialkeytools.ui.screens.DiagnosticsScreen
 import dev.koukeneko.essentialkeytools.ui.screens.HomeScreen
 import dev.koukeneko.essentialkeytools.ui.screens.KeySetupScreen
 import dev.koukeneko.essentialkeytools.ui.screens.KeyTestScreen
@@ -39,6 +40,7 @@ private enum class Screen {
     HOME,
     KEY_SETUP,
     KEY_TEST,
+    DIAGNOSTICS,
     UNLOCK_WIZARD,
     ACTION_PICKER
 }
@@ -143,6 +145,7 @@ private fun AppNavigation(systemBarsPadding: PaddingValues) {
             onUnlockWizard = { navigateTo(Screen.UNLOCK_WIZARD) },
             onKeySetup = { navigateTo(Screen.KEY_SETUP) },
             onKeyTest = { navigateTo(Screen.KEY_TEST) },
+            onDiagnostics = { navigateTo(Screen.DIAGNOSTICS) },
             onReviewOnboarding = { showOnboarding = true },
             systemBarsPadding = systemBarsPadding
         )
@@ -153,6 +156,8 @@ private fun AppNavigation(systemBarsPadding: PaddingValues) {
             onEditGesture = ::editGesture,
             systemBarsPadding = systemBarsPadding
         )
+
+        Screen.DIAGNOSTICS -> DiagnosticsScreen(systemBarsPadding = systemBarsPadding)
 
         Screen.UNLOCK_WIZARD -> UnlockWizardScreen(systemBarsPadding = systemBarsPadding)
 

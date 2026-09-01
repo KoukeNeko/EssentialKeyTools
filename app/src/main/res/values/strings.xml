@@ -15,6 +15,21 @@
     <string name="action_key_test">Key test</string>
     <string name="action_review_onboarding">Review setup guide</string>
     <string name="section_navigation">Setup</string>
+    <string name="action_open_diagnostics">Diagnostics</string>
+
+    <!-- Diagnostics -->
+    <string name="diagnostics_title">DIAGNOSTICS</string>
+    <string name="diagnostics_crash_label">Last crash</string>
+    <string name="diagnostics_crash_empty">No crash has been recorded on this device.</string>
+    <string name="diagnostics_crash_body">Kept on this device only. It is sent nowhere unless you share it.</string>
+    <string name="diagnostics_action_copy">Copy report</string>
+    <string name="diagnostics_action_share">Share report</string>
+    <string name="diagnostics_action_report">Report on GitHub</string>
+    <string name="diagnostics_action_clear">Clear report</string>
+    <string name="diagnostics_share_failed">Could not share the report.</string>
+    <string name="diagnostics_exits_label">Recent process exits</string>
+    <string name="diagnostics_exits_caption">Recorded by Android, covering the exits the app cannot see itself, such as ANRs and low-memory kills.</string>
+    <string name="diagnostics_exits_empty">The system has not recorded any exits yet.</string>
 
     <!-- Onboarding -->
     <string name="onboarding_language_title">LANGUAGE</string>

@@ -9,6 +9,8 @@ import dev.koukeneko.essentialkeytools.R
 const val PRIVACY_POLICY_URL =
     "https://github.com/KoukeNeko/EssentialKeyTools/blob/main/PRIVACY.md"
 
+const val ISSUES_URL = "https://github.com/KoukeNeko/EssentialKeyTools/issues"
+
 private const val PLAY_STORE_PACKAGE = "com.android.vending"
 private const val PRODUCTION_APPLICATION_ID = "dev.koukeneko.essentialkeytools"
 private const val PLAY_STORE_WEB_URL =
