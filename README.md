@@ -71,6 +71,18 @@ Update checks happen only when you press **Check for updates**. Google Play inst
 Google Play, sideloaded stable builds check stable GitHub Releases, and Preview builds check only
 pre-releases. The app never downloads or installs an APK by itself.
 
+
+### Report a crash without guesswork
+
+If something goes wrong, the Diagnostics screen shows the last crash the app caught, along with the
+process exits Android recorded, such as "not responding" or a low-memory shutdown. Copy or share the
+report straight into a GitHub issue.
+
+The report stays on your device. There is no crash-reporting service and nothing is uploaded — the
+app has no server to upload to. It also carries nothing the accessibility service observed: no screen
+content and no record of which keys you pressed. You can read the whole thing before you send it, and
+clear it whenever you like.
+
 ## A clear choice before accessibility
 
 The first-run guide starts with language selection and a short introduction. Its final page explains:

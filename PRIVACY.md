@@ -1,6 +1,6 @@
 # Privacy Policy — Essential Key Tools
 
-_Last updated: 17 July 2026_
+_Last updated: 1 September 2026_
 
 Essential Key Tools ("the app") is a free, open-source Android app that remaps the Nothing Phone
 Essential Key. This policy explains what the app does — and does not do — with your data.
@@ -12,14 +12,34 @@ press its button.**
 
 ## Data the app collects
 
-The developer collects none. The app has no analytics SDKs, advertising, crash or telemetry
-reporting, accounts, or sign-in. It does not send your settings or hardware key-event data anywhere.
+The developer collects none. The app has no analytics SDKs, advertising, telemetry, crash-reporting
+services, accounts, or sign-in. It does not send your settings or hardware key-event data anywhere.
+The app does record a crash report on your own device, described below, but nothing is transmitted
+from it unless you choose to share it.
 
 ## Data stored on your device
 
 Your onboarding progress and settings — which action each gesture (single, double, triple, or long
 press) is mapped to, and the learned scan code of your key — are stored locally on your device using
 Android's DataStore. This data never leaves your device and is removed when you uninstall the app.
+
+## Crash reports stay on your device
+
+If the app crashes, it writes a diagnostic report to its private storage on your device so you can
+see what happened. The report contains the app version, how the app was installed, your device model
+and Android version, the time of the crash, and the technical stack trace. **It deliberately contains
+nothing observed by the Accessibility Service** — no screen content, no window or notification text,
+no record of which keys you pressed or which apps were in the foreground.
+
+The report is never transmitted anywhere automatically. The app has no crash-reporting service and no
+server to send it to. It leaves your device only if you open the Diagnostics screen and choose to copy
+or share it yourself, in which case you decide where it goes and can read the whole report first. Only
+the most recent report is kept, it is replaced by the next one, and you can delete it at any time with
+the Clear report button or by uninstalling the app.
+
+The Diagnostics screen also lists process exits that Android itself recorded for the app, such as
+"Not responding" or a shutdown caused by low memory. That list comes from the operating system, stays
+on your device, and is subject to the same rules.
 
 ## Data retention, deletion, and security
 
