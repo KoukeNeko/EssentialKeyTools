@@ -101,6 +101,8 @@
     <string name="action_take_screenshot">螢幕截圖</string>
     <string name="action_lock_screen">鎖定螢幕</string>
     <string name="action_media_play_pause">播放 / 暫停媒體</string>
+    <string name="action_media_next">下一首</string>
+    <string name="action_media_previous">上一首</string>
     <string name="action_ringer_cycle">循環鈴聲模式</string>
 
     <!-- Home: gestures + unlock -->

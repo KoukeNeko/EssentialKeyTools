@@ -27,6 +27,8 @@ object UiLabels {
         KeyAction.TakeScreenshot.ID -> R.string.action_take_screenshot
         KeyAction.LockScreen.ID -> R.string.action_lock_screen
         KeyAction.MediaPlayPause.ID -> R.string.action_media_play_pause
+        KeyAction.MediaNext.ID -> R.string.action_media_next
+        KeyAction.MediaPrevious.ID -> R.string.action_media_previous
         KeyAction.RingerCycle.ID -> R.string.action_ringer_cycle
         else -> R.string.action_none
     }
@@ -38,6 +40,8 @@ object UiLabels {
         KeyAction.TakeScreenshot,
         KeyAction.LockScreen,
         KeyAction.MediaPlayPause,
+        KeyAction.MediaNext,
+        KeyAction.MediaPrevious,
         KeyAction.RingerCycle
     )
 }

@@ -49,6 +49,21 @@ sealed interface KeyAction {
         const val ID: String = "media_play_pause"
     }
 
+    /** Skips to the next track in whichever app currently owns media buttons. */
+    data object MediaNext : KeyAction {
+        override val id: String = ID
+        const val ID: String = "media_next"
+    }
+
+    /**
+     * Skips to the previous track. What "previous" means is the player's decision: many restart the
+     * current track instead once it has been playing for a few seconds.
+     */
+    data object MediaPrevious : KeyAction {
+        override val id: String = ID
+        const val ID: String = "media_previous"
+    }
+
     /** Cycles the ringer mode: normal -> vibrate -> silent -> normal. */
     data object RingerCycle : KeyAction {
         override val id: String = ID
@@ -67,6 +82,8 @@ sealed interface KeyAction {
             TakeScreenshot.ID -> TakeScreenshot
             LockScreen.ID -> LockScreen
             MediaPlayPause.ID -> MediaPlayPause
+            MediaNext.ID -> MediaNext
+            MediaPrevious.ID -> MediaPrevious
             RingerCycle.ID -> RingerCycle
             else -> None
         }

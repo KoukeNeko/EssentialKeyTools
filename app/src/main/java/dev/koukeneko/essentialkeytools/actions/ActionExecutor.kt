@@ -46,7 +46,10 @@ class ActionExecutor(
                 AccessibilityService.GLOBAL_ACTION_LOCK_SCREEN,
                 R.string.error_lock_screen_failed
             )
-            is KeyAction.MediaPlayPause -> dispatchMediaPlayPause()
+            is KeyAction.MediaPlayPause ->
+                dispatchMediaKey(KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE)
+            is KeyAction.MediaNext -> dispatchMediaKey(KeyEvent.KEYCODE_MEDIA_NEXT)
+            is KeyAction.MediaPrevious -> dispatchMediaKey(KeyEvent.KEYCODE_MEDIA_PREVIOUS)
             is KeyAction.RingerCycle -> cycleRingerMode()
         }
     }
@@ -120,13 +123,19 @@ class ActionExecutor(
         }
     }
 
-    private fun dispatchMediaPlayPause() {
+    /**
+     * Sends one media key to whichever session currently owns media buttons. The down/up pair is
+     * load-bearing rather than ceremony: the framework treats play/pause as a voice key and holds
+     * its down event until the up arrives, so a lone down would never be delivered. Nothing is
+     * reported back — the platform offers no permission-free acknowledgement, so a press with no
+     * player listening is a silent no-op, exactly like a headset button.
+     */
+    private fun dispatchMediaKey(keyCode: Int) {
         val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as? AudioManager
         if (audioManager == null) {
             toast(R.string.error_media_unavailable)
             return
         }
-        val keyCode = KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE
         audioManager.dispatchMediaKeyEvent(KeyEvent(KeyEvent.ACTION_DOWN, keyCode))
         audioManager.dispatchMediaKeyEvent(KeyEvent(KeyEvent.ACTION_UP, keyCode))
     }

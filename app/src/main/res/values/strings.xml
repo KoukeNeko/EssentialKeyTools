@@ -101,6 +101,8 @@
     <string name="action_take_screenshot">Take screenshot</string>
     <string name="action_lock_screen">Lock screen</string>
     <string name="action_media_play_pause">Play / pause media</string>
+    <string name="action_media_next">Next track</string>
+    <string name="action_media_previous">Previous track</string>
     <string name="action_ringer_cycle">Cycle ringer mode</string>
 
     <!-- Home: gestures + unlock -->

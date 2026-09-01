@@ -34,6 +34,29 @@ class SettingsSerializationTest {
     }
 
     @Test
+    fun decodeMap_readsMediaSkipActions() {
+        val nextKey = SettingsSerialization.actionIdKeyName(KeyGesture.DOUBLE_PRESS)
+        val previousKey = SettingsSerialization.actionIdKeyName(KeyGesture.TRIPLE_PRESS)
+        val map = SettingsSerialization.decodeMap(
+            storeOf(
+                nextKey to KeyAction.MediaNext.ID,
+                previousKey to KeyAction.MediaPrevious.ID
+            )
+        )
+
+        assertEquals(KeyAction.MediaNext, map.actionFor(KeyGesture.DOUBLE_PRESS))
+        assertEquals(KeyAction.MediaPrevious, map.actionFor(KeyGesture.TRIPLE_PRESS))
+    }
+
+    @Test
+    fun encodeAction_mediaSkipCarriesNoPayload() {
+        val encoded = SettingsSerialization.encodeAction(KeyAction.MediaNext)
+
+        assertEquals(KeyAction.MediaNext.ID, encoded.id)
+        assertNull(encoded.payload)
+    }
+
+    @Test
     fun decodeMap_readsLaunchAppWithPayload() {
         val idKey = SettingsSerialization.actionIdKeyName(KeyGesture.SINGLE_PRESS)
         val payloadKey = SettingsSerialization.actionPayloadKeyName(KeyGesture.SINGLE_PRESS)
