@@ -31,6 +31,7 @@ class ActionExecutor(
     }
 
     private var torchEnabled = false
+    private var silentUnavailableHintShown = false
 
     fun execute(action: KeyAction) {
         when (action) {
@@ -136,42 +137,51 @@ class ActionExecutor(
             toast(R.string.error_ringer_unavailable)
             return
         }
-        val nextMode = nextRingerMode(audioManager.ringerMode, silentAllowed())
-        try {
-            audioManager.ringerMode = nextMode
-        } catch (error: SecurityException) {
-            // Setting SILENT without policy access throws even when we pre-check; degrade to vibrate.
-            Log.w(TAG, "Ringer mode change denied, falling back to vibrate", error)
-            audioManager.ringerMode = AudioManager.RINGER_MODE_VIBRATE
+        val policyAccessGranted = notificationPolicyAccessGranted()
+        val nextMode = nextRingerMode(audioManager.ringerMode, policyAccessGranted)
+        if (nextMode == null) {
+            toast(R.string.hint_ringer_silent_exit_needs_policy)
+            return
+        }
+        if (!applyRingerMode(audioManager, nextMode)) {
+            toast(R.string.error_ringer_change_denied)
+            return
+        }
+        if (!policyAccessGranted) {
+            showSilentUnavailableHintOnce()
         }
     }
 
     /**
-     * Chooses the next ringer mode. When silent is unavailable (no Notification-Policy access) the
-     * cycle collapses to normal <-> vibrate so the action still does something.
+     * Writes [mode] and reports whether the system accepted it. OEM builds draw the
+     * Do-Not-Disturb line in slightly different places, so the write stays guarded even for
+     * transitions [nextRingerMode] believes are legal — a denied write must never escape, because
+     * the action runs on the accessibility service's main thread.
      */
-    private fun nextRingerMode(currentMode: Int, silentAllowed: Boolean): Int = when (currentMode) {
-        AudioManager.RINGER_MODE_NORMAL -> AudioManager.RINGER_MODE_VIBRATE
-        AudioManager.RINGER_MODE_VIBRATE ->
-            if (silentAllowed) AudioManager.RINGER_MODE_SILENT else AudioManager.RINGER_MODE_NORMAL
-        else -> AudioManager.RINGER_MODE_NORMAL
+    private fun applyRingerMode(audioManager: AudioManager, mode: Int): Boolean = try {
+        audioManager.ringerMode = mode
+        true
+    } catch (error: SecurityException) {
+        Log.w(TAG, "Ringer mode change to $mode denied", error)
+        false
     }
 
-    private fun silentAllowed(): Boolean {
+    private fun notificationPolicyAccessGranted(): Boolean {
         val notificationManager =
             context.getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager
-        val granted = notificationManager?.isNotificationPolicyAccessGranted == true
-        if (!granted && !ringerHintShown) {
-            // Surface the missing-permission hint exactly once per process, not on every cycle.
-            ringerHintShown = true
-            toast(R.string.hint_ringer_silent_needs_policy)
+        return notificationManager?.isNotificationPolicyAccessGranted == true
+    }
+
+    /** Explains the shortened cycle once per process rather than on every key press. */
+    private fun showSilentUnavailableHintOnce() {
+        if (silentUnavailableHintShown) {
+            return
         }
-        return granted
+        silentUnavailableHintShown = true
+        toast(R.string.hint_ringer_silent_needs_policy)
     }
 
     private fun toast(messageRes: Int) {
         Toast.makeText(context, messageRes, Toast.LENGTH_SHORT).show()
     }
-
-    private var ringerHintShown = false
 }

@@ -114,6 +114,7 @@
     <string name="unlock_status_locked">SINGLE PRESS — LOCKED</string>
     <string name="unlock_status_none">NO CONSUMER PACKAGES FOUND</string>
 
+
     <!-- Unlock wizard -->
     <string name="unlock_title">UNLOCK</string>
     <string name="unlock_warning_label">Before you unlock</string>
@@ -136,6 +137,8 @@
     <string name="error_media_unavailable">Media control unavailable</string>
     <string name="error_ringer_unavailable">Ringer control unavailable</string>
     <string name="hint_ringer_silent_needs_policy">Silent mode needs Do Not Disturb access — cycling ring and vibrate only.</string>
+    <string name="hint_ringer_silent_exit_needs_policy">Leaving silent mode needs Do Not Disturb access — grant it in Settings &gt; Apps &gt; Special app access.</string>
+    <string name="error_ringer_change_denied">The system blocked the ringer mode change</string>
 
     <!-- Language -->
     <string name="section_language">Language</string>

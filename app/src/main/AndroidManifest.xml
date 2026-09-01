@@ -4,6 +4,10 @@
     <!-- The home-screen contribution card fetches the contributor list from the GitHub API. -->
     <uses-permission android:name="android.permission.INTERNET" />
 
+    <!-- Entering or leaving silent counts as a Do Not Disturb change, so the ringer-cycle action
+         needs this declared for the app to appear under Settings' Do Not Disturb access list. -->
+    <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
+
     <!-- The action picker lists launchable apps, so package visibility must be declared. -->
     <queries>
         <intent>

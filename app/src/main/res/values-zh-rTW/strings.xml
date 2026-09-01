@@ -114,6 +114,7 @@
     <string name="unlock_status_locked">按一下 — 已鎖定</string>
     <string name="unlock_status_none">找不到消費者套件</string>
 
+
     <!-- Unlock wizard -->
     <string name="unlock_title">解鎖</string>
     <string name="unlock_warning_label">解鎖前請注意</string>
@@ -136,6 +137,8 @@
     <string name="error_media_unavailable">媒體控制無法使用</string>
     <string name="error_ringer_unavailable">鈴聲控制無法使用</string>
     <string name="hint_ringer_silent_needs_policy">靜音模式需要「請勿打擾」存取權 — 目前僅在響鈴與震動間循環。</string>
+    <string name="hint_ringer_silent_exit_needs_policy">離開靜音模式需要「請勿打擾」存取權 — 請至「設定 &gt; 應用程式 &gt; 特殊應用程式存取權」開啟。</string>
+    <string name="error_ringer_change_denied">系統拒絕變更鈴聲模式</string>
 
     <!-- Language -->
     <string name="section_language">語言</string>
