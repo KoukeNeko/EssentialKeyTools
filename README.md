@@ -10,7 +10,10 @@
 </p>
 
 <p align="center">
-  <a href="https://play.google.com/store/apps/details?id=dev.koukeneko.essentialkeytools"><img alt="Google Play" src="https://img.shields.io/badge/GET_IT_ON-GOOGLE_PLAY-414141?style=for-the-badge&logo=googleplay&logoColor=white"></a>
+  <a href="https://play.google.com/store/apps/details?id=dev.koukeneko.essentialkeytools"><img alt="Get it on Google Play" src="logo/google-play-badge.svg" width="220"></a>
+</p>
+
+<p align="center">
   <a href="https://github.com/KoukeNeko/EssentialKeyTools/releases/latest"><img alt="Release" src="https://img.shields.io/github/v/release/KoukeNeko/EssentialKeyTools?style=for-the-badge&logo=github&label=RELEASE&color=2196F3"></a>
   <a href="https://github.com/KoukeNeko/EssentialKeyTools/releases"><img alt="GitHub downloads" src="https://img.shields.io/github/downloads/KoukeNeko/EssentialKeyTools/total?style=for-the-badge&logo=github&label=GITHUB%20DOWNLOADS&color=4CAF50"></a>
   <img alt="Android 15+" src="https://img.shields.io/badge/ANDROID-15%2B-3DDC84?style=for-the-badge&logo=android&logoColor=white">
@@ -18,8 +21,7 @@
 </p>
 
 <p align="center">
-  <a href="https://play.google.com/store/apps/details?id=dev.koukeneko.essentialkeytools"><strong>Get it on Google Play</strong></a>
-  · <a href="https://github.com/KoukeNeko/EssentialKeyTools/releases/latest">Download the APK</a>
+  <a href="https://github.com/KoukeNeko/EssentialKeyTools/releases/latest">Download the APK</a>
   · <a href="#getting-started">Getting started</a>
   · <a href="PRIVACY.md">Privacy</a>
 </p>
@@ -200,3 +202,5 @@ If Essential Key Tools is useful to you, you can support development:
 ## License
 
 [MIT](LICENSE) © KoukeNeko
+
+Google Play and the Google Play logo are trademarks of Google LLC.
