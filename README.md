@@ -15,6 +15,9 @@
 
 <p align="center">
   <a href="https://github.com/KoukeNeko/EssentialKeyTools/releases/latest"><img alt="Release" src="https://img.shields.io/github/v/release/KoukeNeko/EssentialKeyTools?style=for-the-badge&logo=github&label=RELEASE&color=2196F3"></a>
+  <!-- Play publishes only a range, never an exact count, and there is no API for it: this figure is
+       read off the store listing by hand and needs updating when the range changes. -->
+  <a href="https://play.google.com/store/apps/details?id=dev.koukeneko.essentialkeytools"><img alt="Google Play downloads" src="https://img.shields.io/badge/GOOGLE_PLAY-1%2C000%2B_DOWNLOADS-414141?style=for-the-badge&logo=googleplay&logoColor=white"></a>
   <a href="https://github.com/KoukeNeko/EssentialKeyTools/releases"><img alt="GitHub downloads" src="https://img.shields.io/github/downloads/KoukeNeko/EssentialKeyTools/total?style=for-the-badge&logo=github&label=GITHUB%20DOWNLOADS&color=4CAF50"></a>
   <img alt="Android 15+" src="https://img.shields.io/badge/ANDROID-15%2B-3DDC84?style=for-the-badge&logo=android&logoColor=white">
   <a href="https://github.com/KoukeNeko/EssentialKeyTools/stargazers"><img alt="Stars" src="https://img.shields.io/github/stars/KoukeNeko/EssentialKeyTools?style=for-the-badge&logo=github&label=STARS&color=2196F3"></a>

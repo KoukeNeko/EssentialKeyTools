@@ -13,9 +13,9 @@ permissions:
   contents: read
 
 env:
-  PRE_VERSION_NAME: 1.0.9-pre.${{ github.run_number }}
-  PRE_TAG: preview-v1.0.9-pre.${{ github.run_number }}
-  PRE_ARTIFACT_NAME: essential-key-tools-v1.0.9-pre.${{ github.run_number }}
+  PRE_VERSION_NAME: 1.0.11-pre.${{ github.run_number }}
+  PRE_TAG: preview-v1.0.11-pre.${{ github.run_number }}
+  PRE_ARTIFACT_NAME: essential-key-tools-v1.0.11-pre.${{ github.run_number }}
 
 concurrency:
   group: build-apk-${{ github.ref }}
@@ -39,7 +39,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
 
       - name: Run quality gate and assemble the debug APK
-        run: ./gradlew lint test assembleDebug -PversionName="$PRE_VERSION_NAME" -PversionCode=10009 --stacktrace
+        run: ./gradlew lint test assembleDebug -PversionName="$PRE_VERSION_NAME" -PversionCode=10011 --stacktrace
 
       - name: Upload the debug APK
         uses: actions/upload-artifact@v4
