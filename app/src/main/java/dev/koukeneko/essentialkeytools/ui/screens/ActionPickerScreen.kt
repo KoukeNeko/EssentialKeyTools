@@ -32,12 +32,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
-import androidx.core.graphics.drawable.toBitmap
 import dev.koukeneko.essentialkeytools.R
 import dev.koukeneko.essentialkeytools.actions.KeyAction
 import dev.koukeneko.essentialkeytools.core.KeyGesture
@@ -83,8 +82,11 @@ fun ActionPickerScreen(
     var apps by remember { mutableStateOf<List<LaunchableApp>>(emptyList()) }
     var appsLoaded by remember { mutableStateOf(false) }
     var query by remember { mutableStateOf("") }
-    LaunchedEffect(Unit) {
-        apps = withContext(Dispatchers.Default) { InstalledApps.loadLaunchable(context) }
+    val iconSizePx = with(LocalDensity.current) { ICON_SIZE.roundToPx() }
+    LaunchedEffect(iconSizePx) {
+        apps = withContext(Dispatchers.Default) {
+            InstalledApps.loadLaunchable(context, iconSizePx)
+        }
         appsLoaded = true
     }
 
@@ -235,12 +237,17 @@ private fun AppRow(app: LaunchableApp, onClick: () -> Unit) {
             .padding(vertical = ROW_VERTICAL_PADDING),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        val iconBitmap = remember(app.packageName) { app.icon.toBitmap().asImageBitmap() }
-        Image(
-            bitmap = iconBitmap,
-            contentDescription = app.label,
-            modifier = Modifier.size(ICON_SIZE)
-        )
+        val iconBitmap = app.icon
+        if (iconBitmap == null) {
+            // Keep the label column aligned with the rows whose icon did rasterise.
+            Spacer(modifier = Modifier.size(ICON_SIZE))
+        } else {
+            Image(
+                bitmap = iconBitmap,
+                contentDescription = app.label,
+                modifier = Modifier.size(ICON_SIZE)
+            )
+        }
         Spacer(modifier = Modifier.width(ICON_TO_LABEL_GAP))
         Text(
             text = app.label,
