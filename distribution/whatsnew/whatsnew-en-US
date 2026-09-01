@@ -1,8 +1,13 @@
-New
-- Next track and Previous track actions, so a gesture can skip what you are listening to.
-- A Diagnostics screen showing the last crash, with a button that opens a prefilled GitHub issue. Crash reports stay on your device unless you share them.
+New features & improvements
 
-Fixed
-- A crash when cycling the ringer while the phone was already silent.
-- A crash in the action picker caused by an installed app with an oversized icon.
-- Added a shortcut to the Do Not Disturb access screen, which silent mode requires.
+⏭️ Skip tracks with the new Next track and Previous track actions.
+
+🩺 New Diagnostics screen shows the last crash, ready to share into a bug report.
+
+🔕 Added a shortcut to Do Not Disturb access, which silent mode requires.
+
+Bug fixes
+
+🔔 Fixed a crash when cycling the ringer while the phone was already silent.
+
+🖼️ Fixed a crash in the action picker caused by an app with an oversized icon.
