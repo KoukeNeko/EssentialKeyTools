@@ -16,6 +16,10 @@ Why the app asks for accessibility access
 
 Essential Key Tools uses Android's AccessibilityService API only to detect Essential Key presses while the app is not open and run the shortcut you selected. When enabled, it receives which hardware button was pressed or released and when. This lets it tell a single, double, triple, or long press apart.
 
-Key presses are processed immediately on your device. Hardware key-event details are not saved, uploaded, or shared. Your shortcuts and the Essential Key identifier you confirm during setup are stored only on your device. The app does not read screen content, text fields, or anything you type. Screenshot and Lock screen run only when you choose one of them as a shortcut. If the app crashes it writes a diagnostic report to your device so you can report the problem; it is never uploaded automatically and you can delete it at any time.
+Key presses are processed immediately on your device. Hardware key-event details are not saved, uploaded, or shared. Your shortcuts and the Essential Key identifier you confirm during setup are stored only on your device. The app does not read screen content, text fields, or anything you type. Screenshot and Lock screen run only when you choose one of them as a shortcut.
 
 You decide whether to use accessibility access during setup. Choosing not to use it does not enable the service.
+
+Crash reports
+
+If the app crashes, it writes a diagnostic report to your device so you can report the problem. The report holds the app version, your device model, your Android version, and the technical error details. It contains nothing the accessibility service observes, it is never uploaded automatically, and you can share or delete it whenever you like.
