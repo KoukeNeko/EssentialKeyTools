@@ -3,6 +3,7 @@ package dev.koukeneko.essentialkeytools.settings
 import dev.koukeneko.essentialkeytools.actions.KeyAction
 import dev.koukeneko.essentialkeytools.core.KeyGesture
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -43,5 +44,26 @@ class GestureActionMapTest {
             .with(KeyGesture.SINGLE_PRESS, KeyAction.None)
 
         assertTrue(map.activeGestures().isEmpty())
+    }
+
+    @Test
+    fun isMapped_findsActionBoundToAnyGesture() {
+        val map = GestureActionMap.EMPTY.with(KeyGesture.LONG_PRESS, KeyAction.RingerCycle)
+
+        assertTrue(map.isMapped(KeyAction.RingerCycle))
+    }
+
+    @Test
+    fun isMapped_ignoresOtherActions() {
+        val map = GestureActionMap.EMPTY
+            .with(KeyGesture.DOUBLE_PRESS, KeyAction.ToggleFlashlight)
+            .with(KeyGesture.TRIPLE_PRESS, KeyAction.LaunchApp("com.example.app"))
+
+        assertFalse(map.isMapped(KeyAction.RingerCycle))
+    }
+
+    @Test
+    fun isMapped_isFalseForEmptyMap() {
+        assertFalse(GestureActionMap.EMPTY.isMapped(KeyAction.RingerCycle))
     }
 }

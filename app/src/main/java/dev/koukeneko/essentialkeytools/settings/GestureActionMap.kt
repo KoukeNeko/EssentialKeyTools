@@ -19,6 +19,10 @@ data class GestureActionMap(
     fun with(gesture: KeyGesture, action: KeyAction): GestureActionMap =
         GestureActionMap(actionsByGesture + (gesture to action))
 
+    /** Whether [action] is bound to any gesture, so callers can gate action-specific UI on it. */
+    fun isMapped(action: KeyAction): Boolean =
+        KeyGesture.entries.any { gesture -> actionFor(gesture) == action }
+
     /** Gestures whose mapped action is anything other than [KeyAction.None]. */
     fun activeGestures(): Set<KeyGesture> =
         KeyGesture.entries

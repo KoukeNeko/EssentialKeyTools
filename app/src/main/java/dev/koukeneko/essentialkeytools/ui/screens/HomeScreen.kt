@@ -1,5 +1,6 @@
 package dev.koukeneko.essentialkeytools.ui.screens
 
+import android.app.NotificationManager
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
@@ -107,6 +108,7 @@ fun HomeScreen(
     val actionMap by repository.gestureActionMap.collectAsState(initial = GestureActionMap.EMPTY)
     val serviceRunningState = rememberServiceRunningState()
     val unlockStatus = rememberUnlockStatus()
+    val notificationPolicyAccessGranted = rememberNotificationPolicyAccessGranted()
     var showAccessibilityDisclosure by rememberSaveable { mutableStateOf(false) }
 
     if (showAccessibilityDisclosure) {
@@ -158,6 +160,10 @@ fun HomeScreen(
             onEditGesture = onEditGesture
         )
         Spacer(modifier = Modifier.height(CARD_GAP))
+        if (actionMap.isMapped(KeyAction.RingerCycle) && !notificationPolicyAccessGranted) {
+            NotificationPolicyCard()
+            Spacer(modifier = Modifier.height(CARD_GAP))
+        }
         NavigationCard(
             onKeySetup = onKeySetup,
             onKeyTest = onKeyTest,
@@ -364,6 +370,70 @@ private fun DisabledServiceControls(
         onClick = onRequestOpenSettings,
         modifier = Modifier.fillMaxWidth()
     )
+}
+
+/**
+ * Offers the Do Not Disturb grant the ringer-cycle action needs to reach silent mode. Callers show
+ * it only while that grant is missing, so it disappears once the user returns from settings having
+ * given it.
+ */
+@Composable
+private fun NotificationPolicyCard() {
+    val context = LocalContext.current
+    NothingCard(modifier = Modifier.fillMaxWidth()) {
+        NothingSectionLabel(text = stringResource(R.string.section_dnd_access))
+        Spacer(modifier = Modifier.height(LABEL_GAP))
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            StatusDot(active = false)
+            Spacer(modifier = Modifier.width(DOT_TO_TEXT_GAP))
+            Text(
+                text = stringResource(R.string.dnd_access_not_granted),
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+        }
+        Spacer(modifier = Modifier.height(STATUS_TO_ACTION_GAP))
+        Text(
+            text = stringResource(R.string.dnd_access_body),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        Spacer(modifier = Modifier.height(DISCLOSURE_GAP))
+        NothingButton(
+            text = stringResource(R.string.action_open_dnd_access_settings),
+            onClick = { openNotificationPolicyAccessSettings(context) },
+            modifier = Modifier.fillMaxWidth()
+        )
+    }
+}
+
+/** Reads the Do Not Disturb grant, re-checked on resume so returning from settings updates the UI. */
+@Composable
+private fun rememberNotificationPolicyAccessGranted(): Boolean {
+    val context = LocalContext.current
+    fun readGranted(): Boolean {
+        val notificationManager =
+            context.getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager
+        return notificationManager?.isNotificationPolicyAccessGranted == true
+    }
+
+    var granted by remember { mutableStateOf(readGranted()) }
+    OnResume { granted = readGranted() }
+    return granted
+}
+
+/**
+ * Opens the system Do Not Disturb access list, where the user grants the policy access the ringer
+ * cycle needs. The app only appears there because the manifest declares ACCESS_NOTIFICATION_POLICY.
+ */
+private fun openNotificationPolicyAccessSettings(context: Context) {
+    val policyAccess = Intent(Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS)
+        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    try {
+        context.startActivity(policyAccess)
+    } catch (error: android.content.ActivityNotFoundException) {
+        Toast.makeText(context, R.string.dnd_access_settings_unavailable, Toast.LENGTH_LONG).show()
+    }
 }
 
 @Composable

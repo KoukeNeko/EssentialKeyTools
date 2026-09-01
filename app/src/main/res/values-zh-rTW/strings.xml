@@ -114,6 +114,12 @@
     <string name="unlock_status_locked">按一下 — 已鎖定</string>
     <string name="unlock_status_none">找不到消費者套件</string>
 
+    <!-- Home: Do Not Disturb access (shown only while the ringer-cycle action needs it) -->
+    <string name="section_dnd_access">請勿打擾存取權</string>
+    <string name="dnd_access_not_granted">請勿打擾存取權 — 尚未授予</string>
+    <string name="dnd_access_body">鈴聲循環要有「請勿打擾」存取權才能切到靜音。沒有這個權限時，循環只會在響鈴與震動之間切換，而且完全無法離開靜音模式。</string>
+    <string name="action_open_dnd_access_settings">開啟請勿打擾存取權設定</string>
+    <string name="dnd_access_settings_unavailable">無法開啟請勿打擾存取權設定。</string>
 
     <!-- Unlock wizard -->
     <string name="unlock_title">解鎖</string>

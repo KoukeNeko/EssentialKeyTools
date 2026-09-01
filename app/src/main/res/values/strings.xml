@@ -114,6 +114,12 @@
     <string name="unlock_status_locked">SINGLE PRESS — LOCKED</string>
     <string name="unlock_status_none">NO CONSUMER PACKAGES FOUND</string>
 
+    <!-- Home: Do Not Disturb access (shown only while the ringer-cycle action needs it) -->
+    <string name="section_dnd_access">Do Not Disturb access</string>
+    <string name="dnd_access_not_granted">DND ACCESS — NOT GRANTED</string>
+    <string name="dnd_access_body">The ringer cycle can only reach silent mode with Do Not Disturb access. Without it the cycle stays between ring and vibrate, and it cannot leave silent mode at all.</string>
+    <string name="action_open_dnd_access_settings">Open Do Not Disturb access</string>
+    <string name="dnd_access_settings_unavailable">Could not open Do Not Disturb access settings.</string>
 
     <!-- Unlock wizard -->
     <string name="unlock_title">UNLOCK</string>
