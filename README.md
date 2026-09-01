@@ -32,9 +32,13 @@
 Essential Key Tools gives the Nothing Phone's **Essential Key** a life beyond its default action.
 Assign a different shortcut to each gesture and use it instantly, without opening the app first.
 
-It is built to keep you in control: no root access or computer setup is required. The app explains
-its accessibility use before Android settings open, provides clear agree and decline choices, and
-never treats leaving the page as consent.
+**Essential Space stays exactly as it is.** Double press, triple press, and long press are yours the
+moment you enable the service — there is nothing to disable and nothing to give up. Only the single
+press, which Nothing OS reserves, needs the optional unlock wizard.
+
+No root access and no computer setup is required. The app explains its accessibility use before
+Android settings open, provides clear agree and decline choices, and never treats leaving the page
+as consent.
 
 ## See it in action
 
@@ -51,13 +55,20 @@ never treats leaving the page as consent.
 ### Four gestures, four shortcuts
 
 Give single press, double press, triple press, and long press their own actions. Launch an app,
-toggle the flashlight, take a screenshot, lock the screen, control media, or change the ringer mode.
+toggle the flashlight, take a screenshot, lock the screen, play or pause, skip to the next or
+previous track, or cycle the ringer between ring, vibrate, and silent.
 
-### Take back the single press
+### Three gestures with nothing to disable
 
-Nothing OS normally reserves a single press for Essential Space or Recorder. The built-in unlock
-wizard shows the relevant packages and opens each App Info page so you can disable or restore them
-manually. Double, triple, and long press work without this optional step.
+Double press, triple press, and long press are free for the taking. Essential Space and the Recorder
+keep working exactly as they do now, so there is no trade-off to weigh and no wizard to run — enable
+the accessibility service, pick your shortcuts, done.
+
+### Take back the single press, if you want it
+
+Nothing OS reserves the single press for Essential Space or Recorder, so this one is opt-in. The
+built-in unlock wizard shows the relevant packages and opens each App Info page so you can disable
+or restore them manually.
 
 > **Before you unlock:** freeing the single press disables Nothing's Essential Space and Recorder
 > entirely. You can restore them from the same App Info pages, and an OS update may enable them
