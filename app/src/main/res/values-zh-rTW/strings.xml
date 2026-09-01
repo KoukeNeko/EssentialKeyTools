@@ -25,6 +25,7 @@
     <string name="diagnostics_action_copy">複製報告</string>
     <string name="diagnostics_action_share">分享報告</string>
     <string name="diagnostics_action_report">到 GitHub 回報</string>
+    <string name="diagnostics_report_caption">會開啟已預填的 issue,並複製報告供你貼上。</string>
     <string name="diagnostics_action_clear">清除報告</string>
     <string name="diagnostics_share_failed">無法分享報告。</string>
     <string name="diagnostics_exits_label">最近的程序結束記錄</string>

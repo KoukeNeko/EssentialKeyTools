@@ -25,6 +25,7 @@
     <string name="diagnostics_action_copy">Copy report</string>
     <string name="diagnostics_action_share">Share report</string>
     <string name="diagnostics_action_report">Report on GitHub</string>
+    <string name="diagnostics_report_caption">Opens a prefilled issue and copies the report, ready to paste.</string>
     <string name="diagnostics_action_clear">Clear report</string>
     <string name="diagnostics_share_failed">Could not share the report.</string>
     <string name="diagnostics_exits_label">Recent process exits</string>

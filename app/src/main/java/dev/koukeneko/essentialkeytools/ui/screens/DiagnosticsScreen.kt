@@ -33,6 +33,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import dev.koukeneko.essentialkeytools.R
 import dev.koukeneko.essentialkeytools.diagnostics.CrashReportStore
+import dev.koukeneko.essentialkeytools.diagnostics.buildCrashIssueUrl
 import dev.koukeneko.essentialkeytools.diagnostics.ProcessExit
 import dev.koukeneko.essentialkeytools.diagnostics.formatProcessExit
 import dev.koukeneko.essentialkeytools.diagnostics.readRecentProcessExits
@@ -96,16 +97,16 @@ fun DiagnosticsScreen(
 
         CrashReportCard(
             report = crashReport,
-            onCopy = { report ->
-                // Android 13+ shows its own copy confirmation, so the app adds no toast of its own.
+            onCopy = { report -> coroutineScope.launch { copyReport(clipboard, report) } },
+            onShare = { shareReport(context, it) },
+            onReport = { report ->
+                // The trace is far too long for a query string, so it travels on the clipboard while
+                // the issue form opens prefilled with the title and the short device facts.
                 coroutineScope.launch {
-                    clipboard.setClipEntry(
-                        ClipEntry(ClipData.newPlainText(CLIP_LABEL, report))
-                    )
+                    copyReport(clipboard, report)
+                    openExternalUrl(context, buildCrashIssueUrl(ISSUES_URL, report))
                 }
             },
-            onShare = { shareReport(context, it) },
-            onReport = { openExternalUrl(context, ISSUES_URL) },
             onClear = {
                 coroutineScope.launch {
                     withContext(Dispatchers.IO) { store.clear() }
@@ -123,7 +124,7 @@ private fun CrashReportCard(
     report: String?,
     onCopy: (String) -> Unit,
     onShare: (String) -> Unit,
-    onReport: () -> Unit,
+    onReport: (String) -> Unit,
     onClear: () -> Unit
 ) {
     NothingCard(modifier = Modifier.fillMaxWidth()) {
@@ -171,9 +172,14 @@ private fun CrashReportCard(
             )
             NothingButton(
                 text = stringResource(R.string.diagnostics_action_report),
-                onClick = onReport,
+                onClick = { onReport(report) },
                 outlined = true,
                 modifier = Modifier.fillMaxWidth()
+            )
+            Text(
+                text = stringResource(R.string.diagnostics_report_caption),
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             NothingButton(
                 text = stringResource(R.string.diagnostics_action_clear),
@@ -219,6 +225,11 @@ private fun ProcessExitsCard(exits: List<ProcessExit>) {
             }
         }
     }
+}
+
+/** Android 13+ shows its own copy confirmation, so the app adds no message of its own. */
+private suspend fun copyReport(clipboard: androidx.compose.ui.platform.Clipboard, report: String) {
+    clipboard.setClipEntry(ClipEntry(ClipData.newPlainText(CLIP_LABEL, report)))
 }
 
 private fun shareReport(context: android.content.Context, report: String) {
