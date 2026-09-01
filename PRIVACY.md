@@ -37,8 +37,14 @@ or share it yourself, in which case you decide where it goes and can read the wh
 the most recent report is kept, it is replaced by the next one, and you can delete it at any time with
 the Clear report button or by uninstalling the app.
 
+The Diagnostics screen's "Report on GitHub" button is the one place where a small part of this
+leaves your device without a further step from you: opening the prefilled issue puts the app version,
+your device model, and your Android version into the GitHub address as the browser opens it. The
+crash report itself is only copied to your clipboard, so nothing else is transmitted unless you post
+the issue yourself.
+
 The Diagnostics screen also lists process exits that Android itself recorded for the app, such as
-"Not responding" or a shutdown caused by low memory. That list comes from the operating system, stays
+"Not responding" or a shutdown caused by low memory." That list comes from the operating system, stays
 on your device, and is subject to the same rules.
 
 ## Data retention, deletion, and security

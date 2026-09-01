@@ -25,7 +25,7 @@
     <string name="diagnostics_action_copy">複製報告</string>
     <string name="diagnostics_action_share">分享報告</string>
     <string name="diagnostics_action_report">到 GitHub 回報</string>
-    <string name="diagnostics_report_caption">會開啟已預填的 issue,並複製報告供你貼上。</string>
+    <string name="diagnostics_report_caption">會開啟 GitHub,並事先填入你的 App 版本、機型與 Android 版本。當機報告本身只複製到剪貼簿——在你自己送出 issue 之前,不會上傳任何東西。</string>
     <string name="diagnostics_action_clear">清除報告</string>
     <string name="diagnostics_share_failed">無法分享報告。</string>
     <string name="diagnostics_exits_label">最近的程序結束記錄</string>
@@ -61,7 +61,7 @@
     <string name="onboarding_permission_actions_label">App 會做什麼</string>
     <string name="onboarding_permission_actions_body">只有當你將「螢幕截圖」或「鎖定螢幕」設為捷徑時，App 才會使用輔助功能執行該動作。App 不會自行選擇或執行其他動作。</string>
     <string name="onboarding_permission_privacy_label">資訊如何儲存與分享</string>
-    <string name="onboarding_permission_privacy_body">按鍵事件只會在裝置上即時處理，不會儲存、上傳或分享。只有你在「按鍵設定」確認的 Essential Key 識別碼會儲存在裝置上。App 不會讀取螢幕內容、文字欄位或你輸入的文字。</string>
+    <string name="onboarding_permission_privacy_body">按鍵事件只會在裝置上即時處理，不會儲存、上傳或分享。在輔助服務接收到的資訊中,只有你在「按鍵設定」確認的 Essential Key 識別碼會儲存在裝置上。App 不會讀取螢幕內容、文字欄位或你輸入的文字。</string>
     <string name="onboarding_permission_next_label">同意後會發生什麼</string>
     <string name="onboarding_permission_next_body">選擇「同意：使用輔助功能」後，系統會開啟 Android 無障礙設定。請選擇「Essential Key 偵測」、閱讀 Android 的系統警告，再開啟「使用 Essential Key 偵測」。返回、按下返回鍵或選擇不同意，都不會啟用服務。</string>
     <string name="onboarding_use_accessibility">同意：使用輔助功能</string>
@@ -135,7 +135,7 @@
     <!-- Home: Do Not Disturb access (shown only while the ringer-cycle action needs it) -->
     <string name="section_dnd_access">請勿打擾存取權</string>
     <string name="dnd_access_not_granted">請勿打擾存取權 — 尚未授予</string>
-    <string name="dnd_access_body">鈴聲循環要有「請勿打擾」存取權才能切到靜音。沒有這個權限時，循環只會在響鈴與震動之間切換，而且完全無法離開靜音模式。</string>
+    <string name="dnd_access_body">Android 規定任何 App 要把鈴聲切到靜音都必須先取得「請勿打擾」存取權。沒有這個權限時,循環只會在響鈴與震動之間切換,而且完全無法離開靜音模式。App 只有在你觸發自己指派的動作時才會變更鈴聲模式。</string>
     <string name="action_open_dnd_access_settings">開啟請勿打擾存取權設定</string>
     <string name="dnd_access_settings_unavailable">無法開啟請勿打擾存取權設定。</string>
 

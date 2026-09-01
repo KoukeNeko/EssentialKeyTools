@@ -25,7 +25,7 @@
     <string name="diagnostics_action_copy">Copy report</string>
     <string name="diagnostics_action_share">Share report</string>
     <string name="diagnostics_action_report">Report on GitHub</string>
-    <string name="diagnostics_report_caption">Opens a prefilled issue and copies the report, ready to paste.</string>
+    <string name="diagnostics_report_caption">Opens GitHub with your app version, device model and Android version already filled in. The crash report itself is only copied to your clipboard — nothing is uploaded until you post the issue yourself.</string>
     <string name="diagnostics_action_clear">Clear report</string>
     <string name="diagnostics_share_failed">Could not share the report.</string>
     <string name="diagnostics_exits_label">Recent process exits</string>
@@ -61,7 +61,7 @@
     <string name="onboarding_permission_actions_label">What the app can do</string>
     <string name="onboarding_permission_actions_body">The app uses accessibility to take a screenshot or lock the screen only if you assigned that action to a shortcut. It does not choose or run other actions on its own.</string>
     <string name="onboarding_permission_privacy_label">Storage and sharing</string>
-    <string name="onboarding_permission_privacy_body">Key events are processed immediately on your device and are not stored, uploaded, or shared. Only the Essential Key identifier you confirm in Key Setup is stored on your device. The app does not read screen content, text fields, or text you type.</string>
+    <string name="onboarding_permission_privacy_body">Key events are processed immediately on your device and are not stored, uploaded, or shared. Of the information the accessibility service receives, only the Essential Key identifier you confirm in Key Setup is stored on your device. The app does not read screen content, text fields, or text you type.</string>
     <string name="onboarding_permission_next_label">What happens after consent</string>
     <string name="onboarding_permission_next_body">Selecting “Agree: use accessibility service” opens Android Accessibility settings. Select “Essential Key detection,” review Android’s system warning, and turn on “Use Essential Key detection.” Returning, pressing Back, or selecting the decline option never enables the service.</string>
     <string name="onboarding_use_accessibility">Agree: use accessibility service</string>
@@ -135,7 +135,7 @@
     <!-- Home: Do Not Disturb access (shown only while the ringer-cycle action needs it) -->
     <string name="section_dnd_access">Do Not Disturb access</string>
     <string name="dnd_access_not_granted">DND ACCESS — NOT GRANTED</string>
-    <string name="dnd_access_body">The ringer cycle can only reach silent mode with Do Not Disturb access. Without it the cycle stays between ring and vibrate, and it cannot leave silent mode at all.</string>
+    <string name="dnd_access_body">Android requires Do Not Disturb access before any app can switch the ringer to silent. Without it the cycle stays between ring and vibrate, and it cannot leave silent mode at all. The app changes the ringer only when you trigger the action you assigned.</string>
     <string name="action_open_dnd_access_settings">Open Do Not Disturb access</string>
     <string name="dnd_access_settings_unavailable">Could not open Do Not Disturb access settings.</string>
 

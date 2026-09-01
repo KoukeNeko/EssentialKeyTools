@@ -2,7 +2,9 @@ package dev.koukeneko.essentialkeytools.ui.screens
 
 import android.content.ActivityNotFoundException
 import android.content.ClipData
+import android.content.ClipDescription
 import android.content.Intent
+import android.os.PersistableBundle
 import android.widget.Toast
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -227,9 +229,17 @@ private fun ProcessExitsCard(exits: List<ProcessExit>) {
     }
 }
 
-/** Android 13+ shows its own copy confirmation, so the app adds no message of its own. */
+/**
+ * Android 13+ shows its own copy confirmation, so the app adds no message of its own. The clip is
+ * marked sensitive so the system preview does not put a stack trace — which can carry file paths
+ * and URIs — on screen for anyone standing nearby.
+ */
 private suspend fun copyReport(clipboard: androidx.compose.ui.platform.Clipboard, report: String) {
-    clipboard.setClipEntry(ClipEntry(ClipData.newPlainText(CLIP_LABEL, report)))
+    val clip = ClipData.newPlainText(CLIP_LABEL, report)
+    clip.description.extras = PersistableBundle().apply {
+        putBoolean(ClipDescription.EXTRA_IS_SENSITIVE, true)
+    }
+    clipboard.setClipEntry(ClipEntry(clip))
 }
 
 private fun shareReport(context: android.content.Context, report: String) {
