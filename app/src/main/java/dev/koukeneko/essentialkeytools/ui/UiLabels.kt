@@ -30,10 +30,16 @@ object UiLabels {
         KeyAction.MediaNext.ID -> R.string.action_media_next
         KeyAction.MediaPrevious.ID -> R.string.action_media_previous
         KeyAction.RingerCycle.ID -> R.string.action_ringer_cycle
+        KeyAction.ToggleGlyphLight.ID -> R.string.action_toggle_glyph_light
         else -> R.string.action_none
     }
 
-    /** The built-in (non-app) actions offered in the picker, in display order. */
+    /**
+     * The built-in (non-app) actions offered in the picker, in display order. Device-specific
+     * filtering (e.g. [KeyAction.ToggleGlyphLight] needing Glyph Matrix hardware) is the picker
+     * screen's job, not this list's: this is a static mapping of domain values to labels, not a
+     * capability check.
+     */
     val builtInActions: List<KeyAction> = listOf(
         KeyAction.None,
         KeyAction.ToggleFlashlight,
@@ -42,6 +48,7 @@ object UiLabels {
         KeyAction.MediaPlayPause,
         KeyAction.MediaNext,
         KeyAction.MediaPrevious,
-        KeyAction.RingerCycle
+        KeyAction.RingerCycle,
+        KeyAction.ToggleGlyphLight
     )
 }

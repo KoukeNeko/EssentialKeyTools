@@ -8,6 +8,9 @@
          needs this declared for the app to appear under Settings' Do Not Disturb access list. -->
     <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
 
+    <!-- Required to bind Nothing's Glyph Matrix service for the Glyph light action. -->
+    <uses-permission android:name="com.nothing.ketchum.permission.ENABLE" />
+
     <!-- The action picker lists launchable apps, so package visibility must be declared. -->
     <queries>
         <intent>
@@ -20,6 +23,13 @@
         <package android:name="com.nothing.ntessentialspace" />
         <package android:name="com.nothing.ntessentialrecorder" />
         <package android:name="com.essentialintelligence" />
+
+        <!-- The Glyph Matrix SDK binds com.nothing.thirdparty/.GlyphService by action; without this
+             the bind silently fails under Android 11+ package-visibility rules (no exception, no
+             ServiceConnection callback at all). -->
+        <intent>
+            <action android:name="com.nothing.thirdparty.bind_glyphservice" />
+        </intent>
     </queries>
 
     <application

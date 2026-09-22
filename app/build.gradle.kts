@@ -79,6 +79,9 @@ android {
 }
 
 dependencies {
+    // Nothing's Glyph Matrix SDK: not published to Maven Central, vendored as a local AAR per its
+    // own distribution instructions. See app/libs/GLYPH_MATRIX_SDK_LICENSE.md for its license terms.
+    implementation(files("libs/glyph-matrix-sdk-2.0.aar"))
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.compose.material3)

@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import dev.koukeneko.essentialkeytools.R
 import dev.koukeneko.essentialkeytools.actions.KeyAction
 import dev.koukeneko.essentialkeytools.core.KeyGesture
+import dev.koukeneko.essentialkeytools.glyph.GlyphDevice
 import dev.koukeneko.essentialkeytools.settings.SettingsRepository
 import dev.koukeneko.essentialkeytools.ui.LaunchableApp
 import dev.koukeneko.essentialkeytools.ui.InstalledApps
@@ -97,7 +98,14 @@ fun ActionPickerScreen(
         }
     }
 
-    val matchingActions = filterBuiltInActions(UiLabels.builtInActions, query, context)
+    // Glyph Matrix hardware is a fixed fact of the running device, not something that changes
+    // mid-session, so this is cheap to call directly rather than caching it in remember/state.
+    val availableBuiltInActions = if (GlyphDevice.current() != null) {
+        UiLabels.builtInActions
+    } else {
+        UiLabels.builtInActions.filter { action -> action != KeyAction.ToggleGlyphLight }
+    }
+    val matchingActions = filterBuiltInActions(availableBuiltInActions, query, context)
     val matchingApps = filterApps(apps, query)
 
     LazyColumn(

@@ -70,6 +70,12 @@ sealed interface KeyAction {
         const val ID: String = "ringer_cycle"
     }
 
+    /** Toggles the whole Glyph Matrix on steady, as a light. Only offered on Glyph hardware. */
+    data object ToggleGlyphLight : KeyAction {
+        override val id: String = ID
+        const val ID: String = "toggle_glyph_light"
+    }
+
     companion object {
         /**
          * Rebuilds a [KeyAction] from its persisted [id] and optional [payload]. Unknown ids fall
@@ -85,6 +91,7 @@ sealed interface KeyAction {
             MediaNext.ID -> MediaNext
             MediaPrevious.ID -> MediaPrevious
             RingerCycle.ID -> RingerCycle
+            ToggleGlyphLight.ID -> ToggleGlyphLight
             else -> None
         }
 

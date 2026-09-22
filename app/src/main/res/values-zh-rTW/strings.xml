@@ -120,6 +120,7 @@
     <string name="action_media_next">下一首</string>
     <string name="action_media_previous">上一首</string>
     <string name="action_ringer_cycle">循環鈴聲模式</string>
+    <string name="action_toggle_glyph_light">切換 Glyph 燈光</string>
 
     <!-- Home: gestures + unlock -->
     <string name="section_gestures">手勢</string>
@@ -160,6 +161,7 @@
     <string name="error_lock_screen_failed">無法鎖定螢幕</string>
     <string name="error_media_unavailable">媒體控制無法使用</string>
     <string name="error_ringer_unavailable">鈴聲控制無法使用</string>
+    <string name="error_glyph_light_unavailable">Glyph 燈光無法使用</string>
     <string name="hint_ringer_silent_needs_policy">靜音模式需要「請勿打擾」存取權 — 目前僅在響鈴與震動間循環。</string>
     <string name="hint_ringer_silent_exit_needs_policy">離開靜音模式需要「請勿打擾」存取權 — 請至「設定 &gt; 應用程式 &gt; 特殊應用程式存取權」開啟。</string>
     <string name="error_ringer_change_denied">系統拒絕變更鈴聲模式</string>
