@@ -38,6 +38,9 @@ class EssentialKeyDetectionService : AccessibilityService() {
     private var learnedScanCode = DEFAULT_ESSENTIAL_KEY_SCAN_CODE
     private var gestureActionMap = GestureActionMap.EMPTY
     private var suppressNextClassifiedAction = false
+    // Tracks which suppression state the current classifier was built for, so a new press can pick
+    // up a screen transition without disturbing a multi-tap sequence already in flight.
+    private var classifierBuiltWhileSuppressed = false
 
     override fun onServiceConnected() {
         super.onServiceConnected()
@@ -64,14 +67,26 @@ class EssentialKeyDetectionService : AccessibilityService() {
     private fun rebuildClassifier(actionMap: GestureActionMap) {
         classifier?.reset()
         suppressNextClassifiedAction = false
-        // Only the gestures with a real mapping need recognising; this lets the classifier resolve
-        // simpler gestures without waiting for the multi-tap window.
+        classifierBuiltWhileSuppressed = KeyEventStream.actionExecutionSuppressed
         classifier = KeyGestureClassifier(
-            enabledGestures = actionMap.activeGestures(),
+            enabledGestures = enabledGesturesFor(actionMap),
             scheduler = HandlerGestureScheduler(mainHandler),
             onGesture = ::onGestureClassified
         )
     }
+
+    /**
+     * Only the gestures with a real mapping need recognising; this lets the classifier resolve
+     * simpler gestures without waiting for the multi-tap window. The key-test screen suppresses
+     * action execution precisely so it can show the raw gesture the user pressed, so it needs every
+     * gesture recognised regardless of what is currently mapped.
+     */
+    private fun enabledGesturesFor(actionMap: GestureActionMap): Set<KeyGesture> =
+        if (KeyEventStream.actionExecutionSuppressed) {
+            KeyGesture.entries.toSet()
+        } else {
+            actionMap.activeGestures()
+        }
 
     override fun onKeyEvent(event: KeyEvent): Boolean {
         if (KeyEventStream.detectionModeActive) {
@@ -99,6 +114,14 @@ class EssentialKeyDetectionService : AccessibilityService() {
     private fun handleOperationalEvent(event: KeyEvent): Boolean {
         if (!KeyEventFilter.matchesLearnedKey(event.scanCode, learnedScanCode)) {
             return false
+        }
+        // Entering or leaving the key-test screen changes which gestures the classifier should
+        // recognise. Only apply that at the start of a new press so an in-flight multi-tap sequence
+        // is never disturbed mid-way through.
+        if (event.action == KeyEvent.ACTION_DOWN &&
+            classifierBuiltWhileSuppressed != KeyEventStream.actionExecutionSuppressed
+        ) {
+            rebuildClassifier(gestureActionMap)
         }
         // Remember that this gesture began on the test screen. Some gestures resolve after a short
         // timeout, when the user may already have navigated away and cleared the screen-wide flag.
