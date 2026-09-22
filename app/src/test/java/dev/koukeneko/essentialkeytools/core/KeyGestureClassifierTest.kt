@@ -71,15 +71,37 @@ class KeyGestureClassifierTest {
     }
 
     @Test
-    fun doubleTap_emitsImmediatelyWhenTripleDisabled() {
-        // TRIPLE disabled: the second key-up can resolve DOUBLE without waiting the window.
+    fun doubleTap_waitsWindowEvenWhenTripleDisabled() {
+        // TRIPLE disabled, but the second key-up must still wait the window: resolving DOUBLE
+        // immediately here would let a fast third tap start a brand-new sequence instead of being
+        // absorbed into this one.
         val classifier =
             classifierWith(setOf(KeyGesture.SINGLE_PRESS, KeyGesture.DOUBLE_PRESS))
 
         tap(classifier, atMs = 0)
         tap(classifier, atMs = 100)
+        assertTrue(emitted.isEmpty())
 
+        scheduler.advanceBy(multiTapWindowMs)
         assertEquals(listOf(KeyGesture.DOUBLE_PRESS), emitted)
+    }
+
+    @Test
+    fun tripleTap_withTripleUnmappedResolvesAsOneGesture() {
+        // Reproduces the real-usage variant of #3: single and double are mapped, triple is not.
+        // A triple tap must still resolve as one TRIPLE_PRESS classification (which the action map
+        // then no-ops on), not as a DOUBLE_PRESS followed by a separate SINGLE_PRESS that would fire
+        // both mapped actions.
+        val classifier =
+            classifierWith(setOf(KeyGesture.SINGLE_PRESS, KeyGesture.DOUBLE_PRESS))
+
+        tap(classifier, atMs = 0)
+        tap(classifier, atMs = 100)
+        tap(classifier, atMs = 200)
+        assertTrue(emitted.isEmpty())
+
+        scheduler.advanceBy(multiTapWindowMs)
+        assertEquals(listOf(KeyGesture.TRIPLE_PRESS), emitted)
     }
 
     @Test

@@ -72,15 +72,18 @@ class KeyGestureClassifier(
     /**
      * Returns the gesture that can be emitted without waiting for the multi-tap window, or null if
      * a follow-up tap is still possible under the current configuration.
+     *
+     * Only the first tap can resolve early, and only when neither double nor triple press is
+     * enabled. From the second tap on we always wait out the window, even when triple press is
+     * disabled: resolving Double immediately would let a fast follow-up tap start a brand-new
+     * sequence instead of being absorbed into this one, which used to make an unmapped triple press
+     * misfire both the mapped single- and double-press actions.
      */
     private fun immediateGestureOrNull(): KeyGesture? {
         val doubleEnabled = KeyGesture.DOUBLE_PRESS in enabledGestures
         val tripleEnabled = KeyGesture.TRIPLE_PRESS in enabledGestures
         return when (tapCount) {
-            2 -> if (!tripleEnabled) KeyGesture.DOUBLE_PRESS else null
             1 -> if (!doubleEnabled && !tripleEnabled) KeyGesture.SINGLE_PRESS else null
-            // When triple is enabled we still wait the window after the third tap so extra taps
-            // are absorbed (they cap back to triple) rather than starting a new sequence.
             else -> null
         }
     }
