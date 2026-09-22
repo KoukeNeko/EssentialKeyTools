@@ -1,13 +1,3 @@
-New features & improvements
-
-⏭️ Skip tracks with the new Next track and Previous track actions.
-
-🩺 New Diagnostics screen shows the last crash, ready to share into a bug report.
-
-🔕 Added a shortcut to Do Not Disturb access, which silent mode requires.
-
 Bug fixes
 
-🔔 Fixed a crash when cycling the ringer while the phone was already silent.
-
-🖼️ Fixed a crash in the action picker caused by an app with an oversized icon.
+🔁 Fixed Key Test recognizing a triple press as a double press followed by a single press when it had no action assigned yet.
