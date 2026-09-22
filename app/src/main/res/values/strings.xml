@@ -120,6 +120,7 @@
     <string name="action_media_next">Next track</string>
     <string name="action_media_previous">Previous track</string>
     <string name="action_ringer_cycle">Cycle ringer mode</string>
+    <string name="action_toggle_glyph_light">Toggle Glyph light</string>
 
     <!-- Home: gestures + unlock -->
     <string name="section_gestures">Gestures</string>
@@ -160,6 +161,7 @@
     <string name="error_lock_screen_failed">Could not lock screen</string>
     <string name="error_media_unavailable">Media control unavailable</string>
     <string name="error_ringer_unavailable">Ringer control unavailable</string>
+    <string name="error_glyph_light_unavailable">Glyph light unavailable</string>
     <string name="hint_ringer_silent_needs_policy">Silent mode needs Do Not Disturb access — cycling ring and vibrate only.</string>
     <string name="hint_ringer_silent_exit_needs_policy">Leaving silent mode needs Do Not Disturb access — grant it in Settings &gt; Apps &gt; Special app access.</string>
     <string name="error_ringer_change_denied">The system blocked the ringer mode change</string>

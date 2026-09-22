@@ -30,10 +30,17 @@ object UiLabels {
         KeyAction.MediaNext.ID -> R.string.action_media_next
         KeyAction.MediaPrevious.ID -> R.string.action_media_previous
         KeyAction.RingerCycle.ID -> R.string.action_ringer_cycle
+        KeyAction.ToggleGlyphLight.ID -> R.string.action_toggle_glyph_light
         else -> R.string.action_none
     }
 
-    /** The built-in (non-app) actions offered in the picker, in display order. */
+    /**
+     * The built-in (non-app) actions offered in the picker, in display order.
+     *
+     * [KeyAction.ToggleGlyphLight] is deliberately absent: its [dev.koukeneko.essentialkeytools.glyph.MatrixGlyphLight]
+     * backend is a placeholder pending the vendored Glyph Matrix SDK, so offering it here would let
+     * a gesture silently do nothing.
+     */
     val builtInActions: List<KeyAction> = listOf(
         KeyAction.None,
         KeyAction.ToggleFlashlight,

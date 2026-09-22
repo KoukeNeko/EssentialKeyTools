@@ -8,10 +8,14 @@ import android.hardware.camera2.CameraAccessException
 import android.hardware.camera2.CameraCharacteristics
 import android.hardware.camera2.CameraManager
 import android.media.AudioManager
+import android.os.Build
 import android.util.Log
 import android.view.KeyEvent
 import android.widget.Toast
 import dev.koukeneko.essentialkeytools.R
+import dev.koukeneko.essentialkeytools.glyph.GlyphDevice
+import dev.koukeneko.essentialkeytools.glyph.GlyphLight
+import dev.koukeneko.essentialkeytools.glyph.MatrixGlyphLight
 
 /**
  * Runs a [KeyAction]. Actions that need system-level reach (screenshot, lock screen) require the
@@ -33,6 +37,14 @@ class ActionExecutor(
     private var torchEnabled = false
     private var silentUnavailableHintShown = false
 
+    // Null on hardware without a Glyph Matrix. Bound lazily on first use rather than at
+    // construction, since binding the service is pointless if the action is never triggered.
+    private val glyphLight: GlyphLight? by lazy {
+        GlyphDevice.forCodename(Build.DEVICE)?.let { MatrixGlyphLight() }
+    }
+    private var glyphLightBound = false
+    private var glyphLightOn = false
+
     fun execute(action: KeyAction) {
         when (action) {
             is KeyAction.None -> Unit
@@ -51,6 +63,7 @@ class ActionExecutor(
             is KeyAction.MediaNext -> dispatchMediaKey(KeyEvent.KEYCODE_MEDIA_NEXT)
             is KeyAction.MediaPrevious -> dispatchMediaKey(KeyEvent.KEYCODE_MEDIA_PREVIOUS)
             is KeyAction.RingerCycle -> cycleRingerMode()
+            is KeyAction.ToggleGlyphLight -> toggleGlyphLight()
         }
     }
 
@@ -92,6 +105,31 @@ class ActionExecutor(
             Log.w(TAG, "Torch toggle rejected camera id", error)
             toast(R.string.error_flashlight_unavailable)
         }
+    }
+
+    /**
+     * Binds to the Glyph service on first use, then flips [glyphLightOn]. A press that arrives
+     * before binding completes is dropped rather than queued: the service binds in well under a
+     * multi-tap window in practice, so a same-gesture repeat is the realistic case to handle, not a
+     * slow bind.
+     */
+    private fun toggleGlyphLight() {
+        val light = glyphLight
+        if (light == null) {
+            toast(R.string.error_glyph_light_unavailable)
+            return
+        }
+        if (!glyphLightBound) {
+            glyphLightBound = true
+            light.bind(context) { setGlyphLight(light, on = true) }
+            return
+        }
+        setGlyphLight(light, on = !glyphLightOn)
+    }
+
+    private fun setGlyphLight(light: GlyphLight, on: Boolean) {
+        light.setAllOn(on)
+        glyphLightOn = on
     }
 
     private fun backCameraWithFlashOrNull(cameraManager: CameraManager): String? {
