@@ -219,6 +219,14 @@ update-version parsing is covered by JVM unit tests without requiring a device.
   <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/LICENSE-MIT-4CAF50?style=for-the-badge&logo=github"></a>
 </p>
 
+## Third-party software
+
+The Glyph light action on Nothing Phone (3) is built on Nothing's official
+[Glyph Matrix SDK](https://github.com/Nothing-Developer-Programme/GlyphMatrix-Developer-Kit),
+vendored as `app/libs/glyph-matrix-sdk-2.0.aar` under its own closed-source license (see
+[`app/libs/GLYPH_MATRIX_SDK_LICENSE.md`](app/libs/GLYPH_MATRIX_SDK_LICENSE.md)), separate from this
+project's MIT license below.
+
 ## Support
 
 If Essential Key Tools is useful to you, you can support development:

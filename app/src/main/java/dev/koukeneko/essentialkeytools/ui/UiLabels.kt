@@ -35,11 +35,10 @@ object UiLabels {
     }
 
     /**
-     * The built-in (non-app) actions offered in the picker, in display order.
-     *
-     * [KeyAction.ToggleGlyphLight] is deliberately absent: its [dev.koukeneko.essentialkeytools.glyph.MatrixGlyphLight]
-     * backend is a placeholder pending the vendored Glyph Matrix SDK, so offering it here would let
-     * a gesture silently do nothing.
+     * The built-in (non-app) actions offered in the picker, in display order. Device-specific
+     * filtering (e.g. [KeyAction.ToggleGlyphLight] needing Glyph Matrix hardware) is the picker
+     * screen's job, not this list's: this is a static mapping of domain values to labels, not a
+     * capability check.
      */
     val builtInActions: List<KeyAction> = listOf(
         KeyAction.None,
@@ -49,6 +48,7 @@ object UiLabels {
         KeyAction.MediaPlayPause,
         KeyAction.MediaNext,
         KeyAction.MediaPrevious,
-        KeyAction.RingerCycle
+        KeyAction.RingerCycle,
+        KeyAction.ToggleGlyphLight
     )
 }

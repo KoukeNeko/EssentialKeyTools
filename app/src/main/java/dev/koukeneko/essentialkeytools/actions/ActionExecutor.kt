@@ -8,7 +8,6 @@ import android.hardware.camera2.CameraAccessException
 import android.hardware.camera2.CameraCharacteristics
 import android.hardware.camera2.CameraManager
 import android.media.AudioManager
-import android.os.Build
 import android.util.Log
 import android.view.KeyEvent
 import android.widget.Toast
@@ -40,7 +39,7 @@ class ActionExecutor(
     // Null on hardware without a Glyph Matrix. Bound lazily on first use rather than at
     // construction, since binding the service is pointless if the action is never triggered.
     private val glyphLight: GlyphLight? by lazy {
-        GlyphDevice.forCodename(Build.DEVICE)?.let { MatrixGlyphLight() }
+        GlyphDevice.current()?.let { MatrixGlyphLight(it.sdkDeviceId) }
     }
     private var glyphLightBound = false
     private var glyphLightOn = false
