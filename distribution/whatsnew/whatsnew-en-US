@@ -1,3 +1,3 @@
-Bug fixes
+New features & improvements
 
-🔁 Fixed an unmapped triple press firing both the single- and double-press actions instead of doing nothing.
+💡 Added a Glyph light action that turns the whole Glyph Matrix into a steady light on Nothing Phone (3).
