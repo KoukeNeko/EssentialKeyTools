@@ -50,4 +50,25 @@ class SettingsRepositoryTest {
             dataStoreScope.cancel()
         }
     }
+
+    @Test
+    fun hapticStrengthDefaultsOffAndPersists() = runBlocking {
+        val dataStoreScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+        val dataStoreFile = File(temporaryFolder.root, "settings.preferences_pb")
+        val repository = SettingsRepository(
+            PreferenceDataStoreFactory.create(
+                scope = dataStoreScope,
+                produceFile = { dataStoreFile }
+            )
+        )
+
+        try {
+            assertEquals(HapticStrength.OFF, repository.hapticStrength.first())
+
+            repository.setHapticStrength(HapticStrength.STRONG)
+            assertEquals(HapticStrength.STRONG, repository.hapticStrength.first())
+        } finally {
+            dataStoreScope.cancel()
+        }
+    }
 }

@@ -166,6 +166,14 @@
     <string name="hint_ringer_silent_exit_needs_policy">離開靜音模式需要「請勿打擾」存取權 — 請至「設定 &gt; 應用程式 &gt; 特殊應用程式存取權」開啟。</string>
     <string name="error_ringer_change_denied">系統拒絕變更鈴聲模式</string>
 
+    <!-- Haptic feedback -->
+    <string name="section_haptics">震動回饋</string>
+    <string name="haptics_body">每次按下 Essential Key 時震動。</string>
+    <string name="haptics_off">關閉</string>
+    <string name="haptics_light">輕</string>
+    <string name="haptics_medium">中</string>
+    <string name="haptics_strong">強</string>
+
     <!-- Language -->
     <string name="section_language">語言</string>
     <string name="action_open_language_settings">開啟語言設定</string>

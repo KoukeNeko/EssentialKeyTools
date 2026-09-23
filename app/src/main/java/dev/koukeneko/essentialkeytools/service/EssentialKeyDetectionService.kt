@@ -6,10 +6,12 @@ import android.os.Looper
 import android.view.KeyEvent
 import android.view.accessibility.AccessibilityEvent
 import dev.koukeneko.essentialkeytools.actions.ActionExecutor
+import dev.koukeneko.essentialkeytools.actions.KeyHaptics
 import dev.koukeneko.essentialkeytools.core.KeyGesture
 import dev.koukeneko.essentialkeytools.core.KeyGestureClassifier
 import dev.koukeneko.essentialkeytools.settings.DEFAULT_ESSENTIAL_KEY_SCAN_CODE
 import dev.koukeneko.essentialkeytools.settings.GestureActionMap
+import dev.koukeneko.essentialkeytools.settings.HapticStrength
 import dev.koukeneko.essentialkeytools.settings.SettingsRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -32,11 +34,13 @@ class EssentialKeyDetectionService : AccessibilityService() {
     private val mainHandler = Handler(Looper.getMainLooper())
 
     private lateinit var actionExecutor: ActionExecutor
+    private lateinit var keyHaptics: KeyHaptics
 
     // Rebuilt whenever settings change so the classifier reflects the current active gestures.
     private var classifier: KeyGestureClassifier? = null
     private var learnedScanCode = DEFAULT_ESSENTIAL_KEY_SCAN_CODE
     private var gestureActionMap = GestureActionMap.EMPTY
+    private var hapticStrength = HapticStrength.OFF
     private var suppressNextClassifiedAction = false
     // Tracks which suppression state the current classifier was built for, so a new press can pick
     // up a screen transition without disturbing a multi-tap sequence already in flight.
@@ -46,6 +50,7 @@ class EssentialKeyDetectionService : AccessibilityService() {
         super.onServiceConnected()
         isRunning = true
         actionExecutor = ActionExecutor(context = this, accessibilityService = this)
+        keyHaptics = KeyHaptics(this)
         collectSettings()
     }
 
@@ -62,6 +67,9 @@ class EssentialKeyDetectionService : AccessibilityService() {
                     rebuildClassifier(actionMap)
                 }
         }
+        serviceScope.launch {
+            repository.hapticStrength.collect { strength -> hapticStrength = strength }
+        }
     }
 
     private fun rebuildClassifier(actionMap: GestureActionMap) {
@@ -71,7 +79,8 @@ class EssentialKeyDetectionService : AccessibilityService() {
         classifier = KeyGestureClassifier(
             enabledGestures = enabledGesturesFor(actionMap),
             scheduler = HandlerGestureScheduler(mainHandler),
-            onGesture = ::onGestureClassified
+            onGesture = ::onGestureClassified,
+            onPress = ::onPress
         )
     }
 
@@ -146,6 +155,14 @@ class EssentialKeyDetectionService : AccessibilityService() {
         when (event.action) {
             KeyEvent.ACTION_DOWN -> activeClassifier.onKeyDown(event.downTime)
             KeyEvent.ACTION_UP -> activeClassifier.onKeyUp(event.downTime, event.eventTime)
+        }
+    }
+
+    // Like a physical button, feedback confirms the press itself rather than waiting for the
+    // gesture to resolve. Presses are ignored while nothing is mapped, since they do nothing.
+    private fun onPress() {
+        if (gestureActionMap.activeGestures().isNotEmpty()) {
+            keyHaptics.perform(hapticStrength)
         }
     }
 

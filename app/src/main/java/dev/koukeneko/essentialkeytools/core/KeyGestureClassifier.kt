@@ -10,11 +10,14 @@ package dev.koukeneko.essentialkeytools.core
  *
  * @param enabledGestures which gestures the current configuration cares about. Disabling the
  *   multi-tap gestures lets the classifier resolve simpler gestures immediately, cutting latency.
+ * @param onPress called once per physical press as soon as it is known, before any gesture
+ *   resolves, so feedback can be immediate.
  */
 class KeyGestureClassifier(
     private val enabledGestures: Set<KeyGesture>,
     private val scheduler: GestureScheduler,
-    private val onGesture: (KeyGesture) -> Unit
+    private val onGesture: (KeyGesture) -> Unit,
+    private val onPress: () -> Unit = {}
 ) {
 
     companion object {
@@ -37,6 +40,11 @@ class KeyGestureClassifier(
     private var multiTapTimer: Cancellable? = null
 
     fun onKeyDown(timestampMs: Long) {
+        // Auto-repeat key-downs carry the same down time and are not a new press.
+        if (timestampMs == pressDownTimeMs) {
+            return
+        }
+        onPress()
         // A new press cancels any in-flight multi-tap decision: the sequence is still growing.
         cancelMultiTapTimer()
         pressInProgress = true
@@ -70,6 +78,7 @@ class KeyGestureClassifier(
      * is enough to rebuild the press it ends.
      */
     private fun onUnpairedKeyUp(heldMs: Long) {
+        onPress()
         if (heldMs >= LONG_PRESS_THRESHOLD_MS) {
             emitAndReset(KeyGesture.LONG_PRESS)
             return

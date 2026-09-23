@@ -28,7 +28,7 @@ private val Context.settingsDataStore: DataStore<Preferences> by preferencesData
 
 /**
  * Persists the app's configuration: onboarding completion and progress, the learned Essential Key
- * scanCode, and the gesture -> action mapping. Exposes reactive [Flow]s for observers (service, UI)
+ * scanCode, the gesture -> action mapping and the haptic feedback strength. Exposes reactive [Flow]s for observers (service, UI)
  * and suspend writers.
  *
  * No DI framework: a manual process-wide singleton via [getInstance] keeps it simple while still
@@ -40,6 +40,7 @@ class SettingsRepository internal constructor(
     private val scanCodeKey = intPreferencesKey("essential_key_scan_code")
     private val onboardingCompletedKey = booleanPreferencesKey("onboarding_completed")
     private val onboardingStepKey = intPreferencesKey("onboarding_step")
+    private val hapticStrengthKey = intPreferencesKey("haptic_strength")
 
     val onboardingState: Flow<OnboardingState> = dataStore.data.map { preferences ->
         OnboardingState(
@@ -58,6 +59,10 @@ class SettingsRepository internal constructor(
         }
     }
 
+    val hapticStrength: Flow<HapticStrength> = dataStore.data.map { preferences ->
+        HapticStrength.fromStorageValue(preferences[hapticStrengthKey])
+    }
+
     suspend fun setEssentialKeyScanCode(scanCode: Int) {
         dataStore.edit { preferences ->
             preferences[scanCodeKey] = scanCode
@@ -74,6 +79,12 @@ class SettingsRepository internal constructor(
     suspend fun setOnboardingStep(step: OnboardingStep) {
         dataStore.edit { preferences ->
             preferences[onboardingStepKey] = step.storageValue
+        }
+    }
+
+    suspend fun setHapticStrength(strength: HapticStrength) {
+        dataStore.edit { preferences ->
+            preferences[hapticStrengthKey] = strength.storageValue
         }
     }
 

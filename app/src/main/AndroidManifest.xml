@@ -4,6 +4,9 @@
     <!-- The home-screen contribution card fetches the contributor list from the GitHub API. -->
     <uses-permission android:name="android.permission.INTERNET" />
 
+    <!-- Optional vibration confirming that an Essential Key gesture ran its action. -->
+    <uses-permission android:name="android.permission.VIBRATE" />
+
     <!-- Entering or leaving silent counts as a Do Not Disturb change, so the ringer-cycle action
          needs this declared for the app to appear under Settings' Do Not Disturb access list. -->
     <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />

@@ -9,6 +9,7 @@ class KeyGestureClassifierTest {
 
     private lateinit var scheduler: FakeGestureScheduler
     private val emitted = mutableListOf<KeyGesture>()
+    private var pressCount = 0
 
     // Local mirrors of the classifier's timing constants so tests read as boundary assertions
     // rather than magic numbers.
@@ -19,13 +20,15 @@ class KeyGestureClassifierTest {
     fun setUp() {
         scheduler = FakeGestureScheduler()
         emitted.clear()
+        pressCount = 0
     }
 
     private fun classifierWith(enabled: Set<KeyGesture>): KeyGestureClassifier =
         KeyGestureClassifier(
             enabledGestures = enabled,
             scheduler = scheduler,
-            onGesture = { gesture -> emitted.add(gesture) }
+            onGesture = { gesture -> emitted.add(gesture) },
+            onPress = { pressCount++ }
         )
 
     private fun allGesturesClassifier(): KeyGestureClassifier =
@@ -183,6 +186,42 @@ class KeyGestureClassifierTest {
         classifier.onKeyUp(downTimeMs = 0, timestampMs = longPressThresholdMs + 50)
         scheduler.advanceBy(multiTapWindowMs)
 
+        assertEquals(listOf(KeyGesture.LONG_PRESS), emitted)
+    }
+
+    @Test
+    fun onPress_firesPerPressBeforeGestureResolves() {
+        val classifier = allGesturesClassifier()
+
+        tap(classifier, atMs = 0)
+        assertEquals(1, pressCount)
+        assertTrue(emitted.isEmpty())
+
+        tap(classifier, atMs = 100)
+        assertEquals(2, pressCount)
+    }
+
+    @Test
+    fun onPress_firesForUnpairedRelease() {
+        val classifier = allGesturesClassifier()
+
+        classifier.onKeyUp(downTimeMs = 0, timestampMs = 100)
+
+        assertEquals(1, pressCount)
+    }
+
+    @Test
+    fun autoRepeatKeyDown_isNotANewPress() {
+        val classifier = allGesturesClassifier()
+
+        classifier.onKeyDown(0)
+        scheduler.advanceBy(longPressThresholdMs)
+        // Auto-repeat after the long press already fired: same down time, same press.
+        classifier.onKeyDown(0)
+        classifier.onKeyUp(downTimeMs = 0, timestampMs = longPressThresholdMs + 50)
+        scheduler.advanceBy(multiTapWindowMs)
+
+        assertEquals(1, pressCount)
         assertEquals(listOf(KeyGesture.LONG_PRESS), emitted)
     }
 

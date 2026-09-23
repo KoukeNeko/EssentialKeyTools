@@ -17,8 +17,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -34,6 +37,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -42,11 +46,13 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import dev.koukeneko.essentialkeytools.R
 import dev.koukeneko.essentialkeytools.actions.KeyAction
+import dev.koukeneko.essentialkeytools.actions.KeyHaptics
 import dev.koukeneko.essentialkeytools.contributors.Contributor
 import dev.koukeneko.essentialkeytools.contributors.GitHubContributorsService
 import dev.koukeneko.essentialkeytools.core.KeyGesture
 import dev.koukeneko.essentialkeytools.service.EssentialKeyDetectionService
 import dev.koukeneko.essentialkeytools.settings.GestureActionMap
+import dev.koukeneko.essentialkeytools.settings.HapticStrength
 import dev.koukeneko.essentialkeytools.settings.SettingsRepository
 import dev.koukeneko.essentialkeytools.ui.AppLabelResolver
 import dev.koukeneko.essentialkeytools.ui.PRIVACY_POLICY_URL
@@ -79,6 +85,7 @@ private val STATUS_TO_ACTION_GAP = 16.dp
 private val DISCLOSURE_GAP = 12.dp
 private val CONTRIBUTOR_SECTION_GAP = 20.dp
 private val UPDATE_ACTION_GAP = 12.dp
+private val RADIO_TO_TEXT_GAP = 12.dp
 
 // The repository is a proper noun, not translatable copy, so it lives in code; only the captions
 // rendered around it come from string resources. The contributor list itself is fetched from the
@@ -107,6 +114,8 @@ fun HomeScreen(
     val context = LocalContext.current
     val repository = remember { SettingsRepository.getInstance(context) }
     val actionMap by repository.gestureActionMap.collectAsState(initial = GestureActionMap.EMPTY)
+    val hapticStrength by repository.hapticStrength.collectAsState(initial = HapticStrength.OFF)
+    val coroutineScope = rememberCoroutineScope()
     val serviceRunningState = rememberServiceRunningState()
     val unlockStatus = rememberUnlockStatus()
     val notificationPolicyAccessGranted = rememberNotificationPolicyAccessGranted()
@@ -165,6 +174,13 @@ fun HomeScreen(
             NotificationPolicyCard()
             Spacer(modifier = Modifier.height(CARD_GAP))
         }
+        HapticsCard(
+            selected = hapticStrength,
+            onSelect = { strength ->
+                coroutineScope.launch { repository.setHapticStrength(strength) }
+            }
+        )
+        Spacer(modifier = Modifier.height(CARD_GAP))
         NavigationCard(
             onKeySetup = onKeySetup,
             onKeyTest = onKeyTest,
@@ -546,6 +562,60 @@ private fun ActionLabel(action: KeyAction, context: Context) {
         color = MaterialTheme.colorScheme.onBackground,
         textAlign = TextAlign.End
     )
+}
+
+/** Picks the gesture vibration strength; choosing one plays it so the user can feel the difference. */
+@Composable
+private fun HapticsCard(selected: HapticStrength, onSelect: (HapticStrength) -> Unit) {
+    val context = LocalContext.current
+    val keyHaptics = remember(context) { KeyHaptics(context) }
+    NothingCard(modifier = Modifier.fillMaxWidth()) {
+        NothingSectionLabel(text = stringResource(R.string.section_haptics))
+        Spacer(modifier = Modifier.height(LABEL_GAP))
+        Text(
+            text = stringResource(R.string.haptics_body),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        Spacer(modifier = Modifier.height(LABEL_GAP))
+        for (strength in HapticStrength.entries) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .selectable(
+                        selected = strength == selected,
+                        role = Role.RadioButton,
+                        onClick = {
+                            keyHaptics.perform(strength)
+                            onSelect(strength)
+                        }
+                    )
+                    .padding(vertical = GESTURE_ROW_GAP),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                RadioButton(
+                    selected = strength == selected,
+                    onClick = null,
+                    colors = RadioButtonDefaults.colors(
+                        selectedColor = MaterialTheme.colorScheme.tertiary
+                    )
+                )
+                Spacer(modifier = Modifier.width(RADIO_TO_TEXT_GAP))
+                Text(
+                    text = stringResource(hapticStrengthLabelRes(strength)),
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
+        }
+    }
+}
+
+private fun hapticStrengthLabelRes(strength: HapticStrength): Int = when (strength) {
+    HapticStrength.OFF -> R.string.haptics_off
+    HapticStrength.LIGHT -> R.string.haptics_light
+    HapticStrength.MEDIUM -> R.string.haptics_medium
+    HapticStrength.STRONG -> R.string.haptics_strong
 }
 
 @Composable
