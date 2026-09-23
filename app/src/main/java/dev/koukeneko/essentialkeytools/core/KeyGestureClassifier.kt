@@ -30,6 +30,9 @@ class KeyGestureClassifier(
 
     private var tapCount = 0
     private var pressInProgress = false
+    // Identifies the press the next key-up should close. Deliberately kept across reset() so the
+    // release of a press that already resolved as a long press is still recognised as its own.
+    private var pressDownTimeMs: Long? = null
     private var longPressTimer: Cancellable? = null
     private var multiTapTimer: Cancellable? = null
 
@@ -37,10 +40,19 @@ class KeyGestureClassifier(
         // A new press cancels any in-flight multi-tap decision: the sequence is still growing.
         cancelMultiTapTimer()
         pressInProgress = true
+        pressDownTimeMs = timestampMs
         scheduleLongPressTimer()
     }
 
-    fun onKeyUp(timestampMs: Long) {
+    /**
+     * @param downTimeMs when the press this key-up releases went down, as reported by the key-up
+     *   itself; it matches the [onKeyDown] timestamp whenever that key-down was delivered.
+     */
+    fun onKeyUp(downTimeMs: Long, timestampMs: Long) {
+        if (downTimeMs != pressDownTimeMs) {
+            onUnpairedKeyUp(heldMs = timestampMs - downTimeMs)
+            return
+        }
         // If the long-press timer already fired, this key-up closes a long press and is not a tap.
         if (!pressInProgress) {
             return
@@ -48,6 +60,21 @@ class KeyGestureClassifier(
         pressInProgress = false
         cancelLongPressTimer()
 
+        tapCount = (tapCount + 1).coerceAtMost(MAX_TAP_COUNT)
+        resolveOrWaitForMoreTaps()
+    }
+
+    /**
+     * With the screen off, Nothing OS spends a press's key-down on waking the device, so only the
+     * release reaches accessibility services. The release still carries the press's timing, which
+     * is enough to rebuild the press it ends.
+     */
+    private fun onUnpairedKeyUp(heldMs: Long) {
+        if (heldMs >= LONG_PRESS_THRESHOLD_MS) {
+            emitAndReset(KeyGesture.LONG_PRESS)
+            return
+        }
+        cancelMultiTapTimer()
         tapCount = (tapCount + 1).coerceAtMost(MAX_TAP_COUNT)
         resolveOrWaitForMoreTaps()
     }

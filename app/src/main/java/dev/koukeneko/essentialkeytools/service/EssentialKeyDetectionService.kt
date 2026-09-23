@@ -144,8 +144,8 @@ class EssentialKeyDetectionService : AccessibilityService() {
     private fun feedClassifier(event: KeyEvent) {
         val activeClassifier = classifier ?: return
         when (event.action) {
-            KeyEvent.ACTION_DOWN -> activeClassifier.onKeyDown(event.eventTime)
-            KeyEvent.ACTION_UP -> activeClassifier.onKeyUp(event.eventTime)
+            KeyEvent.ACTION_DOWN -> activeClassifier.onKeyDown(event.downTime)
+            KeyEvent.ACTION_UP -> activeClassifier.onKeyUp(event.downTime, event.eventTime)
         }
     }
 

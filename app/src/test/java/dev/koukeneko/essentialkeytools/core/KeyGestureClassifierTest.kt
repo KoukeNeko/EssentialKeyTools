@@ -34,7 +34,7 @@ class KeyGestureClassifierTest {
     // A tap = key-down immediately followed by key-up, well under the long-press threshold.
     private fun tap(classifier: KeyGestureClassifier, atMs: Long) {
         classifier.onKeyDown(atMs)
-        classifier.onKeyUp(atMs + 10)
+        classifier.onKeyUp(downTimeMs = atMs, timestampMs = atMs + 10)
     }
 
     @Test
@@ -148,7 +148,39 @@ class KeyGestureClassifierTest {
         classifier.onKeyDown(0)
         scheduler.advanceBy(longPressThresholdMs)
         // The eventual key-up must not be counted as a tap.
-        classifier.onKeyUp(longPressThresholdMs + 50)
+        classifier.onKeyUp(downTimeMs = 0, timestampMs = longPressThresholdMs + 50)
+        scheduler.advanceBy(multiTapWindowMs)
+
+        assertEquals(listOf(KeyGesture.LONG_PRESS), emitted)
+    }
+
+    @Test
+    fun unpairedShortRelease_countsAsTap() {
+        // Screen off: the key-down was spent waking the device and only the release arrives.
+        val classifier = allGesturesClassifier()
+
+        classifier.onKeyUp(downTimeMs = 0, timestampMs = 100)
+        scheduler.advanceBy(multiTapWindowMs)
+
+        assertEquals(listOf(KeyGesture.SINGLE_PRESS), emitted)
+    }
+
+    @Test
+    fun unpairedRelease_joinsFollowingTapIntoDoublePress() {
+        val classifier = allGesturesClassifier()
+
+        classifier.onKeyUp(downTimeMs = 0, timestampMs = 100)
+        tap(classifier, atMs = 200)
+        scheduler.advanceBy(multiTapWindowMs)
+
+        assertEquals(listOf(KeyGesture.DOUBLE_PRESS), emitted)
+    }
+
+    @Test
+    fun unpairedLongRelease_emitsLongPress() {
+        val classifier = allGesturesClassifier()
+
+        classifier.onKeyUp(downTimeMs = 0, timestampMs = longPressThresholdMs + 50)
         scheduler.advanceBy(multiTapWindowMs)
 
         assertEquals(listOf(KeyGesture.LONG_PRESS), emitted)
