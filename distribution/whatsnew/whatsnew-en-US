@@ -1,3 +1,11 @@
 New features & improvements
 
-💡 Added a Glyph light action that turns the whole Glyph Matrix into a steady light on Nothing Phone (3).
+📳 Added haptic feedback when the Essential Key is pressed, with Off / Light / Medium / Strong options on the home screen.
+
+Bug fixes
+
+🔒 Fixed the first press doing nothing after the screen had been off for a few seconds.
+
+Contributors
+
+🙏 Thanks to @Astrid-starr for requesting #4 and @maurice1 for reporting #5.
