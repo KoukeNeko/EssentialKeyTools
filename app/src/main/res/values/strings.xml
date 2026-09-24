@@ -168,11 +168,12 @@
 
     <!-- Haptic feedback -->
     <string name="section_haptics">Haptic feedback</string>
-    <string name="haptics_body">Vibrate each time the Essential Key is pressed.</string>
+    <string name="haptics_body">Vibrate when the Essential Key is pressed.</string>
     <string name="haptics_off">Off</string>
     <string name="haptics_light">Light</string>
     <string name="haptics_medium">Medium</string>
     <string name="haptics_strong">Strong</string>
+    <string name="haptics_on_action_only">Vibrate only when an action runs</string>
 
     <!-- Language -->
     <string name="section_language">Language</string>

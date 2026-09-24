@@ -6,6 +6,7 @@ import android.os.Looper
 import android.view.KeyEvent
 import android.view.accessibility.AccessibilityEvent
 import dev.koukeneko.essentialkeytools.actions.ActionExecutor
+import dev.koukeneko.essentialkeytools.actions.KeyAction
 import dev.koukeneko.essentialkeytools.actions.KeyHaptics
 import dev.koukeneko.essentialkeytools.core.KeyGesture
 import dev.koukeneko.essentialkeytools.core.KeyGestureClassifier
@@ -41,6 +42,7 @@ class EssentialKeyDetectionService : AccessibilityService() {
     private var learnedScanCode = DEFAULT_ESSENTIAL_KEY_SCAN_CODE
     private var gestureActionMap = GestureActionMap.EMPTY
     private var hapticStrength = HapticStrength.OFF
+    private var hapticsOnActionOnly = false
     private var suppressNextClassifiedAction = false
     // Tracks which suppression state the current classifier was built for, so a new press can pick
     // up a screen transition without disturbing a multi-tap sequence already in flight.
@@ -69,6 +71,9 @@ class EssentialKeyDetectionService : AccessibilityService() {
         }
         serviceScope.launch {
             repository.hapticStrength.collect { strength -> hapticStrength = strength }
+        }
+        serviceScope.launch {
+            repository.hapticsOnActionOnly.collect { enabled -> hapticsOnActionOnly = enabled }
         }
     }
 
@@ -158,10 +163,10 @@ class EssentialKeyDetectionService : AccessibilityService() {
         }
     }
 
-    // Like a physical button, feedback confirms the press itself rather than waiting for the
-    // gesture to resolve. Presses are ignored while nothing is mapped, since they do nothing.
+    // By default, like a physical button, feedback confirms the press itself rather than waiting
+    // for the gesture to resolve. Presses are ignored while nothing is mapped, since they do nothing.
     private fun onPress() {
-        if (gestureActionMap.activeGestures().isNotEmpty()) {
+        if (!hapticsOnActionOnly && gestureActionMap.activeGestures().isNotEmpty()) {
             keyHaptics.perform(hapticStrength)
         }
     }
@@ -173,7 +178,11 @@ class EssentialKeyDetectionService : AccessibilityService() {
         val actionSuppressed = KeyEventStream.actionExecutionSuppressed || suppressNextClassifiedAction
         suppressNextClassifiedAction = false
         if (!actionSuppressed) {
-            actionExecutor.execute(gestureActionMap.actionFor(gesture))
+            val action = gestureActionMap.actionFor(gesture)
+            if (hapticsOnActionOnly && action != KeyAction.None) {
+                keyHaptics.perform(hapticStrength)
+            }
+            actionExecutor.execute(action)
         }
     }
 

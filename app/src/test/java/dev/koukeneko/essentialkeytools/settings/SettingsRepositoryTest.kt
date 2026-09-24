@@ -64,9 +64,12 @@ class SettingsRepositoryTest {
 
         try {
             assertEquals(HapticStrength.OFF, repository.hapticStrength.first())
+            assertEquals(false, repository.hapticsOnActionOnly.first())
 
             repository.setHapticStrength(HapticStrength.STRONG)
+            repository.setHapticsOnActionOnly(true)
             assertEquals(HapticStrength.STRONG, repository.hapticStrength.first())
+            assertEquals(true, repository.hapticsOnActionOnly.first())
         } finally {
             dataStoreScope.cancel()
         }
