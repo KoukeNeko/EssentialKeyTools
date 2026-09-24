@@ -18,7 +18,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
@@ -115,6 +118,7 @@ fun HomeScreen(
     val repository = remember { SettingsRepository.getInstance(context) }
     val actionMap by repository.gestureActionMap.collectAsState(initial = GestureActionMap.EMPTY)
     val hapticStrength by repository.hapticStrength.collectAsState(initial = HapticStrength.OFF)
+    val hapticsOnActionOnly by repository.hapticsOnActionOnly.collectAsState(initial = false)
     val coroutineScope = rememberCoroutineScope()
     val serviceRunningState = rememberServiceRunningState()
     val unlockStatus = rememberUnlockStatus()
@@ -178,6 +182,10 @@ fun HomeScreen(
             selected = hapticStrength,
             onSelect = { strength ->
                 coroutineScope.launch { repository.setHapticStrength(strength) }
+            },
+            onActionOnly = hapticsOnActionOnly,
+            onActionOnlyChange = { enabled ->
+                coroutineScope.launch { repository.setHapticsOnActionOnly(enabled) }
             }
         )
         Spacer(modifier = Modifier.height(CARD_GAP))
@@ -566,7 +574,12 @@ private fun ActionLabel(action: KeyAction, context: Context) {
 
 /** Picks the gesture vibration strength; choosing one plays it so the user can feel the difference. */
 @Composable
-private fun HapticsCard(selected: HapticStrength, onSelect: (HapticStrength) -> Unit) {
+private fun HapticsCard(
+    selected: HapticStrength,
+    onSelect: (HapticStrength) -> Unit,
+    onActionOnly: Boolean,
+    onActionOnlyChange: (Boolean) -> Unit
+) {
     val context = LocalContext.current
     val keyHaptics = remember(context) { KeyHaptics(context) }
     NothingCard(modifier = Modifier.fillMaxWidth()) {
@@ -607,6 +620,38 @@ private fun HapticsCard(selected: HapticStrength, onSelect: (HapticStrength) -> 
                     color = MaterialTheme.colorScheme.onSurface
                 )
             }
+        }
+        val onActionOnlyEnabled = selected != HapticStrength.OFF
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .toggleable(
+                    value = onActionOnly,
+                    enabled = onActionOnlyEnabled,
+                    role = Role.Checkbox,
+                    onValueChange = onActionOnlyChange
+                )
+                .padding(vertical = GESTURE_ROW_GAP),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Checkbox(
+                checked = onActionOnly,
+                onCheckedChange = null,
+                enabled = onActionOnlyEnabled,
+                colors = CheckboxDefaults.colors(
+                    checkedColor = MaterialTheme.colorScheme.tertiary
+                )
+            )
+            Spacer(modifier = Modifier.width(RADIO_TO_TEXT_GAP))
+            Text(
+                text = stringResource(R.string.haptics_on_action_only),
+                style = MaterialTheme.typography.labelLarge,
+                color = if (onActionOnlyEnabled) {
+                    MaterialTheme.colorScheme.onSurface
+                } else {
+                    MaterialTheme.colorScheme.onSurfaceVariant
+                }
+            )
         }
     }
 }

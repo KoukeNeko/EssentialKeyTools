@@ -168,11 +168,12 @@
 
     <!-- Haptic feedback -->
     <string name="section_haptics">震動回饋</string>
-    <string name="haptics_body">每次按下 Essential Key 時震動。</string>
+    <string name="haptics_body">按下 Essential Key 時震動。</string>
     <string name="haptics_off">關閉</string>
     <string name="haptics_light">輕</string>
     <string name="haptics_medium">中</string>
     <string name="haptics_strong">強</string>
+    <string name="haptics_on_action_only">只在執行動作時震動</string>
 
     <!-- Language -->
     <string name="section_language">語言</string>
