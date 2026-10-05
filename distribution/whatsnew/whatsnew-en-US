@@ -1,11 +1,15 @@
 New features & improvements
 
-📳 Added haptic feedback when the Essential Key is pressed, with Off / Light / Medium / Strong options on the home screen.
+🎛️ New Custom haptic level: design your own vibration (pulses, length, frequency, amplitude).
+
+📳 New option to vibrate only when an action runs.
+
+🔓 The unlock wizard can now disable and restore Essential Space and Recorder through Shizuku.
 
 Bug fixes
 
-🔒 Fixed the first press doing nothing after the screen had been off for a few seconds.
+📳 Light, Medium and Strong haptics now feel different on every phone, and Medium now works on the Phone (4a).
 
 Contributors
 
-🙏 Thanks to @Astrid-starr for requesting #4 and @maurice1 for reporting #5.
+🙏 Thanks to @Astrid-starr (#6) and @maurice1 (#4).
