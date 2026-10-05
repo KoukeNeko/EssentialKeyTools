@@ -3,15 +3,14 @@ package dev.koukeneko.essentialkeytools.ui.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import dev.koukeneko.essentialkeytools.ui.theme.NothingGray
-import dev.koukeneko.essentialkeytools.ui.theme.NothingRed
 
-// Small circular indicator. Per Nothing convention red signals a live/active state while gray
-// signals inactive. This is the single sanctioned place for red in the status UI.
+// Small circular indicator: the tertiary accent signals a live/active state, outline gray signals
+// inactive. In the Nothing scheme tertiary is red, the single sanctioned red in the status UI.
 private val DOT_SIZE = 10.dp
 
 @Composable
@@ -19,7 +18,7 @@ fun StatusDot(
     active: Boolean,
     modifier: Modifier = Modifier
 ) {
-    val color = if (active) NothingRed else NothingGray
+    val color = if (active) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.outline
     androidx.compose.foundation.layout.Box(
         modifier = modifier
             .size(DOT_SIZE)

@@ -35,7 +35,9 @@ import dev.koukeneko.essentialkeytools.ui.screens.SettingsScreen
 import dev.koukeneko.essentialkeytools.ui.screens.UnlockWizardScreen
 import dev.koukeneko.essentialkeytools.ui.screens.openAccessibilitySettings
 import dev.koukeneko.essentialkeytools.ui.theme.EssentialKeyToolsTheme
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 /** The screens reachable from the home control panel via the explicit back stack. */
 private enum class Screen {
@@ -53,8 +55,13 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        val repository = SettingsRepository.getInstance(this)
+        // Read before the first frame so a Material You user never sees the Nothing palette flash by.
+        // The preferences file is tiny, so blocking here costs milliseconds.
+        val initialThemeStyle = runBlocking { repository.themeStyle.first() }
         setContent {
-            EssentialKeyToolsTheme {
+            val themeStyle by repository.themeStyle.collectAsState(initial = initialThemeStyle)
+            EssentialKeyToolsTheme(themeStyle = themeStyle) {
                 // The Scaffold keeps the black container edge-to-edge and hands each screen the
                 // system-bar insets as PaddingValues; screens decide whether to apply them as
                 // padding (static screens) or contentPadding (scrolling lists) so content can

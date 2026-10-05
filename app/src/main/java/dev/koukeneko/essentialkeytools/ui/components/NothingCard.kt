@@ -13,7 +13,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import dev.koukeneko.essentialkeytools.ui.theme.EssentialKeyToolsTheme
-import dev.koukeneko.essentialkeytools.ui.theme.NothingGray
 
 // Nothing cards are flat: a #1A1A1A surface with a large corner radius and a hairline outline
 // instead of any elevation shadow. Shadows and gradients are deliberately absent.
@@ -29,7 +28,7 @@ fun NothingCard(
     content: @Composable ColumnScope.() -> Unit
 ) {
     val outline = if (showOutline) {
-        BorderStroke(CARD_OUTLINE_WIDTH, NothingGray.copy(alpha = CARD_OUTLINE_ALPHA))
+        BorderStroke(CARD_OUTLINE_WIDTH, MaterialTheme.colorScheme.outline.copy(alpha = CARD_OUTLINE_ALPHA))
     } else {
         null
     }

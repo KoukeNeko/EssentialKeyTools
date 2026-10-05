@@ -83,6 +83,11 @@ strong they are. It vibrates on every press by default, or only when a gesture a
 action. A phone whose vibration motor can only switch on and off, like the Phone (3), approximates
 strength by pulsing the motor rapidly.
 
+### Pick a look
+
+The app uses the Nothing look by default. Under **Theme** in Settings, Material You takes the colors
+from your wallpaper and follows the system's light or dark setting. Fonts and shapes stay the same.
+
 ### Test without surprises
 
 Key Test shows the detected hardware events and recognized gesture without running the shortcut

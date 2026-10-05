@@ -1,6 +1,6 @@
 # Privacy Policy — Essential Key Tools
 
-_Last updated: 5 October 2026_
+_Last updated: 6 October 2026_
 
 Essential Key Tools ("the app") is a free, open-source Android app that remaps the Nothing Phone
 Essential Key. This policy explains what the app does — and does not do — with your data.
@@ -20,9 +20,9 @@ from it unless you choose to share it.
 ## Data stored on your device
 
 Your onboarding progress and settings — which action each gesture (single, double, triple, or long
-press) is mapped to, your haptic feedback choices including any custom vibration pattern, and the
-learned scan code of your key — are stored locally on your device using Android's DataStore. This
-data never leaves your device and is removed when you uninstall the app.
+press) is mapped to, your haptic feedback choices including any custom vibration pattern, your theme
+choice, and the learned scan code of your key — are stored locally on your device using Android's
+DataStore. This data never leaves your device and is removed when you uninstall the app.
 
 ## Crash reports stay on your device
 

@@ -48,7 +48,6 @@ import dev.koukeneko.essentialkeytools.ui.UiLabels
 import dev.koukeneko.essentialkeytools.ui.components.NothingCard
 import dev.koukeneko.essentialkeytools.ui.components.NothingSectionLabel
 import dev.koukeneko.essentialkeytools.ui.screenContentPadding
-import dev.koukeneko.essentialkeytools.ui.theme.NothingGray
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -190,7 +189,7 @@ private fun SearchField(query: String, onQueryChange: (String) -> Unit) {
             Text(
                 text = stringResource(R.string.picker_search_hint),
                 style = MaterialTheme.typography.labelSmall,
-                color = NothingGray
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         },
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
@@ -202,7 +201,7 @@ private fun SearchField(query: String, onQueryChange: (String) -> Unit) {
             unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
             cursorColor = MaterialTheme.colorScheme.onBackground,
             focusedBorderColor = MaterialTheme.colorScheme.onBackground,
-            unfocusedBorderColor = NothingGray
+            unfocusedBorderColor = MaterialTheme.colorScheme.outline
         )
     )
 }

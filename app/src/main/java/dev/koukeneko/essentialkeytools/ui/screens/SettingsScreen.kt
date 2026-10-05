@@ -38,6 +38,7 @@ import dev.koukeneko.essentialkeytools.actions.KeyHaptics
 import dev.koukeneko.essentialkeytools.settings.HapticPattern
 import dev.koukeneko.essentialkeytools.settings.HapticStrength
 import dev.koukeneko.essentialkeytools.settings.SettingsRepository
+import dev.koukeneko.essentialkeytools.settings.ThemeStyle
 import dev.koukeneko.essentialkeytools.ui.components.NothingButton
 import dev.koukeneko.essentialkeytools.ui.components.NothingCard
 import dev.koukeneko.essentialkeytools.ui.components.NothingSectionLabel
@@ -52,7 +53,7 @@ private val OPTION_ROW_GAP = 4.dp
 private val RADIO_TO_TEXT_GAP = 12.dp
 
 /**
- * The app's preferences: haptic feedback and language. Choices come from [SettingsRepository]
+ * The app's preferences: haptic feedback, theme and language. Choices come from [SettingsRepository]
  * reactively, so each card reflects a change the moment it is made.
  */
 @Composable
@@ -68,6 +69,7 @@ fun SettingsScreen(
         initial = HapticPattern.DEFAULT
     )
     val hapticsOnActionOnly by repository.hapticsOnActionOnly.collectAsState(initial = false)
+    val themeStyle by repository.themeStyle.collectAsState(initial = ThemeStyle.NOTHING)
     val coroutineScope = rememberCoroutineScope()
 
     // Padding sits inside the scroll so the canvas extends under the bars and the last card clears
@@ -96,6 +98,11 @@ fun SettingsScreen(
             onActionOnlyChange = { enabled ->
                 coroutineScope.launch { repository.setHapticsOnActionOnly(enabled) }
             }
+        )
+        Spacer(modifier = Modifier.height(CARD_GAP))
+        ThemeCard(
+            selected = themeStyle,
+            onSelect = { style -> coroutineScope.launch { repository.setThemeStyle(style) } }
         )
         Spacer(modifier = Modifier.height(CARD_GAP))
         LanguageCard()
@@ -197,6 +204,27 @@ private fun RadioOptionRow(label: String, selected: Boolean, onClick: () -> Unit
             color = MaterialTheme.colorScheme.onSurface
         )
     }
+}
+
+/** Picks the color style. It applies at once because the theme wraps the whole app. */
+@Composable
+private fun ThemeCard(selected: ThemeStyle, onSelect: (ThemeStyle) -> Unit) {
+    NothingCard(modifier = Modifier.fillMaxWidth()) {
+        NothingSectionLabel(text = stringResource(R.string.section_theme))
+        Spacer(modifier = Modifier.height(LABEL_GAP))
+        for (style in ThemeStyle.entries) {
+            RadioOptionRow(
+                label = stringResource(themeStyleLabelRes(style)),
+                selected = style == selected,
+                onClick = { onSelect(style) }
+            )
+        }
+    }
+}
+
+private fun themeStyleLabelRes(style: ThemeStyle): Int = when (style) {
+    ThemeStyle.NOTHING -> R.string.theme_nothing
+    ThemeStyle.MATERIAL -> R.string.theme_material
 }
 
 private fun hapticStrengthLabelRes(strength: HapticStrength): Int = when (strength) {

@@ -114,4 +114,25 @@ class SettingsRepositoryTest {
             dataStoreScope.cancel()
         }
     }
+
+    @Test
+    fun themeStyleDefaultsToNothingAndPersists() = runBlocking {
+        val dataStoreScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+        val dataStoreFile = File(temporaryFolder.root, "settings.preferences_pb")
+        val repository = SettingsRepository(
+            PreferenceDataStoreFactory.create(
+                scope = dataStoreScope,
+                produceFile = { dataStoreFile }
+            )
+        )
+
+        try {
+            assertEquals(ThemeStyle.NOTHING, repository.themeStyle.first())
+
+            repository.setThemeStyle(ThemeStyle.MATERIAL)
+            assertEquals(ThemeStyle.MATERIAL, repository.themeStyle.first())
+        } finally {
+            dataStoreScope.cancel()
+        }
+    }
 }

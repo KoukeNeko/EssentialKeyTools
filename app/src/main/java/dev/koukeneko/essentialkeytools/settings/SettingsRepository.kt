@@ -28,7 +28,7 @@ private val Context.settingsDataStore: DataStore<Preferences> by preferencesData
 
 /**
  * Persists the app's configuration: onboarding completion and progress, the learned Essential Key
- * scanCode, the gesture -> action mapping and the haptic feedback settings. Exposes reactive [Flow]s for observers (service, UI)
+ * scanCode, the gesture -> action mapping, the haptic feedback settings and the theme style. Exposes reactive [Flow]s for observers (service, UI)
  * and suspend writers.
  *
  * No DI framework: a manual process-wide singleton via [getInstance] keeps it simple while still
@@ -42,6 +42,7 @@ class SettingsRepository internal constructor(
     private val onboardingStepKey = intPreferencesKey("onboarding_step")
     private val hapticStrengthKey = intPreferencesKey("haptic_strength")
     private val hapticsOnActionOnlyKey = booleanPreferencesKey("haptics_on_action_only")
+    private val themeStyleKey = intPreferencesKey("theme_style")
     private val customPulseCountKey = intPreferencesKey("custom_haptic_pulse_count")
     private val customPulseMillisKey = intPreferencesKey("custom_haptic_pulse_millis")
     private val customFrequencyHzKey = intPreferencesKey("custom_haptic_frequency_hz")
@@ -84,6 +85,10 @@ class SettingsRepository internal constructor(
         ).coerced()
     }
 
+    val themeStyle: Flow<ThemeStyle> = dataStore.data.map { preferences ->
+        ThemeStyle.fromStorageValue(preferences[themeStyleKey])
+    }
+
     suspend fun setEssentialKeyScanCode(scanCode: Int) {
         dataStore.edit { preferences ->
             preferences[scanCodeKey] = scanCode
@@ -116,6 +121,12 @@ class SettingsRepository internal constructor(
             preferences[customPulseMillisKey] = bounded.pulseMillis
             preferences[customFrequencyHzKey] = bounded.frequencyHz
             preferences[customAmplitudePercentKey] = bounded.amplitudePercent
+        }
+    }
+
+    suspend fun setThemeStyle(style: ThemeStyle) {
+        dataStore.edit { preferences ->
+            preferences[themeStyleKey] = style.storageValue
         }
     }
 

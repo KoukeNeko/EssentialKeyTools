@@ -1,12 +1,17 @@
 package dev.koukeneko.essentialkeytools.ui.theme
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.dynamicDarkColorScheme
+import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
+import dev.koukeneko.essentialkeytools.settings.ThemeStyle
 
 // Dark is the primary Nothing look: pure-black canvas, #1A1A1A cards, white ink, red as the
-// single signal accent. No dynamic color — the palette is intentional and brand-consistent.
+// single signal accent. The palette is fixed on purpose; Material You is the opt-in alternative.
 private val DarkColorScheme = darkColorScheme(
     primary = NothingWhite,
     onPrimary = NothingBlack,
@@ -50,11 +55,18 @@ private val LightColorScheme = lightColorScheme(
 
 @Composable
 fun EssentialKeyToolsTheme(
-    // Default to dark; the app leads with the black Nothing aesthetic.
-    darkTheme: Boolean = true,
+    themeStyle: ThemeStyle = ThemeStyle.NOTHING,
+    // The Nothing look leads with black; Material You follows the system like any Material You app.
+    darkTheme: Boolean = themeStyle == ThemeStyle.NOTHING || isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
-    val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme
+    val colorScheme = when (themeStyle) {
+        ThemeStyle.NOTHING -> if (darkTheme) DarkColorScheme else LightColorScheme
+        ThemeStyle.MATERIAL -> {
+            val context = LocalContext.current
+            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+        }
+    }
 
     MaterialTheme(
         colorScheme = colorScheme,
