@@ -24,3 +24,9 @@
 # the original source file names.
 -keepattributes SourceFile,LineNumberTable
 -renamesourcefileattribute SourceFile
+
+# Shizuku instantiates the user service by class name in another process, so nothing in this app
+# references its constructor.
+-keep class dev.koukeneko.essentialkeytools.unlock.PackageToggleService {
+    <init>();
+}

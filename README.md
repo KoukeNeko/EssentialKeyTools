@@ -68,11 +68,12 @@ the accessibility service, pick your shortcuts, done.
 
 Nothing OS reserves the single press for Essential Space or Recorder, so this one is opt-in. The
 built-in unlock wizard shows the relevant packages and opens each App Info page so you can disable
-or restore them manually.
+or restore them manually. On builds where App Info greys out the Disable button, the wizard can also
+disable and restore them through [Shizuku](https://shizuku.rikka.app/), if you have it running.
 
 > **Before you unlock:** freeing the single press disables Nothing's Essential Space and Recorder
-> entirely. You can restore them from the same App Info pages, and an OS update may enable them
-> again.
+> entirely. You can restore them from the same App Info pages or the wizard, and an OS update may
+> enable them again.
 
 ### Test without surprises
 

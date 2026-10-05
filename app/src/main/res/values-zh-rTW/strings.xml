@@ -153,6 +153,13 @@
     <string name="unlock_manual_open_app_info">開啟應用程式資訊</string>
     <string name="unlock_manual_open_failed">無法開啟此套件的應用程式資訊。</string>
     <string name="unlock_manual_system_caption">在部分系統版本中，系統應用程式的「停用」按鈕可能無法使用。</string>
+    <string name="unlock_shizuku_label">Shizuku</string>
+    <string name="unlock_shizuku_not_running">Shizuku 未啟動。請安裝並啟動後再使用。</string>
+    <string name="unlock_shizuku_denied">權限已被拒絕。請在 Shizuku 中允許此 App。</string>
+    <string name="unlock_shizuku_grant">授予權限</string>
+    <string name="unlock_shizuku_disable">停用</string>
+    <string name="unlock_shizuku_enable">啟用</string>
+    <string name="unlock_shizuku_failed">Shizuku 無法變更此套件。</string>
 
     <!-- Action errors / hints -->
     <string name="error_app_not_found">找不到 App</string>

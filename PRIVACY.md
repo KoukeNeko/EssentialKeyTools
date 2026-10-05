@@ -100,6 +100,8 @@ never downloads or installs an APK itself.
 - **Accessibility Service** (`BIND_ACCESSIBILITY_SERVICE`) — to detect your Essential Key press.
 - **Package visibility / queries** — to list your launchable apps in the action picker, and to check
   the enabled state of Nothing's Essential Space packages for the unlock wizard.
+- **Shizuku** (optional) — if you grant it, the unlock wizard asks Shizuku to disable or enable
+  Nothing's Essential Space packages. Nothing else is run through Shizuku.
 
 ## Data sharing
 

@@ -153,6 +153,13 @@
     <string name="unlock_manual_open_app_info">Open App Info</string>
     <string name="unlock_manual_open_failed">Could not open App Info for this package.</string>
     <string name="unlock_manual_system_caption">On some OS builds the Disable button may be greyed out for system apps.</string>
+    <string name="unlock_shizuku_label">Shizuku</string>
+    <string name="unlock_shizuku_not_running">Shizuku is not running. Install and start it to use this.</string>
+    <string name="unlock_shizuku_denied">Permission denied. Allow this app in Shizuku.</string>
+    <string name="unlock_shizuku_grant">Grant permission</string>
+    <string name="unlock_shizuku_disable">Disable</string>
+    <string name="unlock_shizuku_enable">Enable</string>
+    <string name="unlock_shizuku_failed">Shizuku could not change this package.</string>
 
     <!-- Action errors / hints -->
     <string name="error_app_not_found">App not found</string>

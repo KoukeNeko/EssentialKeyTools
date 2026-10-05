@@ -75,6 +75,8 @@ android {
     }
     buildFeatures {
         compose = true
+        // The Shizuku user service is a separate process reached over an AIDL interface.
+        aidl = true
     }
 }
 
@@ -93,6 +95,8 @@ dependencies {
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.play.app.update)
     implementation(libs.play.app.update.ktx)
+    implementation(libs.shizuku.api)
+    implementation(libs.shizuku.provider)
     testImplementation(libs.junit)
     // org.json ships with the Android runtime, so it is only needed on the JVM unit-test classpath
     // to exercise GitHubContributorsParser without a device.
