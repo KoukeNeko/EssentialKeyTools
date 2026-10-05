@@ -31,6 +31,7 @@ import dev.koukeneko.essentialkeytools.ui.screens.HomeScreen
 import dev.koukeneko.essentialkeytools.ui.screens.KeySetupScreen
 import dev.koukeneko.essentialkeytools.ui.screens.KeyTestScreen
 import dev.koukeneko.essentialkeytools.ui.screens.OnboardingScreen
+import dev.koukeneko.essentialkeytools.ui.screens.SettingsScreen
 import dev.koukeneko.essentialkeytools.ui.screens.UnlockWizardScreen
 import dev.koukeneko.essentialkeytools.ui.screens.openAccessibilitySettings
 import dev.koukeneko.essentialkeytools.ui.theme.EssentialKeyToolsTheme
@@ -43,6 +44,7 @@ private enum class Screen {
     KEY_TEST,
     DIAGNOSTICS,
     UNLOCK_WIZARD,
+    SETTINGS,
     HAPTIC_PATTERN,
     ACTION_PICKER
 }
@@ -149,7 +151,7 @@ private fun AppNavigation(systemBarsPadding: PaddingValues) {
             onKeyTest = { navigateTo(Screen.KEY_TEST) },
             onDiagnostics = { navigateTo(Screen.DIAGNOSTICS) },
             onReviewOnboarding = { showOnboarding = true },
-            onEditHapticPattern = { navigateTo(Screen.HAPTIC_PATTERN) },
+            onSettings = { navigateTo(Screen.SETTINGS) },
             systemBarsPadding = systemBarsPadding
         )
 
@@ -163,6 +165,11 @@ private fun AppNavigation(systemBarsPadding: PaddingValues) {
         Screen.DIAGNOSTICS -> DiagnosticsScreen(systemBarsPadding = systemBarsPadding)
 
         Screen.UNLOCK_WIZARD -> UnlockWizardScreen(systemBarsPadding = systemBarsPadding)
+
+        Screen.SETTINGS -> SettingsScreen(
+            onEditHapticPattern = { navigateTo(Screen.HAPTIC_PATTERN) },
+            systemBarsPadding = systemBarsPadding
+        )
 
         Screen.HAPTIC_PATTERN -> HapticPatternScreen(systemBarsPadding = systemBarsPadding)
 

@@ -17,14 +17,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.selection.selectable
-import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Checkbox
-import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.RadioButton
-import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -40,7 +34,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -49,14 +42,11 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import dev.koukeneko.essentialkeytools.R
 import dev.koukeneko.essentialkeytools.actions.KeyAction
-import dev.koukeneko.essentialkeytools.actions.KeyHaptics
 import dev.koukeneko.essentialkeytools.contributors.Contributor
 import dev.koukeneko.essentialkeytools.contributors.GitHubContributorsService
 import dev.koukeneko.essentialkeytools.core.KeyGesture
 import dev.koukeneko.essentialkeytools.service.EssentialKeyDetectionService
 import dev.koukeneko.essentialkeytools.settings.GestureActionMap
-import dev.koukeneko.essentialkeytools.settings.HapticPattern
-import dev.koukeneko.essentialkeytools.settings.HapticStrength
 import dev.koukeneko.essentialkeytools.settings.SettingsRepository
 import dev.koukeneko.essentialkeytools.ui.AppLabelResolver
 import dev.koukeneko.essentialkeytools.ui.PRIVACY_POLICY_URL
@@ -89,7 +79,6 @@ private val STATUS_TO_ACTION_GAP = 16.dp
 private val DISCLOSURE_GAP = 12.dp
 private val CONTRIBUTOR_SECTION_GAP = 20.dp
 private val UPDATE_ACTION_GAP = 12.dp
-private val RADIO_TO_TEXT_GAP = 12.dp
 
 // The repository is a proper noun, not translatable copy, so it lives in code; only the captions
 // rendered around it come from string resources. The contributor list itself is fetched from the
@@ -112,19 +101,13 @@ fun HomeScreen(
     onKeyTest: () -> Unit,
     onDiagnostics: () -> Unit,
     onReviewOnboarding: () -> Unit,
-    onEditHapticPattern: () -> Unit,
+    onSettings: () -> Unit,
     systemBarsPadding: PaddingValues = PaddingValues(),
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
     val repository = remember { SettingsRepository.getInstance(context) }
     val actionMap by repository.gestureActionMap.collectAsState(initial = GestureActionMap.EMPTY)
-    val hapticStrength by repository.hapticStrength.collectAsState(initial = HapticStrength.OFF)
-    val customHapticPattern by repository.customHapticPattern.collectAsState(
-        initial = HapticPattern.DEFAULT
-    )
-    val hapticsOnActionOnly by repository.hapticsOnActionOnly.collectAsState(initial = false)
-    val coroutineScope = rememberCoroutineScope()
     val serviceRunningState = rememberServiceRunningState()
     val unlockStatus = rememberUnlockStatus()
     val notificationPolicyAccessGranted = rememberNotificationPolicyAccessGranted()
@@ -183,20 +166,8 @@ fun HomeScreen(
             NotificationPolicyCard()
             Spacer(modifier = Modifier.height(CARD_GAP))
         }
-        HapticsCard(
-            selected = hapticStrength,
-            customPattern = customHapticPattern,
-            onSelect = { strength ->
-                coroutineScope.launch { repository.setHapticStrength(strength) }
-            },
-            onEditPattern = onEditHapticPattern,
-            onActionOnly = hapticsOnActionOnly,
-            onActionOnlyChange = { enabled ->
-                coroutineScope.launch { repository.setHapticsOnActionOnly(enabled) }
-            }
-        )
-        Spacer(modifier = Modifier.height(CARD_GAP))
         NavigationCard(
+            onSettings = onSettings,
             onKeySetup = onKeySetup,
             onKeyTest = onKeyTest,
             onDiagnostics = onDiagnostics,
@@ -204,8 +175,6 @@ fun HomeScreen(
         )
         Spacer(modifier = Modifier.height(CARD_GAP))
         UpdateCard()
-        Spacer(modifier = Modifier.height(CARD_GAP))
-        LanguageCard()
         Spacer(modifier = Modifier.height(CARD_GAP))
         ContributionCard()
     }
@@ -579,108 +548,9 @@ private fun ActionLabel(action: KeyAction, context: Context) {
     )
 }
 
-/** Picks the gesture vibration strength; choosing one plays it so the user can feel the difference. */
-@Composable
-private fun HapticsCard(
-    selected: HapticStrength,
-    customPattern: HapticPattern,
-    onSelect: (HapticStrength) -> Unit,
-    onEditPattern: () -> Unit,
-    onActionOnly: Boolean,
-    onActionOnlyChange: (Boolean) -> Unit
-) {
-    val context = LocalContext.current
-    val keyHaptics = remember(context) { KeyHaptics(context) }
-    NothingCard(modifier = Modifier.fillMaxWidth()) {
-        NothingSectionLabel(text = stringResource(R.string.section_haptics))
-        Spacer(modifier = Modifier.height(LABEL_GAP))
-        Text(
-            text = stringResource(R.string.haptics_body),
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-        Spacer(modifier = Modifier.height(LABEL_GAP))
-        for (strength in HapticStrength.entries) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .selectable(
-                        selected = strength == selected,
-                        role = Role.RadioButton,
-                        onClick = {
-                            keyHaptics.perform(strength, customPattern)
-                            onSelect(strength)
-                        }
-                    )
-                    .padding(vertical = GESTURE_ROW_GAP),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                RadioButton(
-                    selected = strength == selected,
-                    onClick = null,
-                    colors = RadioButtonDefaults.colors(
-                        selectedColor = MaterialTheme.colorScheme.tertiary
-                    )
-                )
-                Spacer(modifier = Modifier.width(RADIO_TO_TEXT_GAP))
-                Text(
-                    text = stringResource(hapticStrengthLabelRes(strength)),
-                    style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-            }
-        }
-        NothingButton(
-            text = stringResource(R.string.haptics_edit_pattern),
-            onClick = onEditPattern,
-            outlined = true,
-            modifier = Modifier.fillMaxWidth()
-        )
-        val onActionOnlyEnabled = selected != HapticStrength.OFF
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .toggleable(
-                    value = onActionOnly,
-                    enabled = onActionOnlyEnabled,
-                    role = Role.Checkbox,
-                    onValueChange = onActionOnlyChange
-                )
-                .padding(vertical = GESTURE_ROW_GAP),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Checkbox(
-                checked = onActionOnly,
-                onCheckedChange = null,
-                enabled = onActionOnlyEnabled,
-                colors = CheckboxDefaults.colors(
-                    checkedColor = MaterialTheme.colorScheme.tertiary
-                )
-            )
-            Spacer(modifier = Modifier.width(RADIO_TO_TEXT_GAP))
-            Text(
-                text = stringResource(R.string.haptics_on_action_only),
-                style = MaterialTheme.typography.labelLarge,
-                color = if (onActionOnlyEnabled) {
-                    MaterialTheme.colorScheme.onSurface
-                } else {
-                    MaterialTheme.colorScheme.onSurfaceVariant
-                }
-            )
-        }
-    }
-}
-
-private fun hapticStrengthLabelRes(strength: HapticStrength): Int = when (strength) {
-    HapticStrength.OFF -> R.string.haptics_off
-    HapticStrength.LIGHT -> R.string.haptics_light
-    HapticStrength.MEDIUM -> R.string.haptics_medium
-    HapticStrength.STRONG -> R.string.haptics_strong
-    HapticStrength.CUSTOM -> R.string.haptics_custom
-}
-
 @Composable
 private fun NavigationCard(
+    onSettings: () -> Unit,
     onKeySetup: () -> Unit,
     onKeyTest: () -> Unit,
     onDiagnostics: () -> Unit,
@@ -690,6 +560,12 @@ private fun NavigationCard(
         NothingSectionLabel(text = stringResource(R.string.section_navigation))
         Spacer(modifier = Modifier.height(LABEL_GAP))
         Column(verticalArrangement = Arrangement.spacedBy(NAV_BUTTON_GAP)) {
+            NothingButton(
+                text = stringResource(R.string.action_open_settings),
+                onClick = onSettings,
+                outlined = true,
+                modifier = Modifier.fillMaxWidth()
+            )
             NothingButton(
                 text = stringResource(R.string.action_key_setup),
                 onClick = onKeySetup,
@@ -715,51 +591,6 @@ private fun NavigationCard(
                 modifier = Modifier.fillMaxWidth()
             )
         }
-    }
-}
-
-/**
- * Opens this app's per-app language screen in system settings when tapped. The languages offered
- * there come from the locale config AGP generates from the values-* folders (generateLocaleConfig),
- * so the list stays in sync with the translations the app actually ships.
- */
-@Composable
-private fun LanguageCard() {
-    val context = LocalContext.current
-    NothingCard(modifier = Modifier.fillMaxWidth()) {
-        NothingSectionLabel(text = stringResource(R.string.section_language))
-        Spacer(modifier = Modifier.height(LABEL_GAP))
-        NothingButton(
-            text = stringResource(R.string.action_open_language_settings),
-            onClick = { openAppLanguageSettings(context) },
-            outlined = true,
-            modifier = Modifier.fillMaxWidth()
-        )
-    }
-}
-
-/**
- * Opens the per-app language screen in system settings (Android 13+). Falls back to the app details
- * page, then a toast, on OEM builds that do not surface the locale screen directly.
- */
-private fun openAppLanguageSettings(context: Context) {
-    val packageUri = android.net.Uri.fromParts("package", context.packageName, null)
-    val localeSettings = Intent(Settings.ACTION_APP_LOCALE_SETTINGS, packageUri)
-        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-    try {
-        context.startActivity(localeSettings)
-    } catch (error: android.content.ActivityNotFoundException) {
-        openAppDetailsSettings(context, packageUri)
-    }
-}
-
-private fun openAppDetailsSettings(context: Context, packageUri: android.net.Uri) {
-    val details = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, packageUri)
-        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-    try {
-        context.startActivity(details)
-    } catch (error: android.content.ActivityNotFoundException) {
-        Toast.makeText(context, R.string.language_settings_unavailable, Toast.LENGTH_LONG).show()
     }
 }
 
@@ -922,7 +753,7 @@ private fun HomeScreenPreview() {
             onKeyTest = {},
             onDiagnostics = {},
             onReviewOnboarding = {},
-            onEditHapticPattern = {}
+            onSettings = {}
         )
     }
 }

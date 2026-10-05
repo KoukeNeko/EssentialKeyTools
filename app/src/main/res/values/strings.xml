@@ -11,11 +11,15 @@
 
     <!-- Home navigation -->
     <string name="action_open_accessibility_settings">Enable service</string>
+    <string name="action_open_settings">Settings</string>
     <string name="action_key_setup">Key setup</string>
     <string name="action_key_test">Key test</string>
     <string name="action_review_onboarding">Review setup guide</string>
     <string name="section_navigation">Setup</string>
     <string name="action_open_diagnostics">Diagnostics</string>
+
+    <!-- Settings -->
+    <string name="settings_title">SETTINGS</string>
 
     <!-- Diagnostics -->
     <string name="diagnostics_title">DIAGNOSTICS</string>
