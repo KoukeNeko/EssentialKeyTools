@@ -143,7 +143,7 @@
     <!-- Unlock wizard -->
     <string name="unlock_title">解鎖</string>
     <string name="unlock_warning_label">解鎖前請注意</string>
-    <string name="unlock_warning_body">釋放按一下功能會完全停用 Nothing 的 Essential Space 與 Recorder。你可以從相同的應用程式資訊頁面重新啟用。系統更新後可能重新啟用它們 — 若狀態變動，請重新執行手動步驟。</string>
+    <string name="unlock_warning_body">釋放按一下功能會完全停用 Nothing 的 Essential Space 與 Recorder。解除安裝此 App 後，它們仍會維持停用。你可以在此頁面或應用程式資訊頁面重新啟用。系統更新後可能重新啟用它們 — 若狀態變動，請重新執行步驟。</string>
     <string name="unlock_packages_label">消費者套件</string>
     <string name="unlock_package_freed">已釋放</string>
     <string name="unlock_package_active">運作中</string>

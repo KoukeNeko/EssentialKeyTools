@@ -143,7 +143,7 @@
     <!-- Unlock wizard -->
     <string name="unlock_title">UNLOCK</string>
     <string name="unlock_warning_label">Before you unlock</string>
-    <string name="unlock_warning_body">Freeing the single press disables Nothing\'s Essential Space and Recorder entirely. You can enable them again from the same App Info pages. An OS update may re-enable them — repeat the manual steps if the status drifts.</string>
+    <string name="unlock_warning_body">Freeing the single press disables Nothing\'s Essential Space and Recorder entirely. They stay disabled if you uninstall this app. Enable them again from this screen or App Info. An OS update may re-enable them — repeat the steps if the status drifts.</string>
     <string name="unlock_packages_label">Consumer packages</string>
     <string name="unlock_package_freed">FREED</string>
     <string name="unlock_package_active">ACTIVE</string>

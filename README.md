@@ -72,8 +72,8 @@ or restore them manually. On builds where App Info greys out the Disable button,
 disable and restore them through [Shizuku](https://shizuku.rikka.app/), if you have it running.
 
 > **Before you unlock:** freeing the single press disables Nothing's Essential Space and Recorder
-> entirely. You can restore them from the same App Info pages or the wizard, and an OS update may
-> enable them again.
+> entirely. They stay disabled if you uninstall this app. You can enable them again from the wizard
+> or the App Info pages, and an OS update may switch them back on.
 
 ### Feel each press
 
