@@ -38,7 +38,8 @@ class KeyHaptics(context: Context) {
 
         // Waveform timings alternate off/on and begin with the wait before the motor starts.
         val LIGHT_TIMINGS = longArrayOf(0, 15)
-        val MEDIUM_TIMINGS = longArrayOf(0, 40)
+        // 40ms was indistinguishable from Light on the Phone (4a); 50ms is clearly longer there.
+        val MEDIUM_TIMINGS = longArrayOf(0, 50)
         val STRONG_TIMINGS = longArrayOf(0, 80)
     }
 }
