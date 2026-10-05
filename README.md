@@ -75,6 +75,14 @@ disable and restore them through [Shizuku](https://shizuku.rikka.app/), if you h
 > entirely. You can restore them from the same App Info pages or the wizard, and an OS update may
 > enable them again.
 
+### Feel each press
+
+Haptic feedback is off until you turn it on. Choose Light, Medium, or Strong, or design your own
+vibration under **Custom**: how many pulses, how long each lasts, how often they repeat, and how
+strong they are. It vibrates on every press by default, or only when a gesture actually runs its
+action. A phone whose vibration motor can only switch on and off, like the Phone (3), approximates
+strength by pulsing the motor rapidly.
+
 ### Test without surprises
 
 Key Test shows the detected hardware events and recognized gesture without running the shortcut
@@ -181,6 +189,14 @@ single-press remapping.
 - **`INTERNET`** - fetches the public GitHub contributor list for the contribution card. A separate
   request runs only after **Check for updates** is pressed and contacts Google Play or GitHub based
   on the verified installation source.
+- **`VIBRATE`** - plays haptic feedback when you turn it on.
+- **`ACCESS_NOTIFICATION_POLICY`** - Do Not Disturb access, which Android requires before an app can
+  switch the ringer to silent. Only the ringer-cycle action uses it.
+- **`com.nothing.ketchum.permission.ENABLE`** - connects to Nothing's Glyph Matrix service for the
+  Glyph light action.
+- **`moe.shizuku.manager.permission.API_V23`** - optional. Only when Shizuku is running and you grant
+  this app permission in it, the unlock wizard uses it to disable or enable Nothing's Essential
+  packages with `pm disable-user` and `pm enable`. Nothing else is run through Shizuku.
 
 ### Development
 
@@ -208,7 +224,8 @@ the Java installation on `PATH`:
 
 `scripts/simulate-key.sh` is a best-effort development helper that injects a scancode-250 event with
 `adb sendevent`. It needs the correct input node and usually root on stock firmware; the app itself
-does not require root, Shizuku, ADB, or this development setup.
+does not require root, ADB, or this development setup. Shizuku is optional and only used by the
+unlock wizard.
 
 Pure logic such as gesture classification, settings serialization, unlock-status mapping, and
 update-version parsing is covered by JVM unit tests without requiring a device.

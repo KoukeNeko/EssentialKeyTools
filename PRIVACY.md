@@ -1,6 +1,6 @@
 # Privacy Policy — Essential Key Tools
 
-_Last updated: 1 September 2026_
+_Last updated: 5 October 2026_
 
 Essential Key Tools ("the app") is a free, open-source Android app that remaps the Nothing Phone
 Essential Key. This policy explains what the app does — and does not do — with your data.
@@ -20,8 +20,9 @@ from it unless you choose to share it.
 ## Data stored on your device
 
 Your onboarding progress and settings — which action each gesture (single, double, triple, or long
-press) is mapped to, and the learned scan code of your key — are stored locally on your device using
-Android's DataStore. This data never leaves your device and is removed when you uninstall the app.
+press) is mapped to, your haptic feedback choices including any custom vibration pattern, and the
+learned scan code of your key — are stored locally on your device using Android's DataStore. This
+data never leaves your device and is removed when you uninstall the app.
 
 ## Crash reports stay on your device
 
@@ -98,10 +99,18 @@ never downloads or installs an APK itself.
 
 - **INTERNET** — to fetch the contributor list and, only when requested, GitHub release metadata.
 - **Accessibility Service** (`BIND_ACCESSIBILITY_SERVICE`) — to detect your Essential Key press.
+- **Vibration** (`VIBRATE`) — to vibrate when you press the Essential Key or an assigned action runs,
+  if you turn haptic feedback on.
+- **Do Not Disturb access** (`ACCESS_NOTIFICATION_POLICY`) — so the ringer-cycle action can switch the
+  phone to and from silent. You grant it in Android settings, and the app changes the ringer mode
+  only when you trigger the gesture you assigned to it.
+- **Glyph** (`com.nothing.ketchum.permission.ENABLE`) — to connect to Nothing's Glyph Matrix service
+  for the Glyph light action on Nothing Phone (3).
 - **Package visibility / queries** — to list your launchable apps in the action picker, and to check
   the enabled state of Nothing's Essential Space packages for the unlock wizard.
-- **Shizuku** (optional) — if you grant it, the unlock wizard asks Shizuku to disable or enable
-  Nothing's Essential Space packages. Nothing else is run through Shizuku.
+- **Shizuku** (`moe.shizuku.manager.permission.API_V23`, optional) — only if you have Shizuku and
+  grant this app permission in it, the unlock wizard asks Shizuku to disable or enable Nothing's
+  Essential Space packages. Nothing else is run through Shizuku, and nothing is sent over a network.
 
 ## Data sharing
 
