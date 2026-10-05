@@ -42,6 +42,10 @@ class SettingsRepository internal constructor(
     private val onboardingStepKey = intPreferencesKey("onboarding_step")
     private val hapticStrengthKey = intPreferencesKey("haptic_strength")
     private val hapticsOnActionOnlyKey = booleanPreferencesKey("haptics_on_action_only")
+    private val customPulseCountKey = intPreferencesKey("custom_haptic_pulse_count")
+    private val customPulseMillisKey = intPreferencesKey("custom_haptic_pulse_millis")
+    private val customFrequencyHzKey = intPreferencesKey("custom_haptic_frequency_hz")
+    private val customAmplitudePercentKey = intPreferencesKey("custom_haptic_amplitude_percent")
 
     val onboardingState: Flow<OnboardingState> = dataStore.data.map { preferences ->
         OnboardingState(
@@ -69,6 +73,17 @@ class SettingsRepository internal constructor(
         preferences[hapticsOnActionOnlyKey] ?: false
     }
 
+    /** The vibration played by [HapticStrength.CUSTOM]. */
+    val customHapticPattern: Flow<HapticPattern> = dataStore.data.map { preferences ->
+        HapticPattern(
+            pulseCount = preferences[customPulseCountKey] ?: HapticPattern.DEFAULT.pulseCount,
+            pulseMillis = preferences[customPulseMillisKey] ?: HapticPattern.DEFAULT.pulseMillis,
+            frequencyHz = preferences[customFrequencyHzKey] ?: HapticPattern.DEFAULT.frequencyHz,
+            amplitudePercent = preferences[customAmplitudePercentKey]
+                ?: HapticPattern.DEFAULT.amplitudePercent
+        ).coerced()
+    }
+
     suspend fun setEssentialKeyScanCode(scanCode: Int) {
         dataStore.edit { preferences ->
             preferences[scanCodeKey] = scanCode
@@ -91,6 +106,16 @@ class SettingsRepository internal constructor(
     suspend fun setHapticStrength(strength: HapticStrength) {
         dataStore.edit { preferences ->
             preferences[hapticStrengthKey] = strength.storageValue
+        }
+    }
+
+    suspend fun setCustomHapticPattern(pattern: HapticPattern) {
+        val bounded = pattern.coerced()
+        dataStore.edit { preferences ->
+            preferences[customPulseCountKey] = bounded.pulseCount
+            preferences[customPulseMillisKey] = bounded.pulseMillis
+            preferences[customFrequencyHzKey] = bounded.frequencyHz
+            preferences[customAmplitudePercentKey] = bounded.amplitudePercent
         }
     }
 

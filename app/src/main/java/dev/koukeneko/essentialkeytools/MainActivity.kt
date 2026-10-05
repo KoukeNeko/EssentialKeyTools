@@ -26,6 +26,7 @@ import dev.koukeneko.essentialkeytools.settings.OnboardingState
 import dev.koukeneko.essentialkeytools.settings.SettingsRepository
 import dev.koukeneko.essentialkeytools.ui.screens.ActionPickerScreen
 import dev.koukeneko.essentialkeytools.ui.screens.DiagnosticsScreen
+import dev.koukeneko.essentialkeytools.ui.screens.HapticPatternScreen
 import dev.koukeneko.essentialkeytools.ui.screens.HomeScreen
 import dev.koukeneko.essentialkeytools.ui.screens.KeySetupScreen
 import dev.koukeneko.essentialkeytools.ui.screens.KeyTestScreen
@@ -42,6 +43,7 @@ private enum class Screen {
     KEY_TEST,
     DIAGNOSTICS,
     UNLOCK_WIZARD,
+    HAPTIC_PATTERN,
     ACTION_PICKER
 }
 
@@ -147,6 +149,7 @@ private fun AppNavigation(systemBarsPadding: PaddingValues) {
             onKeyTest = { navigateTo(Screen.KEY_TEST) },
             onDiagnostics = { navigateTo(Screen.DIAGNOSTICS) },
             onReviewOnboarding = { showOnboarding = true },
+            onEditHapticPattern = { navigateTo(Screen.HAPTIC_PATTERN) },
             systemBarsPadding = systemBarsPadding
         )
 
@@ -160,6 +163,8 @@ private fun AppNavigation(systemBarsPadding: PaddingValues) {
         Screen.DIAGNOSTICS -> DiagnosticsScreen(systemBarsPadding = systemBarsPadding)
 
         Screen.UNLOCK_WIZARD -> UnlockWizardScreen(systemBarsPadding = systemBarsPadding)
+
+        Screen.HAPTIC_PATTERN -> HapticPatternScreen(systemBarsPadding = systemBarsPadding)
 
         Screen.ACTION_PICKER -> ActionPickerScreen(
             gesture = gestureBeingEdited,

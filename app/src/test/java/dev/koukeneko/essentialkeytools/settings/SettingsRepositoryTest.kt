@@ -74,4 +74,44 @@ class SettingsRepositoryTest {
             dataStoreScope.cancel()
         }
     }
+
+    @Test
+    fun customHapticPatternDefaultsAndPersistsWithinRange() = runBlocking {
+        val dataStoreScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+        val dataStoreFile = File(temporaryFolder.root, "settings.preferences_pb")
+        val repository = SettingsRepository(
+            PreferenceDataStoreFactory.create(
+                scope = dataStoreScope,
+                produceFile = { dataStoreFile }
+            )
+        )
+
+        try {
+            assertEquals(HapticPattern.DEFAULT, repository.customHapticPattern.first())
+
+            val pattern = HapticPattern(
+                pulseCount = 3,
+                pulseMillis = 30,
+                frequencyHz = 8,
+                amplitudePercent = 60
+            )
+            repository.setCustomHapticPattern(pattern)
+            assertEquals(pattern, repository.customHapticPattern.first())
+
+            repository.setCustomHapticPattern(
+                HapticPattern(pulseCount = 99, pulseMillis = 1, frequencyHz = 0, amplitudePercent = 500)
+            )
+            assertEquals(
+                HapticPattern(
+                    pulseCount = HapticPattern.PULSE_COUNT_RANGE.last,
+                    pulseMillis = HapticPattern.PULSE_MILLIS_RANGE.first,
+                    frequencyHz = HapticPattern.FREQUENCY_HZ_RANGE.first,
+                    amplitudePercent = HapticPattern.AMPLITUDE_PERCENT_RANGE.last
+                ),
+                repository.customHapticPattern.first()
+            )
+        } finally {
+            dataStoreScope.cancel()
+        }
+    }
 }

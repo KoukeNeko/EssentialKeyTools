@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.VibrationAttributes
 import android.os.VibrationEffect
 import android.os.VibratorManager
+import dev.koukeneko.essentialkeytools.settings.HapticPattern
 import dev.koukeneko.essentialkeytools.settings.HapticStrength
 
 /**
@@ -23,14 +24,26 @@ class KeyHaptics(context: Context) {
         VibrationAttributes.USAGE_HARDWARE_FEEDBACK
     )
 
-    fun perform(strength: HapticStrength) {
+    val hasAmplitudeControl: Boolean get() = vibrator.hasAmplitudeControl()
+
+    /** Plays [customPattern] for [HapticStrength.CUSTOM]; the other levels are fixed pulses. */
+    fun perform(strength: HapticStrength, customPattern: HapticPattern) {
         val effect = when (strength) {
             HapticStrength.OFF -> return
+            HapticStrength.CUSTOM -> return play(customPattern)
             HapticStrength.LIGHT -> VibrationEffect.createWaveform(LIGHT_TIMINGS, NO_REPEAT)
             HapticStrength.MEDIUM -> VibrationEffect.createWaveform(MEDIUM_TIMINGS, NO_REPEAT)
             HapticStrength.STRONG -> VibrationEffect.createWaveform(STRONG_TIMINGS, NO_REPEAT)
         }
         vibrator.vibrate(effect, attributes)
+    }
+
+    fun play(pattern: HapticPattern) {
+        val waveform = pattern.toWaveform(hasAmplitudeControl)
+        vibrator.vibrate(
+            VibrationEffect.createWaveform(waveform.timings, waveform.amplitudes, NO_REPEAT),
+            attributes
+        )
     }
 
     private companion object {

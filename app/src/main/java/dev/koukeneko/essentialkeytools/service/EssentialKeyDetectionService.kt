@@ -12,6 +12,7 @@ import dev.koukeneko.essentialkeytools.core.KeyGesture
 import dev.koukeneko.essentialkeytools.core.KeyGestureClassifier
 import dev.koukeneko.essentialkeytools.settings.DEFAULT_ESSENTIAL_KEY_SCAN_CODE
 import dev.koukeneko.essentialkeytools.settings.GestureActionMap
+import dev.koukeneko.essentialkeytools.settings.HapticPattern
 import dev.koukeneko.essentialkeytools.settings.HapticStrength
 import dev.koukeneko.essentialkeytools.settings.SettingsRepository
 import kotlinx.coroutines.CoroutineScope
@@ -42,6 +43,7 @@ class EssentialKeyDetectionService : AccessibilityService() {
     private var learnedScanCode = DEFAULT_ESSENTIAL_KEY_SCAN_CODE
     private var gestureActionMap = GestureActionMap.EMPTY
     private var hapticStrength = HapticStrength.OFF
+    private var customHapticPattern = HapticPattern.DEFAULT
     private var hapticsOnActionOnly = false
     private var suppressNextClassifiedAction = false
     // Tracks which suppression state the current classifier was built for, so a new press can pick
@@ -71,6 +73,9 @@ class EssentialKeyDetectionService : AccessibilityService() {
         }
         serviceScope.launch {
             repository.hapticStrength.collect { strength -> hapticStrength = strength }
+        }
+        serviceScope.launch {
+            repository.customHapticPattern.collect { pattern -> customHapticPattern = pattern }
         }
         serviceScope.launch {
             repository.hapticsOnActionOnly.collect { enabled -> hapticsOnActionOnly = enabled }
@@ -167,7 +172,7 @@ class EssentialKeyDetectionService : AccessibilityService() {
     // for the gesture to resolve. Presses are ignored while nothing is mapped, since they do nothing.
     private fun onPress() {
         if (!hapticsOnActionOnly && gestureActionMap.activeGestures().isNotEmpty()) {
-            keyHaptics.perform(hapticStrength)
+            keyHaptics.perform(hapticStrength, customHapticPattern)
         }
     }
 
@@ -180,7 +185,7 @@ class EssentialKeyDetectionService : AccessibilityService() {
         if (!actionSuppressed) {
             val action = gestureActionMap.actionFor(gesture)
             if (hapticsOnActionOnly && action != KeyAction.None) {
-                keyHaptics.perform(hapticStrength)
+                keyHaptics.perform(hapticStrength, customHapticPattern)
             }
             actionExecutor.execute(action)
         }

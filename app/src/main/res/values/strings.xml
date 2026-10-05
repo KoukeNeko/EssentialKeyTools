@@ -180,6 +180,16 @@
     <string name="haptics_light">Light</string>
     <string name="haptics_medium">Medium</string>
     <string name="haptics_strong">Strong</string>
+    <string name="haptics_custom">Custom</string>
+    <string name="haptics_edit_pattern">Edit pattern</string>
+    <string name="haptic_pattern_title">CUSTOM VIBRATION</string>
+    <string name="haptic_pattern_label">Pattern</string>
+    <string name="haptic_pattern_count">Pulses</string>
+    <string name="haptic_pattern_length">Pulse length</string>
+    <string name="haptic_pattern_frequency">Frequency</string>
+    <string name="haptic_pattern_amplitude">Amplitude</string>
+    <string name="haptic_pattern_test">Test</string>
+    <string name="haptic_pattern_no_amplitude_control">This device cannot vary vibration strength. Amplitude is approximated by pulsing the motor on and off.</string>
     <string name="haptics_on_action_only">Vibrate only when an action runs</string>
 
     <!-- Language -->

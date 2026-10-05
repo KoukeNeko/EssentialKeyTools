@@ -180,6 +180,16 @@
     <string name="haptics_light">輕</string>
     <string name="haptics_medium">中</string>
     <string name="haptics_strong">強</string>
+    <string name="haptics_custom">自訂</string>
+    <string name="haptics_edit_pattern">編輯波形</string>
+    <string name="haptic_pattern_title">自訂震動</string>
+    <string name="haptic_pattern_label">波形</string>
+    <string name="haptic_pattern_count">次數</string>
+    <string name="haptic_pattern_length">單次長度</string>
+    <string name="haptic_pattern_frequency">頻率</string>
+    <string name="haptic_pattern_amplitude">振幅</string>
+    <string name="haptic_pattern_test">測試</string>
+    <string name="haptic_pattern_no_amplitude_control">此裝置無法調整震動強度，振幅以馬達快速開關近似。</string>
     <string name="haptics_on_action_only">只在執行動作時震動</string>
 
     <!-- Language -->

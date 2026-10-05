@@ -55,6 +55,7 @@ import dev.koukeneko.essentialkeytools.contributors.GitHubContributorsService
 import dev.koukeneko.essentialkeytools.core.KeyGesture
 import dev.koukeneko.essentialkeytools.service.EssentialKeyDetectionService
 import dev.koukeneko.essentialkeytools.settings.GestureActionMap
+import dev.koukeneko.essentialkeytools.settings.HapticPattern
 import dev.koukeneko.essentialkeytools.settings.HapticStrength
 import dev.koukeneko.essentialkeytools.settings.SettingsRepository
 import dev.koukeneko.essentialkeytools.ui.AppLabelResolver
@@ -111,6 +112,7 @@ fun HomeScreen(
     onKeyTest: () -> Unit,
     onDiagnostics: () -> Unit,
     onReviewOnboarding: () -> Unit,
+    onEditHapticPattern: () -> Unit,
     systemBarsPadding: PaddingValues = PaddingValues(),
     modifier: Modifier = Modifier
 ) {
@@ -118,6 +120,9 @@ fun HomeScreen(
     val repository = remember { SettingsRepository.getInstance(context) }
     val actionMap by repository.gestureActionMap.collectAsState(initial = GestureActionMap.EMPTY)
     val hapticStrength by repository.hapticStrength.collectAsState(initial = HapticStrength.OFF)
+    val customHapticPattern by repository.customHapticPattern.collectAsState(
+        initial = HapticPattern.DEFAULT
+    )
     val hapticsOnActionOnly by repository.hapticsOnActionOnly.collectAsState(initial = false)
     val coroutineScope = rememberCoroutineScope()
     val serviceRunningState = rememberServiceRunningState()
@@ -180,9 +185,11 @@ fun HomeScreen(
         }
         HapticsCard(
             selected = hapticStrength,
+            customPattern = customHapticPattern,
             onSelect = { strength ->
                 coroutineScope.launch { repository.setHapticStrength(strength) }
             },
+            onEditPattern = onEditHapticPattern,
             onActionOnly = hapticsOnActionOnly,
             onActionOnlyChange = { enabled ->
                 coroutineScope.launch { repository.setHapticsOnActionOnly(enabled) }
@@ -576,7 +583,9 @@ private fun ActionLabel(action: KeyAction, context: Context) {
 @Composable
 private fun HapticsCard(
     selected: HapticStrength,
+    customPattern: HapticPattern,
     onSelect: (HapticStrength) -> Unit,
+    onEditPattern: () -> Unit,
     onActionOnly: Boolean,
     onActionOnlyChange: (Boolean) -> Unit
 ) {
@@ -599,7 +608,7 @@ private fun HapticsCard(
                         selected = strength == selected,
                         role = Role.RadioButton,
                         onClick = {
-                            keyHaptics.perform(strength)
+                            keyHaptics.perform(strength, customPattern)
                             onSelect(strength)
                         }
                     )
@@ -621,6 +630,12 @@ private fun HapticsCard(
                 )
             }
         }
+        NothingButton(
+            text = stringResource(R.string.haptics_edit_pattern),
+            onClick = onEditPattern,
+            outlined = true,
+            modifier = Modifier.fillMaxWidth()
+        )
         val onActionOnlyEnabled = selected != HapticStrength.OFF
         Row(
             modifier = Modifier
@@ -661,6 +676,7 @@ private fun hapticStrengthLabelRes(strength: HapticStrength): Int = when (streng
     HapticStrength.LIGHT -> R.string.haptics_light
     HapticStrength.MEDIUM -> R.string.haptics_medium
     HapticStrength.STRONG -> R.string.haptics_strong
+    HapticStrength.CUSTOM -> R.string.haptics_custom
 }
 
 @Composable
@@ -905,7 +921,8 @@ private fun HomeScreenPreview() {
             onKeySetup = {},
             onKeyTest = {},
             onDiagnostics = {},
-            onReviewOnboarding = {}
+            onReviewOnboarding = {},
+            onEditHapticPattern = {}
         )
     }
 }
