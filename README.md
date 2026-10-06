@@ -102,7 +102,7 @@ pre-releases. The app never downloads or installs an APK by itself.
 
 ### Report a crash without guesswork
 
-If something goes wrong, the Diagnostics screen shows the last crash the app caught, along with the
+If something goes wrong, the Diagnostics screen under *Settings* shows the last crash the app caught, along with the
 process exits Android recorded, such as "not responding" or a low-memory shutdown. Copy or share the
 report straight into a GitHub issue.
 
@@ -144,9 +144,9 @@ Read the complete [Privacy Policy](PRIVACY.md).
 
 1. **Choose your language** and read the short product introduction.
 2. **Review the accessibility disclosure** and choose whether to use the service.
-3. **Learn your key** from Home → *Key setup*, then press the Essential Key and save it.
-4. **Choose your shortcuts** by tapping each gesture on the home screen.
-5. **Test the gestures** in *Key Test* without executing their mapped actions.
+3. **Learn your key** in the *Key setup* tab, then press the Essential Key and save it.
+4. **Choose your shortcuts** by tapping each gesture on the *Home* tab.
+5. **Test the gestures** in the *Key test* tab without executing their mapped actions.
 6. **Optionally free single press** with the *Unlock wizard* if you do not use Essential Space or
    Recorder.
 

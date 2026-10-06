@@ -11,11 +11,11 @@
 
     <!-- Home navigation -->
     <string name="action_open_accessibility_settings">啟用服務</string>
+    <string name="nav_home">首頁</string>
     <string name="action_open_settings">設定</string>
     <string name="action_key_setup">按鍵設定</string>
     <string name="action_key_test">按鍵測試</string>
     <string name="action_review_onboarding">重新查看設定指南</string>
-    <string name="section_navigation">設定</string>
     <string name="action_open_diagnostics">診斷</string>
 
     <!-- Settings -->
@@ -195,6 +195,8 @@
     <string name="haptic_pattern_test">測試</string>
     <string name="haptic_pattern_no_amplitude_control">此裝置無法調整震動強度，振幅以馬達快速開關近似。</string>
     <string name="haptics_on_action_only">只在執行動作時震動</string>
+
+    <string name="section_help">說明</string>
 
     <!-- Theme -->
     <string name="section_theme">主題</string>

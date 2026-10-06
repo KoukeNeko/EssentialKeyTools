@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.provider.Settings
 import android.widget.Toast
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -50,15 +51,19 @@ private val TITLE_TO_CONTENT_GAP = 32.dp
 private val CARD_GAP = 16.dp
 private val LABEL_GAP = 12.dp
 private val OPTION_ROW_GAP = 4.dp
+private val BUTTON_GAP = 12.dp
 private val RADIO_TO_TEXT_GAP = 12.dp
 
 /**
- * The app's preferences: haptic feedback, theme and language. Choices come from [SettingsRepository]
- * reactively, so each card reflects a change the moment it is made.
+ * The app's preferences: haptic feedback, theme and language, then the pages that explain or repair
+ * the app. Choices come from [SettingsRepository] reactively, so each card reflects a change the
+ * moment it is made.
  */
 @Composable
 fun SettingsScreen(
     onEditHapticPattern: () -> Unit,
+    onDiagnostics: () -> Unit,
+    onReviewOnboarding: () -> Unit,
     systemBarsPadding: PaddingValues = PaddingValues(),
     modifier: Modifier = Modifier
 ) {
@@ -106,6 +111,8 @@ fun SettingsScreen(
         )
         Spacer(modifier = Modifier.height(CARD_GAP))
         LanguageCard()
+        Spacer(modifier = Modifier.height(CARD_GAP))
+        HelpCard(onDiagnostics = onDiagnostics, onReviewOnboarding = onReviewOnboarding)
     }
 }
 
@@ -277,5 +284,27 @@ private fun openAppDetailsSettings(context: Context, packageUri: android.net.Uri
         context.startActivity(details)
     } catch (error: android.content.ActivityNotFoundException) {
         Toast.makeText(context, R.string.language_settings_unavailable, Toast.LENGTH_LONG).show()
+    }
+}
+
+@Composable
+private fun HelpCard(onDiagnostics: () -> Unit, onReviewOnboarding: () -> Unit) {
+    NothingCard(modifier = Modifier.fillMaxWidth()) {
+        NothingSectionLabel(text = stringResource(R.string.section_help))
+        Spacer(modifier = Modifier.height(LABEL_GAP))
+        Column(verticalArrangement = Arrangement.spacedBy(BUTTON_GAP)) {
+            NothingButton(
+                text = stringResource(R.string.action_open_diagnostics),
+                onClick = onDiagnostics,
+                outlined = true,
+                modifier = Modifier.fillMaxWidth()
+            )
+            NothingButton(
+                text = stringResource(R.string.action_review_onboarding),
+                onClick = onReviewOnboarding,
+                outlined = true,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
     }
 }

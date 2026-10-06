@@ -17,9 +17,14 @@ import dev.koukeneko.essentialkeytools.ui.theme.EssentialKeyToolsTheme
 // Nothing cards are flat: a #1A1A1A surface with a large corner radius and a hairline outline
 // instead of any elevation shadow. Shadows and gradients are deliberately absent.
 private val CARD_CORNER_RADIUS = 24.dp
-private val CARD_OUTLINE_WIDTH = 1.dp
-private const val CARD_OUTLINE_ALPHA = 0.3f
 private val CARD_CONTENT_PADDING = 20.dp
+private val OUTLINE_WIDTH = 1.dp
+private const val OUTLINE_ALPHA = 0.3f
+
+/** The hairline Nothing surfaces use in place of a shadow; shared so every surface draws it alike. */
+@Composable
+internal fun hairlineBorder(): BorderStroke =
+    BorderStroke(OUTLINE_WIDTH, MaterialTheme.colorScheme.outline.copy(alpha = OUTLINE_ALPHA))
 
 @Composable
 fun NothingCard(
@@ -27,11 +32,7 @@ fun NothingCard(
     showOutline: Boolean = true,
     content: @Composable ColumnScope.() -> Unit
 ) {
-    val outline = if (showOutline) {
-        BorderStroke(CARD_OUTLINE_WIDTH, MaterialTheme.colorScheme.outline.copy(alpha = CARD_OUTLINE_ALPHA))
-    } else {
-        null
-    }
+    val outline = if (showOutline) hairlineBorder() else null
 
     androidx.compose.material3.Card(
         modifier = modifier,

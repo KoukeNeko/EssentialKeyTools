@@ -74,7 +74,6 @@ private val LABEL_GAP = 12.dp
 private val DOT_TO_TEXT_GAP = 12.dp
 private val GESTURE_ROW_GAP = 4.dp
 private val GESTURE_ROW_VERTICAL_PADDING = 14.dp
-private val NAV_BUTTON_GAP = 12.dp
 private val STATUS_TO_ACTION_GAP = 16.dp
 private val DISCLOSURE_GAP = 12.dp
 private val CONTRIBUTOR_SECTION_GAP = 20.dp
@@ -88,8 +87,8 @@ private const val REPOSITORY_DISPLAY_NAME = "KoukeNeko/EssentialKeyTools"
 private const val REPOSITORY_URL = "https://github.com/KoukeNeko/EssentialKeyTools"
 
 /**
- * The main control panel. Surfaces live service and single-press-unlock status, one card per
- * gesture showing its mapped action (tap to reassign), and footer links into setup and test.
+ * The main control panel. Surfaces live service and single-press-unlock status, and one row per
+ * gesture showing its mapped action (tap to reassign).
  * Mappings come from [SettingsRepository] reactively so a card updates the moment an action is
  * picked; the unlock status is re-read on resume to catch drift from an OS update.
  */
@@ -97,11 +96,6 @@ private const val REPOSITORY_URL = "https://github.com/KoukeNeko/EssentialKeyToo
 fun HomeScreen(
     onEditGesture: (KeyGesture) -> Unit,
     onUnlockWizard: () -> Unit,
-    onKeySetup: () -> Unit,
-    onKeyTest: () -> Unit,
-    onDiagnostics: () -> Unit,
-    onReviewOnboarding: () -> Unit,
-    onSettings: () -> Unit,
     systemBarsPadding: PaddingValues = PaddingValues(),
     modifier: Modifier = Modifier
 ) {
@@ -166,14 +160,6 @@ fun HomeScreen(
             NotificationPolicyCard()
             Spacer(modifier = Modifier.height(CARD_GAP))
         }
-        NavigationCard(
-            onSettings = onSettings,
-            onKeySetup = onKeySetup,
-            onKeyTest = onKeyTest,
-            onDiagnostics = onDiagnostics,
-            onReviewOnboarding = onReviewOnboarding
-        )
-        Spacer(modifier = Modifier.height(CARD_GAP))
         UpdateCard()
         Spacer(modifier = Modifier.height(CARD_GAP))
         ContributionCard()
@@ -548,52 +534,6 @@ private fun ActionLabel(action: KeyAction, context: Context) {
     )
 }
 
-@Composable
-private fun NavigationCard(
-    onSettings: () -> Unit,
-    onKeySetup: () -> Unit,
-    onKeyTest: () -> Unit,
-    onDiagnostics: () -> Unit,
-    onReviewOnboarding: () -> Unit
-) {
-    NothingCard(modifier = Modifier.fillMaxWidth()) {
-        NothingSectionLabel(text = stringResource(R.string.section_navigation))
-        Spacer(modifier = Modifier.height(LABEL_GAP))
-        Column(verticalArrangement = Arrangement.spacedBy(NAV_BUTTON_GAP)) {
-            NothingButton(
-                text = stringResource(R.string.action_open_settings),
-                onClick = onSettings,
-                outlined = true,
-                modifier = Modifier.fillMaxWidth()
-            )
-            NothingButton(
-                text = stringResource(R.string.action_key_setup),
-                onClick = onKeySetup,
-                outlined = true,
-                modifier = Modifier.fillMaxWidth()
-            )
-            NothingButton(
-                text = stringResource(R.string.action_key_test),
-                onClick = onKeyTest,
-                outlined = true,
-                modifier = Modifier.fillMaxWidth()
-            )
-            NothingButton(
-                text = stringResource(R.string.action_open_diagnostics),
-                onClick = onDiagnostics,
-                outlined = true,
-                modifier = Modifier.fillMaxWidth()
-            )
-            NothingButton(
-                text = stringResource(R.string.action_review_onboarding),
-                onClick = onReviewOnboarding,
-                outlined = true,
-                modifier = Modifier.fillMaxWidth()
-            )
-        }
-    }
-}
-
 /**
  * Footer credit: a tappable link to the open-source repository, followed by the contributor list
  * fetched live from the GitHub API. Each row opens the relevant GitHub page in the browser.
@@ -748,12 +688,7 @@ private fun HomeScreenPreview() {
     EssentialKeyToolsTheme {
         HomeScreen(
             onEditGesture = {},
-            onUnlockWizard = {},
-            onKeySetup = {},
-            onKeyTest = {},
-            onDiagnostics = {},
-            onReviewOnboarding = {},
-            onSettings = {}
+            onUnlockWizard = {}
         )
     }
 }
