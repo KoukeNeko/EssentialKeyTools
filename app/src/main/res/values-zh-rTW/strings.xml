@@ -40,7 +40,7 @@
     <string name="onboarding_language_title">語言</string>
     <string name="onboarding_step_language">01 / 03 · 語言</string>
     <string name="onboarding_language_headline">選擇你的語言</string>
-    <string name="onboarding_language_body">選擇設定流程與 App 使用的語言。之後仍可從首頁變更。</string>
+    <string name="onboarding_language_body">選擇設定流程與 App 使用的語言。之後仍可在設定中變更。</string>
     <string name="onboarding_language_device">裝置語言</string>
     <string name="onboarding_language_device_body">跟隨 Android 系統語言</string>
     <string name="onboarding_language_english">English</string>

@@ -40,7 +40,7 @@
     <string name="onboarding_language_title">LANGUAGE</string>
     <string name="onboarding_step_language">01 / 03 · Language</string>
     <string name="onboarding_language_headline">CHOOSE YOUR LANGUAGE</string>
-    <string name="onboarding_language_body">Choose the language used for setup and the app. You can change it later from the home screen.</string>
+    <string name="onboarding_language_body">Choose the language used for setup and the app. You can change it later in Settings.</string>
     <string name="onboarding_language_device">Device language</string>
     <string name="onboarding_language_device_body">Follow your Android system language</string>
     <string name="onboarding_language_english">English</string>
