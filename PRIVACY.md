@@ -77,8 +77,9 @@ Settings.
 
 ## Network access (INTERNET permission)
 
-The home screen automatically fetches the public list of the project's contributors from the GitHub
-API (`https://api.github.com/repos/KoukeNeko/EssentialKeyTools/contributors`) to display their names.
+The Settings screen automatically fetches the public list of the project's contributors from the
+GitHub API (`https://api.github.com/repos/KoukeNeko/EssentialKeyTools/contributors`) to display their
+names.
 This request sends no personal information. As with any web request, GitHub may process your device's
 IP address under its own privacy policy. This feature is cosmetic — the app's core features work
 fully offline, and the app still functions if the request fails.
