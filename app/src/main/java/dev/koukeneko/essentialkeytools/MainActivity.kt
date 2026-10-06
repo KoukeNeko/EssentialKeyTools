@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -27,6 +28,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import dev.koukeneko.essentialkeytools.core.KeyGesture
 import dev.koukeneko.essentialkeytools.settings.OnboardingState
@@ -35,6 +37,7 @@ import dev.koukeneko.essentialkeytools.ui.components.FloatingNavBar
 import dev.koukeneko.essentialkeytools.ui.components.NavBarItem
 import dev.koukeneko.essentialkeytools.ui.components.navBarBackdropSource
 import dev.koukeneko.essentialkeytools.ui.components.rememberNavBarBackdrop
+import dev.koukeneko.essentialkeytools.ui.components.rememberNavBarScroll
 import dev.koukeneko.essentialkeytools.ui.screens.ActionPickerScreen
 import dev.koukeneko.essentialkeytools.ui.screens.DiagnosticsScreen
 import dev.koukeneko.essentialkeytools.ui.screens.HapticPatternScreen
@@ -124,7 +127,11 @@ private fun AppNavigation() {
     // The tab a page was opened from stays selected while the bar slides away and back.
     val selectedTab = backStack.last { screen -> screen.tab != null }
     val backdrop = rememberNavBarBackdrop()
+    val navScroll = rememberNavBarScroll()
     val background = MaterialTheme.colorScheme.background
+
+    // A new screen starts with the full-size bar, whatever the last one left it as.
+    LaunchedEffect(current) { navScroll.expand() }
 
     fun finishOnboarding() {
         showOnboarding = false
@@ -172,12 +179,18 @@ private fun AppNavigation() {
                     items = TAB_ITEMS,
                     selectedIndex = TAB_SCREENS.indexOf(selectedTab),
                     onSelect = { index -> selectTab(TAB_SCREENS[index]) },
-                    backdrop = backdrop
+                    backdrop = backdrop,
+                    collapsed = navScroll.collapsed
                 )
             }
         }
     ) { systemBarsPadding ->
-        Box(modifier = Modifier.fillMaxSize().navBarBackdropSource(backdrop, background)) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .nestedScroll(navScroll.connection)
+                .navBarBackdropSource(backdrop, background)
+        ) {
             if (showOnboarding) {
                 OnboardingScreen(
                     initialStep = onboardingState.step,

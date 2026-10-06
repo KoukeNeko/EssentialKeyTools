@@ -45,12 +45,16 @@ import androidx.compose.ui.graphics.BlurEffect
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TileMode
+import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.compositeOver
+import androidx.compose.ui.graphics.drawscope.scale
 import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.layer.GraphicsLayer
 import androidx.compose.ui.graphics.layer.drawLayer
 import androidx.compose.ui.graphics.rememberGraphicsLayer
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInWindow
@@ -64,8 +68,10 @@ import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.util.lerp
 import kotlin.math.floor
 import kotlin.math.roundToInt
+import kotlin.math.sign
 import kotlinx.coroutines.launch
 
 private val BAR_MARGIN = 16.dp
@@ -78,6 +84,9 @@ private val RIM_WIDTH = 1.dp
 // A press released further than this above or below the bar is a cancel, as on any other button.
 private val CANCEL_SLOP = 48.dp
 
+// How far the content must scroll in one direction before the bar shrinks or grows back.
+private val COLLAPSE_THRESHOLD = 12.dp
+
 private val BLUR_RADIUS = 20.dp
 
 // How much of the blurred screen shows through the glass; the rest is the bar's own tint.
@@ -88,6 +97,10 @@ private const val UNSELECTED_ICON_ALPHA = 0.72f
 private const val RIM_BRIGHT_ALPHA = 0.35f
 private const val RIM_DIM_ALPHA = 0.08f
 private const val LIFTED_INDICATOR_SCALE = 1.12f
+
+// Measured from Nothing's own bar: the capsule and disc shrink to about 87%, the icons to about 96%.
+private const val COLLAPSED_BAR_SCALE = 0.875f
+private const val COLLAPSED_ICON_SCALE = 0.96f
 
 // Material 3 Expressive motion tokens. Position changes are spatial and may overshoot a little, while
 // color is an effect that settles at once, so the tab under the finger reads as picked before the
@@ -132,11 +145,59 @@ fun Modifier.navBarBackdropSource(backdrop: NavBarBackdrop, background: Color): 
         }
 
 /**
+ * Whether the bar should be shrunk, decided by the direction the content is scrolled: scrolling toward
+ * the end of the content past [COLLAPSE_THRESHOLD] shrinks it, scrolling back the same distance grows it
+ * again. Counting from the last change of direction keeps a small wobble from toggling it. Attach
+ * [connection] to the content with `Modifier.nestedScroll`; it watches the scrolling without taking any
+ * part of it.
+ */
+@Stable
+class NavBarScroll internal constructor(private val thresholdPx: Float) {
+    var collapsed by mutableStateOf(false)
+        private set
+
+    // Distance scrolled since the direction last changed; positive is toward the end of the content.
+    private var travelled = 0f
+
+    val connection = object : NestedScrollConnection {
+        override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+            if (source == NestedScrollSource.UserInput) {
+                onScrolled(-available.y)
+            }
+            return Offset.Zero
+        }
+    }
+
+    internal fun onScrolled(delta: Float) {
+        if (delta == 0f) return
+        travelled = if (travelled.sign == delta.sign) travelled + delta else delta
+        if (travelled >= thresholdPx) {
+            collapsed = true
+        } else if (travelled <= -thresholdPx) {
+            collapsed = false
+        }
+    }
+
+    /** Back to the full-size bar, for when the content on screen changes. */
+    fun expand() {
+        collapsed = false
+        travelled = 0f
+    }
+}
+
+@Composable
+fun rememberNavBarScroll(): NavBarScroll {
+    val thresholdPx = with(LocalDensity.current) { COLLAPSE_THRESHOLD.toPx() }
+    return remember(thresholdPx) { NavBarScroll(thresholdPx) }
+}
+
+/**
  * A frosted-glass capsule that floats above the content at the bottom of the screen, one icon per
  * destination. A dark disc behind the selected icon slides to the tab that is picked. Tapping a tab
  * picks it; pressing anywhere on the bar and dragging carries the disc along with the finger, and
  * the tab under the finger when it lifts is picked. Letting go well above or below the bar cancels.
- * The bar is only as wide as its icons, takes its colors from the color scheme so the Nothing and
+ * While [collapsed] the capsule shrinks toward its bottom edge, which keeps it clear of the content
+ * being scrolled. The bar is only as wide as its icons, takes its colors from the color scheme so the Nothing and
  * Material You themes both fit, and is inset to sit in `Scaffold(bottomBar = ...)`, which then
  * reports its height to the screens as `innerPadding` so their content scrolls clear of it.
  *
@@ -150,7 +211,8 @@ fun FloatingNavBar(
     selectedIndex: Int,
     onSelect: (Int) -> Unit,
     backdrop: NavBarBackdrop,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    collapsed: Boolean = false
 ) {
     val colors = MaterialTheme.colorScheme
     val glassTint = colors.onSurface.copy(alpha = GLASS_TINT_ALPHA)
@@ -184,6 +246,19 @@ fun FloatingNavBar(
     )
     // The tab being pointed at while a finger is down, otherwise the picked one.
     val highlightedIndex = if (pressing) hoverIndex else selectedIndex
+    // Kept as State and read only while drawing, so shrinking never recomposes or relays out the bar,
+    // and the height reported to the screens stays the same.
+    val collapse = animateFloatAsState(
+        targetValue = if (collapsed) 1f else 0f,
+        animationSpec = SettleSpring,
+        label = "collapse"
+    )
+    val barScale = remember(collapse) { { lerp(1f, COLLAPSED_BAR_SCALE, collapse.value) } }
+    // The capsule's scale carries over to the icons, so they are scaled back up to keep their own.
+    val iconScale = remember(collapse) {
+        { lerp(1f, COLLAPSED_ICON_SCALE / COLLAPSED_BAR_SCALE, collapse.value) }
+    }
+    var unscaledOrigin by remember { mutableStateOf(Offset.Zero) }
 
     LaunchedEffect(selectedIndex, tabStepPx) {
         if (!pressing) {
@@ -210,8 +285,15 @@ fun FloatingNavBar(
     ) {
         Box(
             modifier = Modifier
+                .onGloballyPositioned { unscaledOrigin = it.positionInWindow() }
+                .graphicsLayer {
+                    val scale = barScale()
+                    scaleX = scale
+                    scaleY = scale
+                    transformOrigin = TransformOrigin(0.5f, 1f)
+                }
                 .clip(CircleShape)
-                .frostedGlass(backdrop, glassTint)
+                .frostedGlass(backdrop, glassTint, barScale) { unscaledOrigin }
                 .border(RIM_WIDTH, rim, CircleShape)
                 .pointerInput(lastIndex, tabStepPx) {
                     awaitEachGesture {
@@ -260,6 +342,7 @@ fun FloatingNavBar(
                         item = item,
                         selected = index == selectedIndex,
                         highlighted = index == highlightedIndex,
+                        iconScale = iconScale,
                         onActivate = { onSelect(index) }
                     )
                 }
@@ -273,6 +356,7 @@ private fun NavBarTab(
     item: NavBarItem,
     selected: Boolean,
     highlighted: Boolean,
+    iconScale: () -> Float,
     onActivate: () -> Unit
 ) {
     val colors = MaterialTheme.colorScheme
@@ -298,7 +382,13 @@ private fun NavBarTab(
             painter = painterResource(item.iconRes),
             contentDescription = stringResource(item.labelRes),
             tint = tint,
-            modifier = Modifier.size(ICON_SIZE)
+            modifier = Modifier
+                .size(ICON_SIZE)
+                .graphicsLayer {
+                    val scale = iconScale()
+                    scaleX = scale
+                    scaleY = scale
+                }
         )
     }
 }
@@ -307,25 +397,37 @@ private fun NavBarTab(
  * Paints a blurred copy of [backdrop] under the node, then [tint] over it. The copy is recorded a few
  * blur radii larger than the node and clipped by the caller, so the blur is true right up to the edge
  * instead of smearing the border pixels.
+ *
+ * The caller scales the node around its bottom center by [barScale], so the screen is drawn back at its
+ * true size, and [unscaledOrigin] is where the node would sit on the window without that scaling.
  */
 @Composable
-private fun Modifier.frostedGlass(backdrop: NavBarBackdrop, tint: Color): Modifier {
+private fun Modifier.frostedGlass(
+    backdrop: NavBarBackdrop,
+    tint: Color,
+    barScale: () -> Float,
+    unscaledOrigin: () -> Offset
+): Modifier {
     val blurLayer = rememberGraphicsLayer()
     val radius = with(LocalDensity.current) { BLUR_RADIUS.toPx() }
     SideEffect { blurLayer.renderEffect = BlurEffect(radius, radius, TileMode.Clamp) }
-    var origin by remember { mutableStateOf(Offset.Zero) }
     val margin = radius * 3
     return this
-        .onGloballyPositioned { origin = it.positionInWindow() }
         .drawWithContent {
-            val inBackdrop = origin - backdrop.sourceOrigin
+            val current = barScale()
+            val pivot = Offset(size.width / 2, size.height)
+            val inBackdrop = unscaledOrigin() + pivot * (1f - current) - backdrop.sourceOrigin
             blurLayer.record(
                 IntSize(
                     (size.width + 2 * margin).roundToInt(),
                     (size.height + 2 * margin).roundToInt()
                 )
             ) {
-                translate(margin - inBackdrop.x, margin - inBackdrop.y) { drawLayer(backdrop.layer) }
+                translate(margin, margin) {
+                    scale(1f / current, Offset.Zero) {
+                        translate(-inBackdrop.x, -inBackdrop.y) { drawLayer(backdrop.layer) }
+                    }
+                }
             }
             translate(-margin, -margin) { drawLayer(blurLayer) }
             drawRect(tint)
