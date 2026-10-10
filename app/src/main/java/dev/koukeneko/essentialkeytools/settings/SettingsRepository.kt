@@ -28,7 +28,8 @@ private val Context.settingsDataStore: DataStore<Preferences> by preferencesData
 
 /**
  * Persists the app's configuration: onboarding completion and progress, the learned Essential Key
- * scanCode, the gesture -> action mapping, the haptic feedback settings and the theme style. Exposes reactive [Flow]s for observers (service, UI)
+ * scanCode, the gesture -> action mapping, the haptic feedback settings, whether actions run only
+ * on an unlocked device, and the theme style. Exposes reactive [Flow]s for observers (service, UI)
  * and suspend writers.
  *
  * No DI framework: a manual process-wide singleton via [getInstance] keeps it simple while still
@@ -42,6 +43,7 @@ class SettingsRepository internal constructor(
     private val onboardingStepKey = intPreferencesKey("onboarding_step")
     private val hapticStrengthKey = intPreferencesKey("haptic_strength")
     private val hapticsOnActionOnlyKey = booleanPreferencesKey("haptics_on_action_only")
+    private val actionsOnlyWhenUnlockedKey = booleanPreferencesKey("actions_only_when_unlocked")
     private val themeStyleKey = intPreferencesKey("theme_style")
     private val customPulseCountKey = intPreferencesKey("custom_haptic_pulse_count")
     private val customPulseMillisKey = intPreferencesKey("custom_haptic_pulse_millis")
@@ -72,6 +74,11 @@ class SettingsRepository internal constructor(
     /** Whether to vibrate once when a gesture runs its action instead of on every press. */
     val hapticsOnActionOnly: Flow<Boolean> = dataStore.data.map { preferences ->
         preferences[hapticsOnActionOnlyKey] ?: false
+    }
+
+    /** Whether gestures do nothing, vibration included, while the lock screen is showing. */
+    val actionsOnlyWhenUnlocked: Flow<Boolean> = dataStore.data.map { preferences ->
+        preferences[actionsOnlyWhenUnlockedKey] ?: false
     }
 
     /** The vibration played by [HapticStrength.CUSTOM]. */
@@ -133,6 +140,12 @@ class SettingsRepository internal constructor(
     suspend fun setHapticsOnActionOnly(enabled: Boolean) {
         dataStore.edit { preferences ->
             preferences[hapticsOnActionOnlyKey] = enabled
+        }
+    }
+
+    suspend fun setActionsOnlyWhenUnlocked(enabled: Boolean) {
+        dataStore.edit { preferences ->
+            preferences[actionsOnlyWhenUnlockedKey] = enabled
         }
     }
 

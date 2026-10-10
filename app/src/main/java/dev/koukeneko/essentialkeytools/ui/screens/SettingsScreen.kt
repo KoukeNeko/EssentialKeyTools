@@ -78,9 +78,9 @@ private const val REPOSITORY_DISPLAY_NAME = "KoukeNeko/EssentialKeyTools"
 private const val REPOSITORY_URL = "https://github.com/KoukeNeko/EssentialKeyTools"
 
 /**
- * The app's preferences: haptic feedback, theme and language, then updates, the pages that explain or
- * repair the app, and the credits. Choices come from [SettingsRepository] reactively, so each card
- * reflects a change the moment it is made.
+ * The app's preferences: haptic feedback, whether actions run on a locked device, theme and
+ * language, then updates, the pages that explain or repair the app, and the credits. Choices come
+ * from [SettingsRepository] reactively, so each card reflects a change the moment it is made.
  */
 @Composable
 fun SettingsScreen(
@@ -97,6 +97,9 @@ fun SettingsScreen(
         initial = HapticPattern.DEFAULT
     )
     val hapticsOnActionOnly by repository.hapticsOnActionOnly.collectAsState(initial = false)
+    val actionsOnlyWhenUnlocked by repository.actionsOnlyWhenUnlocked.collectAsState(
+        initial = false
+    )
     val themeStyle by repository.themeStyle.collectAsState(initial = ThemeStyle.NOTHING)
     val coroutineScope = rememberCoroutineScope()
 
@@ -125,6 +128,13 @@ fun SettingsScreen(
             onActionOnly = hapticsOnActionOnly,
             onActionOnlyChange = { enabled ->
                 coroutineScope.launch { repository.setHapticsOnActionOnly(enabled) }
+            }
+        )
+        Spacer(modifier = Modifier.height(CARD_GAP))
+        ScreenLockCard(
+            actionsOnlyWhenUnlocked = actionsOnlyWhenUnlocked,
+            onChange = { enabled ->
+                coroutineScope.launch { repository.setActionsOnlyWhenUnlocked(enabled) }
             }
         )
         Spacer(modifier = Modifier.height(CARD_GAP))
@@ -180,38 +190,66 @@ private fun HapticsCard(
             outlined = true,
             modifier = Modifier.fillMaxWidth()
         )
-        val onActionOnlyEnabled = selected != HapticStrength.OFF
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .toggleable(
-                    value = onActionOnly,
-                    enabled = onActionOnlyEnabled,
-                    role = Role.Checkbox,
-                    onValueChange = onActionOnlyChange
-                )
-                .padding(vertical = ROW_GAP),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Checkbox(
-                checked = onActionOnly,
-                onCheckedChange = null,
-                enabled = onActionOnlyEnabled,
-                colors = CheckboxDefaults.colors(
-                    checkedColor = MaterialTheme.colorScheme.tertiary
-                )
+        CheckboxOptionRow(
+            label = stringResource(R.string.haptics_on_action_only),
+            checked = onActionOnly,
+            enabled = selected != HapticStrength.OFF,
+            onCheckedChange = onActionOnlyChange
+        )
+    }
+}
+
+/** Limits the gestures to a device that is not locked, so a press in a pocket does nothing. */
+@Composable
+private fun ScreenLockCard(actionsOnlyWhenUnlocked: Boolean, onChange: (Boolean) -> Unit) {
+    NothingCard(modifier = Modifier.fillMaxWidth()) {
+        NothingSectionLabel(text = stringResource(R.string.section_screen_lock))
+        Spacer(modifier = Modifier.height(LABEL_GAP))
+        CheckboxOptionRow(
+            label = stringResource(R.string.screen_lock_only_when_unlocked),
+            checked = actionsOnlyWhenUnlocked,
+            onCheckedChange = onChange
+        )
+    }
+}
+
+@Composable
+private fun CheckboxOptionRow(
+    label: String,
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+    enabled: Boolean = true
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .toggleable(
+                value = checked,
+                enabled = enabled,
+                role = Role.Checkbox,
+                onValueChange = onCheckedChange
             )
-            Spacer(modifier = Modifier.width(RADIO_TO_TEXT_GAP))
-            Text(
-                text = stringResource(R.string.haptics_on_action_only),
-                style = MaterialTheme.typography.labelLarge,
-                color = if (onActionOnlyEnabled) {
-                    MaterialTheme.colorScheme.onSurface
-                } else {
-                    MaterialTheme.colorScheme.onSurfaceVariant
-                }
+            .padding(vertical = ROW_GAP),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Checkbox(
+            checked = checked,
+            onCheckedChange = null,
+            enabled = enabled,
+            colors = CheckboxDefaults.colors(
+                checkedColor = MaterialTheme.colorScheme.tertiary
             )
-        }
+        )
+        Spacer(modifier = Modifier.width(RADIO_TO_TEXT_GAP))
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelLarge,
+            color = if (enabled) {
+                MaterialTheme.colorScheme.onSurface
+            } else {
+                MaterialTheme.colorScheme.onSurfaceVariant
+            }
+        )
     }
 }
 

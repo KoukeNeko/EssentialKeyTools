@@ -196,6 +196,10 @@
     <string name="haptic_pattern_no_amplitude_control">此裝置無法調整震動強度，振幅以馬達快速開關近似。</string>
     <string name="haptics_on_action_only">只在執行動作時震動</string>
 
+    <!-- Screen lock -->
+    <string name="section_screen_lock">螢幕鎖定</string>
+    <string name="screen_lock_only_when_unlocked">只在解鎖時執行動作</string>
+
     <string name="section_help">說明</string>
 
     <!-- Theme -->

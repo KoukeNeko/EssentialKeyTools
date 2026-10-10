@@ -76,6 +76,30 @@ class SettingsRepositoryTest {
     }
 
     @Test
+    fun actionsOnlyWhenUnlockedDefaultsOffAndPersists() = runBlocking {
+        val dataStoreScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+        val dataStoreFile = File(temporaryFolder.root, "settings.preferences_pb")
+        val repository = SettingsRepository(
+            PreferenceDataStoreFactory.create(
+                scope = dataStoreScope,
+                produceFile = { dataStoreFile }
+            )
+        )
+
+        try {
+            assertEquals(false, repository.actionsOnlyWhenUnlocked.first())
+
+            repository.setActionsOnlyWhenUnlocked(true)
+            assertEquals(true, repository.actionsOnlyWhenUnlocked.first())
+
+            repository.setActionsOnlyWhenUnlocked(false)
+            assertEquals(false, repository.actionsOnlyWhenUnlocked.first())
+        } finally {
+            dataStoreScope.cancel()
+        }
+    }
+
+    @Test
     fun customHapticPatternDefaultsAndPersistsWithinRange() = runBlocking {
         val dataStoreScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
         val dataStoreFile = File(temporaryFolder.root, "settings.preferences_pb")

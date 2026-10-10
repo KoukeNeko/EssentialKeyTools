@@ -1,6 +1,7 @@
 package dev.koukeneko.essentialkeytools.service
 
 import android.accessibilityservice.AccessibilityService
+import android.app.KeyguardManager
 import android.os.Handler
 import android.os.Looper
 import android.view.KeyEvent
@@ -37,6 +38,7 @@ class EssentialKeyDetectionService : AccessibilityService() {
 
     private lateinit var actionExecutor: ActionExecutor
     private lateinit var keyHaptics: KeyHaptics
+    private lateinit var keyguardManager: KeyguardManager
 
     // Rebuilt whenever settings change so the classifier reflects the current active gestures.
     private var classifier: KeyGestureClassifier? = null
@@ -45,6 +47,7 @@ class EssentialKeyDetectionService : AccessibilityService() {
     private var hapticStrength = HapticStrength.OFF
     private var customHapticPattern = HapticPattern.DEFAULT
     private var hapticsOnActionOnly = false
+    private var actionsOnlyWhenUnlocked = false
     private var suppressNextClassifiedAction = false
     // Tracks which suppression state the current classifier was built for, so a new press can pick
     // up a screen transition without disturbing a multi-tap sequence already in flight.
@@ -55,6 +58,7 @@ class EssentialKeyDetectionService : AccessibilityService() {
         isRunning = true
         actionExecutor = ActionExecutor(context = this, accessibilityService = this)
         keyHaptics = KeyHaptics(this)
+        keyguardManager = getSystemService(KeyguardManager::class.java)
         collectSettings()
     }
 
@@ -79,6 +83,9 @@ class EssentialKeyDetectionService : AccessibilityService() {
         }
         serviceScope.launch {
             repository.hapticsOnActionOnly.collect { enabled -> hapticsOnActionOnly = enabled }
+        }
+        serviceScope.launch {
+            repository.actionsOnlyWhenUnlocked.collect { enabled -> actionsOnlyWhenUnlocked = enabled }
         }
     }
 
@@ -169,9 +176,13 @@ class EssentialKeyDetectionService : AccessibilityService() {
     }
 
     // By default, like a physical button, feedback confirms the press itself rather than waiting
-    // for the gesture to resolve. Presses are ignored while nothing is mapped, since they do nothing.
+    // for the gesture to resolve. A press that does nothing, because nothing is mapped or it is
+    // ignored while locked, gets no feedback.
     private fun onPress() {
-        if (!hapticsOnActionOnly && gestureActionMap.activeGestures().isNotEmpty()) {
+        if (!hapticsOnActionOnly &&
+            gestureActionMap.activeGestures().isNotEmpty() &&
+            !ignoredWhileLocked()
+        ) {
             keyHaptics.perform(hapticStrength, customHapticPattern)
         }
     }
@@ -182,7 +193,7 @@ class EssentialKeyDetectionService : AccessibilityService() {
         )
         val actionSuppressed = KeyEventStream.actionExecutionSuppressed || suppressNextClassifiedAction
         suppressNextClassifiedAction = false
-        if (!actionSuppressed) {
+        if (!actionSuppressed && !ignoredWhileLocked()) {
             val action = gestureActionMap.actionFor(gesture)
             if (hapticsOnActionOnly && action != KeyAction.None) {
                 keyHaptics.perform(hapticStrength, customHapticPattern)
@@ -190,6 +201,16 @@ class EssentialKeyDetectionService : AccessibilityService() {
             actionExecutor.execute(action)
         }
     }
+
+    /**
+     * Whether the key does nothing right now because actions are limited to an unlocked device.
+     * The test is the lock screen showing, not the screen being off: with the screen off the press
+     * itself wakes the device, so by the time a gesture resolves it is awake and showing the lock
+     * screen. Checked when the action is about to run rather than when the press began, so a press
+     * that straddles the device locking cannot slip through.
+     */
+    private fun ignoredWhileLocked(): Boolean =
+        actionsOnlyWhenUnlocked && keyguardManager.isKeyguardLocked
 
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
         // This service filters key events only; window/content events are irrelevant.

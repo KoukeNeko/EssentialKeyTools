@@ -83,6 +83,12 @@ strong they are. It vibrates on every press by default, or only when a gesture a
 action. A phone whose vibration motor can only switch on and off, like the Phone (3), approximates
 strength by pulsing the motor rapidly.
 
+### Ignore presses while locked
+
+Under **Screen lock** in Settings, turn on **Run actions only when unlocked** and the Essential Key
+does nothing while the lock screen is showing, vibration included. It is off by default, so
+shortcuts such as the flashlight or skipping a track keep working with the screen locked or off.
+
 ### Pick a look
 
 The app uses the Nothing look by default. Under **Theme** in Settings, Material You takes the colors
